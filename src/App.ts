@@ -1,5 +1,5 @@
 import './styles/output.css';
-// @ts-ignore
+// @ts-ignore // TODO: Will see if I want to convert to TS. Probably not.
 import Experience from './three/experience/Experience';
 import { html } from './utils/html.ts';
 

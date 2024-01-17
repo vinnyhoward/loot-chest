@@ -1,10 +1,9 @@
-import EventEmitter from './EventEmitter.js';
+import EventEmitter from './EventEmitter';
 
 export default class Time extends EventEmitter {
   constructor() {
     super();
 
-    // Setup
     this.start = Date.now();
     this.current = this.start;
     this.elapsed = 0;

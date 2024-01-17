@@ -14,19 +14,15 @@ let instance = null;
 
 export default class Experience {
   constructor(_canvas) {
-    // Singleton
     if (instance) {
       return instance;
     }
     instance = this;
 
-    // Global access
     window.experience = this;
 
-    // Options
     this.canvas = _canvas;
 
-    // Setup
     this.debug = new Debug();
     this.sizes = new Sizes();
     this.time = new Time();
@@ -36,12 +32,10 @@ export default class Experience {
     this.renderer = new Renderer();
     this.world = new World();
 
-    // Resize event
     this.sizes.on('resize', () => {
       this.resize();
     });
 
-    // Time tick event
     this.time.on('tick', () => {
       this.update();
     });
@@ -62,17 +56,13 @@ export default class Experience {
     this.sizes.off('resize');
     this.time.off('tick');
 
-    // Traverse the whole scene
     this.scene.traverse((child) => {
-      // Test if it's a mesh
       if (child instanceof THREE.Mesh) {
         child.geometry.dispose();
 
-        // Loop through the material properties
         for (const key in child.material) {
           const value = child.material[key];
 
-          // Test if there is a dispose function
           if (value && typeof value.dispose === 'function') {
             value.dispose();
           }

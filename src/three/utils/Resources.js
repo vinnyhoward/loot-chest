@@ -1,6 +1,6 @@
 import * as THREE from 'three';
-import { GLTFLoader } from 'three/examples/jsm/loaders/GLTFLoader.js';
-import EventEmitter from './EventEmitter.js';
+import { GLTFLoader } from 'three/examples/jsm/loaders/GLTFLoader';
+import EventEmitter from './EventEmitter';
 
 export default class Resources extends EventEmitter {
   constructor(sources) {
@@ -24,7 +24,6 @@ export default class Resources extends EventEmitter {
   }
 
   startLoading() {
-    // Load each source
     for (const source of this.sources) {
       if (source.type === 'gltfModel') {
         this.loaders.gltfLoader.load(source.path, (file) => {
