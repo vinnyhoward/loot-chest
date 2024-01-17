@@ -1,7 +1,6 @@
 import Experience from '../experience/Experience';
 import Environment from './Environment';
-import Floor from './Floor';
-import Fox from './Fox';
+import Trapdoor from './Trapdoor';
 
 export default class World {
   constructor() {
@@ -10,13 +9,12 @@ export default class World {
     this.resources = this.experience.resources;
 
     this.resources.on('ready', () => {
-      this.floor = new Floor();
-      this.fox = new Fox();
+      this.trapdoor = new Trapdoor();
       this.environment = new Environment();
     });
   }
 
   update() {
-    if (this.fox) this.fox.update();
+    if (this.trapdoor) this.trapdoor.update();
   }
 }

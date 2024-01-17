@@ -1,5 +1,6 @@
 import * as THREE from 'three';
 import { GLTFLoader } from 'three/examples/jsm/loaders/GLTFLoader';
+import { DRACOLoader } from 'three/examples/jsm/loaders/DRACOLoader.js';
 import EventEmitter from './EventEmitter';
 
 export default class Resources extends EventEmitter {
@@ -21,11 +22,16 @@ export default class Resources extends EventEmitter {
     this.loaders.gltfLoader = new GLTFLoader();
     this.loaders.textureLoader = new THREE.TextureLoader();
     this.loaders.cubeTextureLoader = new THREE.CubeTextureLoader();
+    const dracoLoader = new DRACOLoader();
+    dracoLoader.setDecoderPath('/draco/');
+    // console.log('hello');
+    this.loaders.gltfLoader.setDRACOLoader(dracoLoader);
+    // console.log('world');
   }
 
   startLoading() {
     for (const source of this.sources) {
-      if (source.type === 'gltfModel') {
+      if (source.type === 'gltfModel' || source.type === 'glbModel') {
         this.loaders.gltfLoader.load(source.path, (file) => {
           this.sourceLoaded(source, file);
         });
