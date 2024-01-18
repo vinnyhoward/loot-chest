@@ -1,4 +1,5 @@
 import * as THREE from 'three';
+import gsap from 'gsap';
 import { GLTFLoader } from 'three/examples/jsm/loaders/GLTFLoader';
 import { DRACOLoader } from 'three/examples/jsm/loaders/DRACOLoader.js';
 import EventEmitter from './EventEmitter';
@@ -6,9 +7,10 @@ import EventEmitter from './EventEmitter';
 export default class Resources extends EventEmitter {
   constructor(sources) {
     super();
-
+    this.experience = window.experience;
     this.sources = sources;
-    // this.loadingScreen = this.experience.loadingScreen;
+    this.loadingBar = this.experience.loadingBar;
+    this.overlayMaterial = this.experience.planeLoader.material;
 
     this.items = {};
     this.toLoad = this.sources.length;
@@ -48,11 +50,25 @@ export default class Resources extends EventEmitter {
 
   sourceLoaded(source, file) {
     this.items[source.name] = file;
+    this.loaded += 1;
 
-    this.loaded++;
+    const progressRatio = (this.loaded / this.toLoad) * 100;
+    if (progressRatio <= 100) {
+      this.loadingBar.updateLoadingBar(progressRatio);
+    }
 
     if (this.loaded === this.toLoad) {
-      // this.loadingScreen.hideLoadingScreen();
+      console.log('complete');
+      this.loadingBar.hideLoadingScreen();
+
+      window.setTimeout(() => {
+        gsap.to(this.overlayMaterial.uniforms.uAlpha, {
+          duration: 3,
+          value: 0,
+          delay: 0,
+        });
+      }, 2000);
+
       this.trigger('ready');
     }
   }

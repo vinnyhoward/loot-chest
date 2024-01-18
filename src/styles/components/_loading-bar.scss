@@ -7,7 +7,7 @@
 
     position: absolute;
     right: 50%;
-    top: 60%;
+    top: 50%;
     transform: translate(50%, -50%);
     width: 50%;
 
@@ -21,7 +21,7 @@
         border-radius: 100px;
         height: 12px;
         transition: width 0.15s ease-out;
-        width: 10%;
+        width: 0%;
     }
 
     .percentage {
