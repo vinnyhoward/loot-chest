@@ -1,9 +1,9 @@
+import * as TWEEN from '@tweenjs/tween.js';
 import EventEmitter from './EventEmitter';
 
 export default class Time extends EventEmitter {
   constructor() {
     super();
-
     this.start = Date.now();
     this.current = this.start;
     this.elapsed = 0;
@@ -19,10 +19,10 @@ export default class Time extends EventEmitter {
     this.delta = currentTime - this.current;
     this.current = currentTime;
     this.elapsed = this.current - this.start;
-
     this.trigger('tick');
 
     window.requestAnimationFrame(() => {
+      TWEEN.update();
       this.tick();
     });
   }

@@ -8,6 +8,8 @@ import Renderer from './Renderer';
 import World from '../world/World';
 import Resources from '../utils/Resources';
 
+import LoadingScreen from '../dom/LoadingScreen';
+
 import sources from './sources';
 
 let instance = null;

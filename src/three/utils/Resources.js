@@ -8,6 +8,7 @@ export default class Resources extends EventEmitter {
     super();
 
     this.sources = sources;
+    // this.loadingScreen = this.experience.loadingScreen;
 
     this.items = {};
     this.toLoad = this.sources.length;
@@ -24,9 +25,7 @@ export default class Resources extends EventEmitter {
     this.loaders.cubeTextureLoader = new THREE.CubeTextureLoader();
     const dracoLoader = new DRACOLoader();
     dracoLoader.setDecoderPath('/draco/');
-    // console.log('hello');
     this.loaders.gltfLoader.setDRACOLoader(dracoLoader);
-    // console.log('world');
   }
 
   startLoading() {
@@ -53,6 +52,7 @@ export default class Resources extends EventEmitter {
     this.loaded++;
 
     if (this.loaded === this.toLoad) {
+      // this.loadingScreen.hideLoadingScreen();
       this.trigger('ready');
     }
   }
