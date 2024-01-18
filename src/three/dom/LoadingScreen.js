@@ -5,7 +5,7 @@ export default class LoadingScreen {
   constructor() {
     this.experience = window.experience;
     this.overlayMaterial = this.experience.planeLoader.material;
-    this.quarterMachineIconElement = document.querySelector('.logo');
+    // this.quarterMachineIconElement = document.querySelector('.logo');
     this.loadingBarElement = document.querySelector('.loading-bar');
     this.loadingBarContainerElement = document.querySelector(
       '.loading-bar-container',
@@ -13,12 +13,12 @@ export default class LoadingScreen {
   }
 
   showLoadingScreen() {
-    gsap.to(this.quarterMachineIconElement, {
-      duration: 0.25,
-      opacity: 1,
-      delay: 0.25,
-      ease: 'Power2.easeIn',
-    });
+    // gsap.to(this.quarterMachineIconElement, {
+    //   duration: 0.25,
+    //   opacity: 1,
+    //   delay: 0.25,
+    //   ease: 'Power2.easeIn',
+    // });
     gsap.to(this.loadingBarElement, {
       duration: 0.25,
       opacity: 1,
@@ -38,11 +38,11 @@ export default class LoadingScreen {
 
   hideLoadingScreen() {
     window.setTimeout(() => {
-      gsap.to(this.quarterMachineIconElement, {
-        duration: 2,
-        opacity: 0,
-        delay: 0,
-      });
+      //   gsap.to(this.quarterMachineIconElement, {
+      //     duration: 2,
+      //     opacity: 0,
+      //     delay: 0,
+      //   });
       gsap.to(this.loadingBarElement, {
         duration: 2,
         opacity: 0,
@@ -66,12 +66,12 @@ export default class LoadingScreen {
   }
 
   showLoadingTransition() {
-    gsap.to(this.quarterMachineIconElement, {
-      duration: 1,
-      opacity: 1,
-      delay: 0,
-      ease: 'Power2.easeIn',
-    });
+    // gsap.to(this.quarterMachineIconElement, {
+    //   duration: 1,
+    //   opacity: 1,
+    //   delay: 0,
+    //   ease: 'Power2.easeIn',
+    // });
     gsap.to(this.overlayMaterial.uniforms.uAlpha, {
       duration: 1,
       value: 1,
@@ -81,12 +81,12 @@ export default class LoadingScreen {
   }
 
   hideLoadingTransition() {
-    gsap.to(this.quarterMachineIconElement, {
-      duration: 1,
-      opacity: 0,
-      delay: 1,
-      ease: 'Power2.easeIn',
-    });
+    // gsap.to(this.quarterMachineIconElement, {
+    //   duration: 1,
+    //   opacity: 0,
+    //   delay: 1,
+    //   ease: 'Power2.easeIn',
+    // });
     gsap.to(this.overlayMaterial.uniforms.uAlpha, {
       duration: 1,
       value: 0,

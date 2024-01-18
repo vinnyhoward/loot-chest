@@ -1,0 +1,33 @@
+.loading-bar-container {
+    --bar-color: #d52c3a;
+    --body-color: #222;
+    --text-color: white;
+    --bar-wrap-back-color: rgba(166, 166, 166, 0.2);
+
+
+    position: absolute;
+    right: 50%;
+    top: 60%;
+    transform: translate(50%, -50%);
+    width: 50%;
+
+    border-radius: 100px;
+    background-color: var(--bar-wrap-back-color);
+    padding: 4px;
+    margin-top: 10px;
+
+    .loading-bar {
+        background: linear-gradient(90deg, #d52c3a 0%, #ff2839 100%);
+        border-radius: 100px;
+        height: 12px;
+        transition: width 0.15s ease-out;
+        width: 10%;
+    }
+
+    .percentage {
+        align-self: center;
+        color: var(--text-color);
+        margin: 10px 0 25px;
+        font-size: clamp(1.8rem, 3.5vw, 2.6rem);
+    }
+}

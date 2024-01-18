@@ -1,5 +1,5 @@
-import './styles/global.scss';
-// @ts-ignore // TODO: Will see if I want to convert to TS. Probably not.
+import './styles/main.scss';
+// @ts-ignore
 import Experience from './three/experience/Experience';
 import { html } from './utils/html.ts';
 
