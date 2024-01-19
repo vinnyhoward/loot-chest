@@ -9,6 +9,7 @@ export default class Camera {
     this.sizes = this.experience.sizes;
     this.scene = this.experience.scene;
     this.canvas = this.experience.canvas;
+    this.renderer = this.experience.renderer;
 
     this.originalCameraAngle = new THREE.Vector3(6, 6, 8);
     this.setInstance();
@@ -35,7 +36,7 @@ export default class Camera {
     this.controls = new OrbitControls(this.instance, this.canvas);
     this.controls.enableDamping = true;
     this.controls.dampingFactor = 0.25;
-    this.controls.maxDistance = 15;
+    this.controls.maxDistance = 10;
     this.controls.minDistance = 5;
     this.controls.rotateSpeed = 0.25;
     this.controls.autoRotate = false;
@@ -46,7 +47,7 @@ export default class Camera {
 
     // Don't allow the camera to go past a certain distance vertically
     this.controls.minPolarAngle = 0;
-    this.controls.maxPolarAngle = Math.PI / 2.6;
+    this.controls.maxPolarAngle = Math.PI / 3;
 
     // Don't allow the camera to go a certain distance horizontally
     this.controls.minAzimuthAngle = -Math.PI / 2.4;
