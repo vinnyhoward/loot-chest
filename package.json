@@ -17,6 +17,7 @@
   },
   "dependencies": {
     "@tweenjs/tween.js": "^23.1.1",
+    "cannon-es": "^0.20.0",
     "gsap": "^3.12.4",
     "lil-gui": "^0.19.1",
     "three": "^0.160.0"

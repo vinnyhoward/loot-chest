@@ -1,4 +1,3 @@
-// packages
 import gsap from 'gsap';
 import { html } from '../utils/html';
 

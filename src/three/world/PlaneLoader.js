@@ -1,4 +1,3 @@
-// packages
 import * as THREE from 'three';
 
 export default class PlaneLoader {
@@ -6,7 +5,6 @@ export default class PlaneLoader {
     this.experience = window.experience;
     this.scene = this.experience.scene;
 
-    // Setup
     this.setGeometry();
     this.setMaterial();
     this.setMesh();

@@ -36,7 +36,7 @@ export default class Trapdoor {
           const target = new THREE.Vector3();
           const { x, y } = child.getWorldPosition(target);
           this.trapdoorPosition = { x, y: y + 0.5, z: 0 };
-          //   this.physics.addFloor(this.trapdoorPosition);
+          this.physics.addFloor(this.trapdoorPosition);
         }
 
         child.castShadow = true;
@@ -69,7 +69,6 @@ export default class Trapdoor {
   }
 
   update() {
-    // TODO: comment back in when trapdoor animation is available
     if (Object.keys(this.animation).length !== 0) {
       this.animation.mixer.update(this.time.delta * 0.001);
     }
