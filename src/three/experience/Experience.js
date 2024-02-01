@@ -16,7 +16,7 @@ import sources from './sources';
 let instance = null;
 
 export default class Experience {
-  constructor(_canvas) {
+  constructor(_canvas, _sources) {
     if (instance) {
       return instance;
     }
@@ -24,6 +24,15 @@ export default class Experience {
 
     window.experience = this;
 
+    const sanitySource = _sources.map((source) => {
+      return {
+        name: source.fileChestName,
+        type: 'glbModel',
+        path: `/models/lootchest/glb/${source.fileChestName}.glb`,
+        assetType: 'lootchest',
+      };
+    });
+    const allAssets = [...sources, ...sanitySource];
     this.canvas = _canvas;
 
     this.debug = new Debug();
@@ -32,7 +41,7 @@ export default class Experience {
     this.scene = new THREE.Scene();
     this.planeLoader = new PlaneLoader();
     this.loadingBar = new LoadingBar();
-    this.resources = new Resources(sources);
+    this.resources = new Resources(allAssets);
     this.camera = new Camera();
     this.renderer = new Renderer();
     this.world = new World();

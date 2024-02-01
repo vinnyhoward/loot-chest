@@ -58,7 +58,6 @@ export default class Resources extends EventEmitter {
     }
 
     if (this.loaded === this.toLoad) {
-      console.log('complete');
       this.loadingBar.hideLoadingScreen();
 
       window.setTimeout(() => {

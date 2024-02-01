@@ -35,13 +35,6 @@ export default class Physics {
   }
 
   addBox(width, height, depth, mass, modelPosition) {
-    console.log('adding box:', {
-      width,
-      height,
-      depth,
-      mass,
-      modelPosition,
-    });
     const shape = new CANNON.Box(new CANNON.Vec3(width, height, depth));
     const position = new CANNON.Vec3(
       modelPosition.x,

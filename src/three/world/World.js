@@ -15,13 +15,15 @@ export default class World {
       this.environment = new Environment();
       this.trapdoor = new Trapdoor();
       this.lootChest = new LootChest();
+      const chestAssets = this.resources.sources.filter(
+        (source) => source.assetType === 'lootchest',
+      );
 
-      const currentChest = 'chest1';
       if (this.lootChest.sceneLoaded) {
-        this.lootChest.setLootChest(currentChest);
+        this.lootChest.setLootChest(chestAssets[0].name);
       } else {
         setTimeout(() => {
-          this.lootChest.setLootChest(currentChest);
+          this.lootChest.setLootChest(chestAssets[0].name);
         }, 3000);
       }
     });
