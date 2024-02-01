@@ -1,8 +1,9 @@
 // @ts-nocheck
 import './styles/main.scss';
 import Experience from './three/experience/Experience';
-import { html } from './utils/html.ts';
+import { html } from './utils/html';
 import LoadingBar from './components/LoadingBar';
+import DropdownMenu from './components/DropdownMenu';
 
 const fetchAssets = async () => {
   const token: string =
@@ -25,6 +26,9 @@ const fetchAssets = async () => {
 };
 
 class App {
+  private loadingBar: LoadingBar;
+  private dropdownMenu: DropdownMenu;
+
   constructor(private rootElement: HTMLElement) {
     this.loadingBar = {};
   }
@@ -34,6 +38,7 @@ class App {
       new Experience(document.querySelector('canvas.webgl'), assets);
     });
     this.loadingBar = new LoadingBar();
+    this.dropdownMenu = new DropdownMenu(['Option 1', 'Option 2', 'Option 3']);
     this.render();
   }
 
