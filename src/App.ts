@@ -1,9 +1,8 @@
 // @ts-nocheck
-import './styles/main.scss';
 import Experience from './three/experience/Experience';
+import './components/login-modal/login-modal';
+import './components/loading-bar/loading-bar';
 import { html } from './utils/html';
-import LoadingBar from './components/LoadingBar';
-import DropdownMenu from './components/DropdownMenu';
 
 const fetchAssets = async () => {
   const token: string =
@@ -25,31 +24,29 @@ const fetchAssets = async () => {
   }
 };
 
-class App {
-  private loadingBar: LoadingBar;
-  private dropdownMenu: DropdownMenu;
-
-  constructor(private rootElement: HTMLElement) {
-    this.loadingBar = {};
+export default class App extends HTMLElement {
+  constructor() {
+    super();
+    this.attachShadow({ mode: 'open' });
   }
 
-  init() {
+  connectedCallback() {
+    this.render();
     fetchAssets().then((assets) => {
       new Experience(document.querySelector('canvas.webgl'), assets);
     });
-    this.loadingBar = new LoadingBar();
-    this.dropdownMenu = new DropdownMenu(['Option 1', 'Option 2', 'Option 3']);
-    this.render();
   }
 
   render() {
-    this.rootElement.innerHTML = html`
+    if (!this.shadowRoot) return;
+    this.shadowRoot.innerHTML = html`
       <div>
-        ${this.loadingBar.render()}
+        <login-modal></login-modal>
+        <loading-bar></loading-bar>
         <canvas class="webgl"></canvas>
       </div>
     `;
   }
 }
 
-export default App;
+customElements.define('app-container', App);

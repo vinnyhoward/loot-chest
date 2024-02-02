@@ -9,7 +9,7 @@ import World from '../world/World';
 import Resources from '../utils/Resources';
 
 import PlaneLoader from '../world/PlaneLoader';
-import LoadingBar from '../../components/LoadingBar';
+import LoadingBar from '../../components/loading-bar/loading-bar';
 
 import sources from './sources';
 

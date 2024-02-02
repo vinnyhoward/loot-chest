@@ -1,8 +1,8 @@
-import App from './App';
+import './App';
 
 const rootElement = document.getElementById('app');
 
 if (rootElement) {
-    const app = new App(rootElement);
-    app.init();
+  const appElement = document.createElement('app-container');
+  rootElement.appendChild(appElement);
 }
