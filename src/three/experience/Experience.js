@@ -9,7 +9,6 @@ import World from '../world/World';
 import Resources from '../utils/Resources';
 
 import PlaneLoader from '../world/PlaneLoader';
-import LoadingBar from '../../components/loading-bar/loading-bar';
 
 import sources from './sources';
 
@@ -40,7 +39,6 @@ export default class Experience {
     this.time = new Time();
     this.scene = new THREE.Scene();
     this.planeLoader = new PlaneLoader();
-    this.loadingBar = new LoadingBar();
     this.resources = new Resources(allAssets);
     this.camera = new Camera();
     this.renderer = new Renderer();

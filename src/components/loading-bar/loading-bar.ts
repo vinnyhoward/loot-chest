@@ -17,12 +17,28 @@ export default class LoadingBar extends HTMLElement {
     this.loadingBarElement = this.loadingBarContainerElement.appendChild(
       document.createElement('div'),
     );
-    this.loadingBarElement.className = 'loading-bar';
+    this.loadingBarElement = this.shadowRoot.querySelector('.loading-bar');
   }
 
   connectedCallback(): void {
     this.render();
-    this.showLoadingScreen();
+    document.addEventListener(
+      'loading-progress',
+      this.handleLoadingProgress.bind(this),
+    );
+    document.addEventListener(
+      'show-loading',
+      this.showLoadingScreen.bind(this),
+    );
+    document.addEventListener(
+      'hide-loading',
+      this.hideLoadingScreen.bind(this),
+    );
+  }
+
+  public handleLoadingProgress(event) {
+    const { progressRatio } = event.detail;
+    this.updateLoadingBar(progressRatio);
   }
 
   public showLoadingScreen(): void {
@@ -54,7 +70,10 @@ export default class LoadingBar extends HTMLElement {
   }
 
   public updateLoadingBar(progressRatio: number): void {
-    this.loadingBarElement.style.width = `${progressRatio}%`;
+    this.loadingBarElement = this.shadowRoot.querySelector('.loading-bar');
+    if (this.loadingBarElement) {
+      this.loadingBarElement.style.width = `${progressRatio}%`;
+    }
   }
 
   private render(): void {

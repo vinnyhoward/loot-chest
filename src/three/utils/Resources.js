@@ -9,7 +9,6 @@ export default class Resources extends EventEmitter {
     super();
     this.experience = window.experience;
     this.sources = sources;
-    this.loadingBar = this.experience.loadingBar;
     this.overlayMaterial = this.experience.planeLoader.material;
 
     this.items = {};
@@ -54,11 +53,14 @@ export default class Resources extends EventEmitter {
 
     const progressRatio = (this.loaded / this.toLoad) * 100;
     if (progressRatio <= 100) {
-      this.loadingBar.updateLoadingBar(progressRatio);
+      const event = new CustomEvent('loading-progress', {
+        detail: { progressRatio },
+      });
+      document.dispatchEvent(event);
     }
 
     if (this.loaded === this.toLoad) {
-      this.loadingBar.hideLoadingScreen();
+      document.dispatchEvent(new CustomEvent('hide-loading'));
 
       window.setTimeout(() => {
         gsap.to(this.overlayMaterial.uniforms.uAlpha, {

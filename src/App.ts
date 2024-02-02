@@ -32,8 +32,12 @@ export default class App extends HTMLElement {
 
   connectedCallback() {
     this.render();
+    document.dispatchEvent(new CustomEvent('show-loading'));
     fetchAssets().then((assets) => {
-      new Experience(document.querySelector('canvas.webgl'), assets);
+      const canvas = this.shadowRoot.querySelector('canvas.webgl');
+      if (canvas) {
+        new Experience(canvas, assets);
+      }
     });
   }
 
