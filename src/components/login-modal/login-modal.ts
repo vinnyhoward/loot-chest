@@ -46,7 +46,6 @@ export class LoginModal extends HTMLElement {
   connectedCallback(): void {
     const token = localStorage.getItem('token');
     document.addEventListener(EVENTS.LOGIN_SUCCESS, () => {
-      console.log('Login success!');
       this.style.display = 'none';
     });
 

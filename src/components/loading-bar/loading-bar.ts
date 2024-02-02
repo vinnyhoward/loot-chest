@@ -9,16 +9,6 @@ export default class LoadingBar extends HTMLElement {
   constructor() {
     super();
     this.attachShadow({ mode: 'open' });
-
-    this.loadingBarContainerElement = this.shadowRoot!.appendChild(
-      document.createElement('div'),
-    );
-    this.loadingBarContainerElement.className = 'loading-bar-container';
-
-    this.loadingBarElement = this.loadingBarContainerElement.appendChild(
-      document.createElement('div'),
-    );
-    this.loadingBarElement = this.shadowRoot.querySelector('.loading-bar');
   }
 
   connectedCallback(): void {
@@ -43,6 +33,11 @@ export default class LoadingBar extends HTMLElement {
   }
 
   public showLoadingScreen(): void {
+    this.loadingBarElement = this.shadowRoot.querySelector('.loading-bar');
+    this.loadingBarContainerElement = this.shadowRoot.querySelector(
+      '.loading-bar-container',
+    );
+
     gsap.to(this.loadingBarElement, {
       duration: 0.25,
       opacity: 1,
@@ -56,6 +51,11 @@ export default class LoadingBar extends HTMLElement {
   }
 
   public hideLoadingScreen(): void {
+    this.loadingBarElement = this.shadowRoot.querySelector('.loading-bar');
+    this.loadingBarContainerElement = this.shadowRoot.querySelector(
+      '.loading-bar-container',
+    );
+
     window.setTimeout(() => {
       gsap.to(this.loadingBarElement, {
         duration: 2,

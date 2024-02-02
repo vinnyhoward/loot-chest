@@ -7,4 +7,8 @@ export const EVENTS = {
   LOGIN_FAILURE: 'login-failure',
   LOGOUT: 'logout',
   LOGIN_LOADING: 'login-loading',
+
+  ASSETS_LOADING: 'assets-loading',
+  ASSETS_LOADING_FAILURE: 'assets-loading-failure',
+  ASSETS_LOADING_SUCCESS: 'assets-loading-success',
 };
