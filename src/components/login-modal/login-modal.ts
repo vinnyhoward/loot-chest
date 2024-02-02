@@ -1,4 +1,40 @@
 import { html } from '../../utils/html';
+import { loginUserUrl } from '../../services/route';
+import { EVENTS } from '../../constants/events';
+
+const loginUser = async (email: string, password: string) => {
+  try {
+    const response = await fetch(loginUserUrl(), {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({ email, password }),
+    });
+
+    if (!response.ok) {
+      throw new Error(`Error: ${response.status}`);
+    }
+
+    const user = await response.json();
+
+    if (user.success && user.token) {
+      localStorage.setItem('token', user.token);
+      localStorage.setItem('user_auth', JSON.stringify(user.data));
+
+      document.dispatchEvent(
+        new CustomEvent(EVENTS.LOGIN_SUCCESS, {
+          bubbles: true,
+          composed: true,
+        }),
+      );
+    } else {
+      console.error('Login failed:', user.message);
+    }
+  } catch (error) {
+    console.error('Failed to login:', error);
+  }
+};
 
 export class LoginModal extends HTMLElement {
   constructor() {
@@ -8,8 +44,18 @@ export class LoginModal extends HTMLElement {
   }
 
   connectedCallback(): void {
-    this.render();
-    this.attachFormSubmitListener();
+    const token = localStorage.getItem('token');
+    document.addEventListener(EVENTS.LOGIN_SUCCESS, () => {
+      console.log('Login success!');
+      this.style.display = 'none';
+    });
+
+    if (token) {
+      this.style.display = 'none';
+    } else {
+      this.render();
+      this.attachFormSubmitListener();
+    }
   }
 
   private attachFormSubmitListener(): void {
@@ -17,16 +63,18 @@ export class LoginModal extends HTMLElement {
     form?.addEventListener('submit', this.onSubmit);
   }
 
-  private onSubmit(event: Event): void {
+  private async onSubmit(event: Event): void {
     event.preventDefault();
 
     const target = event.target as HTMLFormElement;
     const formData = new FormData(target);
 
-    const username: FormDataEntryValue | null = formData.get('username');
+    const email: FormDataEntryValue | null = formData.get('email');
     const password: FormDataEntryValue | null = formData.get('password');
 
-    console.log('Username:', username, 'Password:', password);
+    if (email && password) {
+      await loginUser(email, password);
+    }
   }
 
   private render(): void {
@@ -69,8 +117,8 @@ export class LoginModal extends HTMLElement {
             </div>
             <form class="modal__form">
               <div>
-                <label for="username">Username:</label>
-                <input type="text" id="username" name="username" />
+                <label for="email">Email:</label>
+                <input type="text" id="email" name="email" />
               </div>
 
               <div>

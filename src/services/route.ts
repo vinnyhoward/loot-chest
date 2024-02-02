@@ -1,21 +1,23 @@
-const BASE_URL = import.meta.env.VITE_API_URL;
+export const BASE_URL = import.meta.env.VITE_API_URL;
 
-const getAllUsersAdmin = () => `${BASE_URL}/users/all`;
-const getUserByIdAdmin = (id: string) => `${BASE_URL}/users/${id}`;
-const signUpUser = () => `${BASE_URL}/users/signup`;
-const loginUser = () => `${BASE_URL}/users/login`;
-const getUserProfile = () => `${BASE_URL}/users/me`;
-const updateUserProfile = () => `${BASE_URL}/users/me`;
+export const getAllUsersAdminUrl = () => `${BASE_URL}/users/all`;
+export const getUserByIdAdminUrl = (id: string) => `${BASE_URL}/users/${id}`;
+export const signUpUserUrl = () => `${BASE_URL}/users/signup`;
+export const loginUserUrl = () => `${BASE_URL}/users/login`;
+export const getUserProfileUrl = () => `${BASE_URL}/users/me`;
+export const updateUserProfileUrl = () => `${BASE_URL}/users/me`;
 
-const getAllChests = () => `${BASE_URL}/chests/all`;
-const openChest = (userId: string) => `${BASE_URL}/chests/${userId}/open`;
-const getUserChestInteractions = () => `${BASE_URL}/chests/me/interactions`;
+export const getAllChestsUrl = () => `${BASE_URL}/chests/all`;
+export const openChestUrl = (userId: string) =>
+  `${BASE_URL}/chests/${userId}/open`;
+export const getUserChestInteractionsUrl = () =>
+  `${BASE_URL}/chests/me/interactions`;
 
-const getUserPrizesWon = () => `${BASE_URL}/prizes/me`;
-const getUserPrizesWonById = () => `${BASE_URL}/prizes/me`;
+export const getUserPrizesWonUrl = () => `${BASE_URL}/prizes/me`;
+export const getUserPrizesWonByIdUrl = () => `${BASE_URL}/prizes/me`;
 
-const savePrizeFulfillment = () => `${BASE_URL}/prizes/fulfillment`;
-const getPrizeFulfillmentId = (prizeId: string) =>
+export const savePrizeFulfillmentUrl = () => `${BASE_URL}/prizes/fulfillment`;
+export const getPrizeFulfillmentIdUrl = (prizeId: string) =>
   `${BASE_URL}/prizes/${prizeId}/fulfillment`;
 
-const healthCheck = () => `${BASE_URL}/health-check`;
+export const healthCheckUrl = () => `${BASE_URL}/health-check`;
