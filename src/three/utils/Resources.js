@@ -3,6 +3,7 @@ import gsap from 'gsap';
 import { GLTFLoader } from 'three/examples/jsm/loaders/GLTFLoader';
 import { DRACOLoader } from 'three/examples/jsm/loaders/DRACOLoader.js';
 import EventEmitter from './EventEmitter';
+import { EVENTS } from '../../constants/events';
 
 export default class Resources extends EventEmitter {
   constructor(sources) {
@@ -53,14 +54,14 @@ export default class Resources extends EventEmitter {
 
     const progressRatio = (this.loaded / this.toLoad) * 100;
     if (progressRatio <= 100) {
-      const event = new CustomEvent('loading-progress', {
+      const event = new CustomEvent(EVENTS.LOADING_PROGRESS, {
         detail: { progressRatio },
       });
       document.dispatchEvent(event);
     }
 
     if (this.loaded === this.toLoad) {
-      document.dispatchEvent(new CustomEvent('hide-loading'));
+      document.dispatchEvent(new CustomEvent(EVENTS.HIDE_LOADING));
 
       window.setTimeout(() => {
         gsap.to(this.overlayMaterial.uniforms.uAlpha, {

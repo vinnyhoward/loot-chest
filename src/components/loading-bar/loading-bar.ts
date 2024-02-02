@@ -1,5 +1,6 @@
 import gsap from 'gsap';
 import { html } from '../../utils/html';
+import { EVENTS } from '../../constants/events';
 
 export default class LoadingBar extends HTMLElement {
   private loadingBarElement: HTMLElement;
@@ -23,15 +24,15 @@ export default class LoadingBar extends HTMLElement {
   connectedCallback(): void {
     this.render();
     document.addEventListener(
-      'loading-progress',
+      EVENTS.LOADING_PROGRESS,
       this.handleLoadingProgress.bind(this),
     );
     document.addEventListener(
-      'show-loading',
+      EVENTS.SHOW_LOADING,
       this.showLoadingScreen.bind(this),
     );
     document.addEventListener(
-      'hide-loading',
+      EVENTS.HIDE_LOADING,
       this.hideLoadingScreen.bind(this),
     );
   }

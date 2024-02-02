@@ -3,6 +3,7 @@ import Experience from './three/experience/Experience';
 import './components/login-modal/login-modal';
 import './components/loading-bar/loading-bar';
 import { html } from './utils/html';
+import { EVENTS } from './constants/events';
 
 const fetchAssets = async () => {
   const token: string =
@@ -32,7 +33,7 @@ export default class App extends HTMLElement {
 
   connectedCallback() {
     this.render();
-    document.dispatchEvent(new CustomEvent('show-loading'));
+    document.dispatchEvent(new CustomEvent(EVENTS.SHOW_LOADING));
     fetchAssets().then((assets) => {
       const canvas = this.shadowRoot.querySelector('canvas.webgl');
       if (canvas) {
