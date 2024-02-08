@@ -2,7 +2,10 @@ import { html } from '../../utils/html';
 import { loginUserUrl } from '../../services/route';
 import { EVENTS } from '../../constants/events';
 
-const loginUser = async (email: string, password: string) => {
+const loginUser = async (
+  email: FormDataEntryValue,
+  password: FormDataEntryValue,
+) => {
   try {
     const response = await fetch(loginUserUrl(), {
       method: 'POST',
@@ -62,7 +65,7 @@ export class LoginModal extends HTMLElement {
     form?.addEventListener('submit', this.onSubmit);
   }
 
-  private async onSubmit(event: Event): void {
+  private async onSubmit(event: Event): Promise<void> {
     event.preventDefault();
 
     const target = event.target as HTMLFormElement;

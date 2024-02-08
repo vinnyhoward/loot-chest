@@ -3,12 +3,14 @@ import { html } from '../../utils/html';
 import { EVENTS } from '../../constants/events';
 
 export default class LoadingBar extends HTMLElement {
-  private loadingBarElement: HTMLElement;
-  private loadingBarContainerElement: HTMLElement;
+  private loadingBarElement: HTMLElement | null;
+  private loadingBarContainerElement: HTMLElement | null;
 
   constructor() {
     super();
     this.attachShadow({ mode: 'open' });
+    this.loadingBarElement = null;
+    this.loadingBarContainerElement = null;
   }
 
   connectedCallback(): void {
@@ -27,12 +29,14 @@ export default class LoadingBar extends HTMLElement {
     );
   }
 
-  public handleLoadingProgress(event) {
+  public handleLoadingProgress(event: CustomEvent): void {
     const { progressRatio } = event.detail;
     this.updateLoadingBar(progressRatio);
   }
 
   public showLoadingScreen(): void {
+    if (!this.shadowRoot) return;
+
     this.loadingBarElement = this.shadowRoot.querySelector('.loading-bar');
     this.loadingBarContainerElement = this.shadowRoot.querySelector(
       '.loading-bar-container',
@@ -51,6 +55,8 @@ export default class LoadingBar extends HTMLElement {
   }
 
   public hideLoadingScreen(): void {
+    if (!this.shadowRoot) return;
+
     this.loadingBarElement = this.shadowRoot.querySelector('.loading-bar');
     this.loadingBarContainerElement = this.shadowRoot.querySelector(
       '.loading-bar-container',
@@ -71,6 +77,8 @@ export default class LoadingBar extends HTMLElement {
   }
 
   public updateLoadingBar(progressRatio: number): void {
+    if (!this.shadowRoot) return;
+
     this.loadingBarElement = this.shadowRoot.querySelector('.loading-bar');
     if (this.loadingBarElement) {
       this.loadingBarElement.style.width = `${progressRatio}%`;

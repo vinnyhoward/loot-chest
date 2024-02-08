@@ -1,4 +1,5 @@
 import { html } from '../../utils/html';
+import { urlFor } from '../../services/sanity';
 
 const mockData = [
   {
@@ -93,17 +94,18 @@ export class DropdownMenu extends HTMLElement {
       <div class="dropdown__container">
         <div class="dropdown">
           <ul class="dropdown__list">
-            ${mockData.map(
-              (chest) => html`
+            ${mockData.map((chest) => {
+              const url = urlFor(chest.chestIcon.asset._ref)
+                .width(50)
+                .height(50)
+                .url();
+              return html`
                 <li class="chest__item">
-                  <img
-                    src="${chest.chestIcon.asset._ref}"
-                    alt="${chest.chestName}"
-                  />
+                  <img src="${url}" alt="${chest.chestName}" />
                   <span>${chest.chestName}</span>
                 </li>
-              `,
-            )}
+              `;
+            })}
           </ul>
         </div>
       </div>
