@@ -1,5 +1,6 @@
 import gsap from 'gsap';
 import { html } from '../../utils/html';
+// @ts-ignore
 import { EVENTS } from '../../constants/events';
 
 export default class LoadingBar extends HTMLElement {

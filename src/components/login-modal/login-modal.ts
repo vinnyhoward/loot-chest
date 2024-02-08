@@ -1,5 +1,6 @@
 import { html } from '../../utils/html';
 import { loginUserUrl } from '../../services/route';
+// @ts-ignore
 import { EVENTS } from '../../constants/events';
 
 const loginUser = async (
