@@ -1,7 +1,3 @@
-/* eslint-disable no-param-reassign */
-/* eslint-disable guard-for-in */
-/* eslint-disable no-restricted-syntax */
-/* eslint-disable no-constructor-return */
 import * as THREE from 'three';
 
 export default class LootChest {
@@ -23,6 +19,7 @@ export default class LootChest {
 
     this.setModel = this.setModel.bind(this);
     this.setAnimation = this.setAnimation.bind(this);
+    this.setLootChest = this.setLootChest.bind(this);
   }
 
   setLootChest(assetName) {

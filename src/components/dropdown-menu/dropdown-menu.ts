@@ -1,72 +1,27 @@
 import { html } from '../../utils/html';
 import { urlFor } from '../../services/sanity';
 
-const mockData = [
-  {
-    chestName: "Skeleton King's Chest",
-    chestIcon: {
-      _type: 'chestIcon',
-      asset: {
-        _ref: 'image-3ac136999db1d553685290a713902d919aa02b01-75x75-png',
-        _type: 'reference',
-      },
-    },
-    _id: '03bf6655-fc3a-44f7-b609-634fd2182faa',
-    chestImage: {
-      _type: 'chestImage',
-      asset: {
-        _ref: 'image-3e2f8e6cfbf7365cb07ffbe70345d42c9e0235b4-750x750-png',
-        _type: 'reference',
-      },
-    },
-  },
-  {
-    _id: '1e02b6dc-9b19-4cf3-b78d-c8ccb06ebd01',
-    chestName: 'Arcana Loot Chest',
-    chestImage: {
-      _type: 'chestImage',
-      asset: {
-        _type: 'reference',
-        _ref: 'image-84b9f8fd3c70c7f2214cb11b044d512e18ac7fa8-75x75-png',
-      },
-    },
-    chestIcon: {
-      asset: {
-        _ref: 'image-54be7740831000f066b8fba5e82729602c3b543a-750x750-png',
-        _type: 'reference',
-      },
-      _type: 'chestIcon',
-    },
-  },
-  {
-    _id: '8e53ce86-d439-4947-876d-528675a83cf3',
-    chestImage: {
-      _type: 'chestImage',
-      asset: {
-        _ref: 'image-9f60f9f0445600c0d31273e7f88acb795d89d93b-75x75-png',
-        _type: 'reference',
-      },
-    },
-    chestIcon: {
-      asset: {
-        _ref: 'image-c4c566c6e9e3938539ec6d333891ac76bb899216-750x750-png',
-        _type: 'reference',
-      },
-      _type: 'chestIcon',
-    },
-    chestName: "Nature's Guise Chest",
-  },
-];
-
 export class DropdownMenu extends HTMLElement {
   private state: { selectedItem: any };
+  private _chests: any[] = [];
 
   constructor() {
     super();
     this.attachShadow({ mode: 'open' });
     this.state = {
-      selectedItem: mockData[0],
+      selectedItem: this._chests[0],
     };
+  }
+
+  set chests(data) {
+    this._chests = data;
+    this.state.selectedItem = data.length > 0 ? data[0] : null;
+    this.render();
+    this.attachEventListeners();
+  }
+
+  get chests() {
+    return this._chests;
   }
 
   connectedCallback() {
@@ -75,16 +30,23 @@ export class DropdownMenu extends HTMLElement {
   }
 
   selectItem(selectedChestId: string | null) {
-    // @ts-ignore
-    this.state.selectedItem = mockData.filter(
+    const selectedChest = this._chests.find(
       (chest) => chest._id === selectedChestId,
-    )[0];
-    this.dispatchEvent(
+    );
+    if (!selectedChest) return;
+
+    this.state.selectedItem = selectedChest;
+    document.dispatchEvent(
       new CustomEvent('item-selected', {
         detail: { selectedItem: selectedChestId },
         bubbles: true,
         composed: true,
       }),
+    );
+
+    // @ts-ignore
+    window.experience.world.lootChest.setLootChest(
+      this.state.selectedItem.fileChestName,
     );
     this.render();
     this.attachEventListeners();
@@ -113,6 +75,7 @@ export class DropdownMenu extends HTMLElement {
   }
 
   render() {
+    console.log('chests: ', this._chests);
     if (!this.shadowRoot) return;
 
     this.shadowRoot.innerHTML = html`
@@ -134,6 +97,7 @@ export class DropdownMenu extends HTMLElement {
           flex-direction: column;
           justify-content: center;
           align-items: center;
+          padding: 0px 10px;
         }
 
         .chest__item {
@@ -173,19 +137,21 @@ export class DropdownMenu extends HTMLElement {
       </style>
       <div class="dropdown__container">
         <div class="dropdown">
-          <div class="dropdown__selected-chest">
-            <img
-              src="${urlFor(this.state.selectedItem.chestIcon.asset._ref)
-                .width(50)
-                .height(50)
-                .url()}"
-              alt="${this.state.selectedItem.chestName}"
-            />
-            <span>${this.state.selectedItem.chestName}</span>
-          </div>
+          ${this._chests.length > 0
+            ? html`<div class="dropdown__selected-chest">
+                <img
+                  src="${urlFor(this.state.selectedItem.chestIcon.asset._ref)
+                    .width(50)
+                    .height(50)
+                    .url()}"
+                  alt="${this.state.selectedItem.chestName}"
+                />
+                <span>${this.state.selectedItem.chestName}</span>
+              </div>`
+            : html`<div>Loading...</div>`}
 
           <ul class="dropdown__list">
-            ${mockData
+            ${this._chests
               .filter((chest) => chest._id !== this.state.selectedItem._id)
               .map((chest) => {
                 const url = urlFor(chest.chestIcon.asset._ref)

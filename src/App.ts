@@ -20,7 +20,6 @@ const fetchAssets = async () => {
       throw new Error(`Error: ${response.status}`);
     }
     const chests = await response.json();
-    console.log('chests:', chests.data);
     return chests.data;
   } catch (error) {
     console.error('Failed to fetch chests:', error);
@@ -41,6 +40,11 @@ export default class App extends HTMLElement {
         const canvas = this.shadowRoot.querySelector('canvas.webgl');
         if (canvas) {
           new Experience(canvas, assets);
+        }
+
+        const dropdownMenu = this.shadowRoot.querySelector('dropdown-menu');
+        if (dropdownMenu) {
+          dropdownMenu.chests = assets;
         }
       })
       .catch((error) => {
