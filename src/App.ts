@@ -7,14 +7,8 @@ import { html } from './utils/html';
 import { EVENTS } from './constants/events';
 
 const fetchAssets = async () => {
-  const token: string =
-    'eyJhbGciOiJIUzI1NiJ9.eyJ1c2VySWQiOiJjbHJ2aHg4YWswMDAwMTBud2JidTFmaW1wIn0.LDKPeG6r7ElF42HF_ogFvIINado6VNcjz4ZQlOA5ais';
   try {
-    const response = await fetch(`${import.meta.env.VITE_API_URL}/chests/all`, {
-      headers: {
-        Authorization: `Bearer ${token}`,
-      },
-    });
+    const response = await fetch(`${import.meta.env.VITE_API_URL}/chests/all`);
 
     if (!response.ok) {
       throw new Error(`Error: ${response.status}`);

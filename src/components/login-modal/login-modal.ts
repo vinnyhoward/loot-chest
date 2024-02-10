@@ -93,15 +93,15 @@ export class LoginModal extends HTMLElement {
 
         .modal {
           background-color: white;
-          border-radius: 8px;
+          border-radius: 24px;
           box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
-          padding: 20px;
-          width: 300px;
-          min-height: 300px;
+          /* padding: 20px; */
+          min-width: 350px;
+          min-height: 450px;
           display: flex;
-          flex-direction: column;
+          /* flex-direction: column;
           justify-content: center;
-          align-items: center;
+          align-items: center; */
         }
 
         .modal__body {
@@ -110,27 +110,18 @@ export class LoginModal extends HTMLElement {
           justify-content: center;
           align-items: center;
         }
+
+        .line {
+          width: 100%;
+          height: 2px;
+          background-color: #f0f0f0;
+          margin: 20px 0;
+        }
       </style>
       <div>
         <div class="modal__container">
           <div class="modal">
-            <div class="modal__header">
-              <h2 class="modal__title">Temp Title for Login!</h2>
-              <button class="modal__close-button">Close</button>
-            </div>
-            <form class="modal__form">
-              <div>
-                <label for="email">Email:</label>
-                <input type="text" id="email" name="email" />
-              </div>
-
-              <div>
-                <label for="password">Password:</label>
-                <input type="password" id="password" name="password" />
-              </div>
-
-              <button type="submit">Login</button>
-            </form>
+            <div class="line"></div>
           </div>
         </div>
       </div>
@@ -139,3 +130,22 @@ export class LoginModal extends HTMLElement {
 }
 
 customElements.define('login-modal', LoginModal);
+
+// <div class="modal__header">
+// <h2 class="modal__title">Temp Title for Login!</h2>
+// <button class="modal__close-button">Close</button>
+// </div>
+// <form class="modal__form">
+// <div>
+//   <label for="email">Email:</label>
+//   <input type="text" id="email" name="email" />
+// </div>
+
+// <div>
+//   <label for="password">Password:</label>
+//   <input type="password" id="password" name="password" />
+// </div>
+
+// <button type="submit">Login</button>
+// </form>
+// </div>

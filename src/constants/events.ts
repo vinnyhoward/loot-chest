@@ -1,4 +1,4 @@
-export const EVENTS = {
+export const EVENTS: Record<string, string> = {
   SHOW_LOADING: 'show-loading',
   HIDE_LOADING: 'hide-loading',
   LOADING_PROGRESS: 'loading-progress',

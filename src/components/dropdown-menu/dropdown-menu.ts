@@ -124,21 +124,21 @@ export class DropdownMenu extends HTMLElement {
           position: absolute;
           top: 10%;
           left: 70%;
-          width: 300px;
+          width: 320px;
           height: 50px;
           opacity: 1;
         }
 
         .dropdown {
           background-color: white;
-          border-radius: 16px;
+          border-radius: 24px;
           box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
           min-height: 50px;
           display: flex;
           flex-direction: column;
           justify-content: center;
           align-items: center;
-          padding: 10px 15px;
+          padding: 10px 20px;
         }
 
         .chest__item {
@@ -150,11 +150,12 @@ export class DropdownMenu extends HTMLElement {
           padding: 5px 0px;
           margin: 5px 0;
           text-align: left;
+          width: 100%;
         }
 
         .chest__item:hover {
           background-color: #f0f0f0;
-          border-radius: 8px;
+          border-radius: 16px;
         }
 
         .chest__item.selected {
