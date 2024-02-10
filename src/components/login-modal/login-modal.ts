@@ -1,6 +1,5 @@
 import { html } from '../../utils/html';
 import { loginUserUrl } from '../../services/route';
-// @ts-ignore
 import { EVENTS } from '../../constants/events';
 
 const loginUser = async (
@@ -84,6 +83,33 @@ export class LoginModal extends HTMLElement {
     if (!this.shadowRoot) return;
     this.shadowRoot.innerHTML = html`
       <style>
+        @import url('https://fonts.googleapis.com/css2?family=Montserrat:ital,wght@0,100..900;1,100..900&display=swap');
+        @import url('https://fonts.googleapis.com/css2?family=Hind:wght@300;400;500;600;700&family=Montserrat:ital,wght@0,100..900;1,100..900&display=swap');
+
+        * {
+          box-sizing: border-box;
+        }
+
+        a {
+          text-decoration: none;
+          color: inherit;
+        }
+
+        button {
+          width: 100%;
+          height: 50px;
+          border: none;
+          border-radius: 8px;
+          background-color: #974af4;
+          color: white;
+          font-family: 'Hind', sans-serif;
+          font-weight: 600;
+          font-style: normal;
+          font-size: 14px;
+          cursor: pointer;
+          text-transform: uppercase;
+        }
+
         .modal__container {
           position: absolute;
           top: 50%;
@@ -94,34 +120,178 @@ export class LoginModal extends HTMLElement {
         .modal {
           background-color: white;
           border-radius: 24px;
-          box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
-          /* padding: 20px; */
-          min-width: 350px;
+          box-shadow: 0 0 20px rgba(0, 0, 0, 0.1);
+          min-width: 400px;
           min-height: 450px;
           display: flex;
-          /* flex-direction: column;
-          justify-content: center;
-          align-items: center; */
+          flex-direction: column;
         }
 
         .modal__body {
           display: flex;
           flex-direction: column;
-          justify-content: center;
-          align-items: center;
+          padding: 25px;
         }
 
         .line {
           width: 100%;
           height: 2px;
           background-color: #f0f0f0;
-          margin: 20px 0;
+        }
+        .modal__logo {
+          margin: 25px 0;
+          object-fit: contain;
+          height: 75px;
+        }
+
+        .modal__header {
+          display: flex;
+          flex-direction: column;
+          justify-content: center;
+          align-items: center;
+        }
+
+        .input_field {
+          width: 100%;
+          border: 1px solid #e9e9e9;
+          border-radius: 8px;
+          height: 50px;
+          background-color: #fbfbfb;
+          margin: 0;
+          padding: 0;
+          margin-bottom: 15px;
+
+          font-family: 'Hind', sans-serif;
+          font-weight: 400;
+          font-style: normal;
+          color: #25314c;
+          font-size: 14px;
+          padding: 10px;
+        }
+
+        .input_field::placeholder {
+          color: #acbcc0;
+          font-family: 'Hind', sans-serif;
+          font-weight: 400;
+          font-style: normal;
+          font-size: 14px;
+        }
+
+        .input_field:focus {
+          outline: none;
+        }
+
+        .modal__form {
+          display: flex;
+          flex-direction: column;
+          width: 100%;
+        }
+
+        .forgot-password {
+          margin-bottom: 20px;
+          color: #acbcc0;
+          font-family: 'Hind', sans-serif;
+          font-weight: 400;
+          font-style: normal;
+          font-size: 14px;
+          text-decoration: none;
+        }
+
+        .bottom-separator {
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          margin-top: 20px;
+          margin-bottom: 20px;
+          color: #acbcc0;
+          font-family: 'Hind', sans-serif;
+          font-weight: 400;
+          font-style: normal;
+          font-size: 14px;
+        }
+
+        .half-line {
+          width: 50%;
+          height: 2px;
+          background-color: #f0f0f0;
+        }
+
+        span {
+          margin: 0 10px;
+          text-transform: uppercase;
+          font-size: 14px;
+          font-weight: 600;
+          color: #acbcc0;
+          font-family: 'Hind', sans-serif;
+        }
+
+        .sign-out__container {
+          display: flex;
+          justify-content: center;
+          align-items: center;
+        }
+
+        .sign-up_caption,
+        .sign-up_button {
+          color: #acbcc0;
+          font-family: 'Hind', sans-serif;
+          font-weight: 400;
+          font-style: normal;
+          font-size: 14px;
+          text-transform: none;
+        }
+
+        .sign-up_button {
+          font-weight: 600;
+          text-transform: none;
+          color: #974af4;
         }
       </style>
       <div>
         <div class="modal__container">
           <div class="modal">
-            <div class="line"></div>
+            <div class="modal__header">
+              <img class="modal__logo" src="/logos/temp_logo.png" alt="logo" />
+              <div class="line"></div>
+            </div>
+            <div class="modal__body">
+              <form class="modal__form">
+                <div>
+                  <input
+                    class="input_field"
+                    type="text"
+                    id="email"
+                    name="email"
+                    placeholder="User or email"
+                  />
+                </div>
+
+                <div>
+                  <input
+                    class="input_field"
+                    type="password"
+                    id="password"
+                    name="password"
+                    placeholder="Password"
+                  />
+                </div>
+                <div class="forgot-password">
+                  <a href="#">Forgot Password?</a>
+                </div>
+
+                <button type="submit">Log in</button>
+              </form>
+              <div class="bottom-separator">
+                <div class="half-line"></div>
+                <span>or</span>
+                <div class="half-line"></div>
+              </div>
+
+              <div class="sign-out__container">
+                <span class="sign-up_caption">Don't have an account?</span>
+                <a class="sign-up_button" href="#">Sign up</a>
+              </div>
+            </div>
           </div>
         </div>
       </div>
@@ -130,22 +300,3 @@ export class LoginModal extends HTMLElement {
 }
 
 customElements.define('login-modal', LoginModal);
-
-// <div class="modal__header">
-// <h2 class="modal__title">Temp Title for Login!</h2>
-// <button class="modal__close-button">Close</button>
-// </div>
-// <form class="modal__form">
-// <div>
-//   <label for="email">Email:</label>
-//   <input type="text" id="email" name="email" />
-// </div>
-
-// <div>
-//   <label for="password">Password:</label>
-//   <input type="password" id="password" name="password" />
-// </div>
-
-// <button type="submit">Login</button>
-// </form>
-// </div>
