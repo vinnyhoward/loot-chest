@@ -6,36 +6,32 @@ const loginUser = async (
   email: FormDataEntryValue,
   password: FormDataEntryValue,
 ) => {
-  try {
-    const response = await fetch(loginUserUrl(), {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify({ email, password }),
-    });
+  const response = await fetch(loginUserUrl(), {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+    },
+    body: JSON.stringify({ email, password }),
+  });
 
-    if (!response.ok) {
-      throw new Error(`Error: ${response.status}`);
-    }
+  if (!response.ok) {
+    throw new Error(`Error: ${response.status}`);
+  }
 
-    const user = await response.json();
+  const user = await response.json();
 
-    if (user.success && user.token) {
-      localStorage.setItem('token', user.token);
-      localStorage.setItem('user_auth', JSON.stringify(user.data));
+  if (user.success && user.token) {
+    localStorage.setItem('token', user.token);
+    localStorage.setItem('user_auth', JSON.stringify(user.data));
 
-      document.dispatchEvent(
-        new CustomEvent(EVENTS.LOGIN_SUCCESS, {
-          bubbles: true,
-          composed: true,
-        }),
-      );
-    } else {
-      console.error('Login failed:', user.message);
-    }
-  } catch (error) {
-    console.error('Failed to login:', error);
+    document.dispatchEvent(
+      new CustomEvent(EVENTS.LOGIN_SUCCESS, {
+        bubbles: true,
+        composed: true,
+      }),
+    );
+  } else {
+    console.error('Login failed:', user.message);
   }
 };
 
@@ -75,7 +71,32 @@ export class LoginModal extends HTMLElement {
     const password: FormDataEntryValue | null = formData.get('password');
 
     if (email && password) {
-      await loginUser(email, password);
+      try {
+        await loginUser(email, password);
+      } catch (error) {
+        console.error('Failed to login:', error);
+
+        const errorContainer = this.shadowRoot?.querySelector(
+          '.auth-form-error',
+        ) as HTMLElement;
+        const errorText = this.shadowRoot?.querySelector(
+          '.error-message',
+        ) as HTMLElement;
+        const inputFields = this.shadowRoot?.querySelectorAll(
+          '.input_field',
+        ) as NodeListOf<HTMLInputElement>;
+
+        if (errorContainer && errorText) {
+          errorContainer.style.display = 'flex';
+
+          errorText.textContent = 'Invalid email or password';
+
+          inputFields.forEach((inputField) => {
+            inputField.style.borderColor = 'red';
+            inputField.value = '';
+          });
+        }
+      }
     }
   }
 
@@ -141,7 +162,7 @@ export class LoginModal extends HTMLElement {
         .modal__logo {
           margin: 25px 0;
           object-fit: contain;
-          height: 75px;
+          width: 260px;
         }
 
         .modal__header {
@@ -197,7 +218,7 @@ export class LoginModal extends HTMLElement {
           text-decoration: none;
         }
 
-        .bottom-separator {
+        .modal__separator-text {
           display: flex;
           align-items: center;
           justify-content: center;
@@ -210,7 +231,7 @@ export class LoginModal extends HTMLElement {
           font-size: 14px;
         }
 
-        .half-line {
+        .modal__separator-line {
           width: 50%;
           height: 2px;
           background-color: #f0f0f0;
@@ -225,14 +246,14 @@ export class LoginModal extends HTMLElement {
           font-family: 'Hind', sans-serif;
         }
 
-        .sign-out__container {
+        .modal__footer {
           display: flex;
           justify-content: center;
           align-items: center;
         }
 
-        .sign-up_caption,
-        .sign-up_button {
+        .modal__footer-caption,
+        .modal__footer-button {
           color: #acbcc0;
           font-family: 'Hind', sans-serif;
           font-weight: 400;
@@ -241,10 +262,26 @@ export class LoginModal extends HTMLElement {
           text-transform: none;
         }
 
-        .sign-up_button {
+        .modal__footer-button {
           font-weight: 600;
           text-transform: none;
           color: #974af4;
+        }
+
+        .error-message {
+          color: red;
+          font-family: 'Hind', sans-serif;
+          font-weight: 400;
+          font-style: normal;
+          font-size: 14px;
+          text-transform: none;
+          margin: 0;
+          padding: 0;
+          margin-bottom: 10px;
+        }
+
+        .auth-form-error {
+          display: none;
         }
       </style>
       <div>
@@ -262,7 +299,7 @@ export class LoginModal extends HTMLElement {
                     type="text"
                     id="email"
                     name="email"
-                    placeholder="User or email"
+                    placeholder="Username or email"
                   />
                 </div>
 
@@ -279,17 +316,22 @@ export class LoginModal extends HTMLElement {
                   <a href="#">Forgot Password?</a>
                 </div>
 
+                <div class="auth-form-error">
+                  <span class="error-message"> Invalid email or password </span>
+                </div>
                 <button type="submit">Log in</button>
               </form>
-              <div class="bottom-separator">
-                <div class="half-line"></div>
+              <div class="modal__separator-text">
+                <div class="modal__separator-line"></div>
                 <span>or</span>
-                <div class="half-line"></div>
+                <div class="modal__separator-line"></div>
               </div>
 
-              <div class="sign-out__container">
-                <span class="sign-up_caption">Don't have an account?</span>
-                <a class="sign-up_button" href="#">Sign up</a>
+              <div class="modal__footer">
+                <span class="modal__footer-caption"
+                  >Don't have an account?</span
+                >
+                <a class="modal__footer-button" href="#">Sign up</a>
               </div>
             </div>
           </div>
