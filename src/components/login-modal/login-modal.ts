@@ -1,6 +1,7 @@
 import { html } from '../../utils/html';
 import { loginUserUrl } from '../../services/route';
 import { EVENTS } from '../../constants/events';
+import '../loader/loader';
 
 const loginUser = async (
   email: FormDataEntryValue,
@@ -36,10 +37,14 @@ const loginUser = async (
 };
 
 export class LoginModal extends HTMLElement {
+  private submitting: boolean;
+
   constructor() {
     super();
     this.attachShadow({ mode: 'open' });
     this.onSubmit = this.onSubmit.bind(this);
+
+    this.submitting = false;
   }
 
   connectedCallback(): void {
@@ -63,6 +68,7 @@ export class LoginModal extends HTMLElement {
 
   private async onSubmit(event: Event): Promise<void> {
     event.preventDefault();
+    if (this.submitting) return;
 
     const target = event.target as HTMLFormElement;
     const formData = new FormData(target);
@@ -73,30 +79,50 @@ export class LoginModal extends HTMLElement {
     if (email && password) {
       try {
         await loginUser(email, password);
+        this.setFormState(true);
       } catch (error) {
         console.error('Failed to login:', error);
-
-        const errorContainer = this.shadowRoot?.querySelector(
-          '.auth-form-error',
-        ) as HTMLElement;
-        const errorText = this.shadowRoot?.querySelector(
-          '.error-message',
-        ) as HTMLElement;
-        const inputFields = this.shadowRoot?.querySelectorAll(
-          '.input_field',
-        ) as NodeListOf<HTMLInputElement>;
-
-        if (errorContainer && errorText) {
-          errorContainer.style.display = 'flex';
-
-          errorText.textContent = 'Invalid email or password';
-
-          inputFields.forEach((inputField) => {
-            inputField.style.borderColor = 'red';
-            inputField.value = '';
-          });
-        }
+        this.showError();
+      } finally {
+        this.setFormState(false);
       }
+    }
+  }
+
+  private setFormState(disabled: boolean): void {
+    this.submitting = disabled;
+    const button = this.shadowRoot?.querySelector(
+      'button',
+    ) as HTMLButtonElement;
+    const inputFields = this.shadowRoot?.querySelectorAll(
+      '.input_field',
+    ) as NodeListOf<HTMLInputElement>;
+
+    if (button) button.disabled = disabled;
+    inputFields.forEach((inputField) => {
+      inputField.disabled = disabled;
+    });
+  }
+
+  private showError(): void {
+    const errorContainer = this.shadowRoot?.querySelector(
+      '.auth-form-error',
+    ) as HTMLElement;
+    const errorText = this.shadowRoot?.querySelector(
+      '.error-message',
+    ) as HTMLElement;
+    const inputFields = this.shadowRoot?.querySelectorAll(
+      '.input_field',
+    ) as NodeListOf<HTMLInputElement>;
+
+    if (errorContainer && errorText) {
+      errorContainer.style.display = 'flex';
+      errorText.textContent = 'Invalid email or password';
+
+      inputFields.forEach((inputField) => {
+        inputField.style.borderColor = 'red';
+        inputField.value = '';
+      });
     }
   }
 
@@ -104,8 +130,10 @@ export class LoginModal extends HTMLElement {
     if (!this.shadowRoot) return;
     this.shadowRoot.innerHTML = html`
       <style>
+        {
         @import url('https://fonts.googleapis.com/css2?family=Montserrat:ital,wght@0,100..900;1,100..900&display=swap');
         @import url('https://fonts.googleapis.com/css2?family=Hind:wght@300;400;500;600;700&family=Montserrat:ital,wght@0,100..900;1,100..900&display=swap');
+        }
 
         * {
           box-sizing: border-box;
@@ -319,7 +347,11 @@ export class LoginModal extends HTMLElement {
                 <div class="auth-form-error">
                   <span class="error-message"> Invalid email or password </span>
                 </div>
-                <button type="submit">Log in</button>
+                <button type="submit">
+                  ${this.submitting
+                    ? html`<loader-component></loader-component>`
+                    : 'Login'}
+                </button>
               </form>
               <div class="modal__separator-text">
                 <div class="modal__separator-line"></div>
