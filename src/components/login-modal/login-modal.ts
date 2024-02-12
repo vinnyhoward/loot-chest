@@ -24,7 +24,6 @@ const loginUser = async (
   if (user.success && user.token) {
     localStorage.setItem('token', user.token);
     localStorage.setItem('user_auth', JSON.stringify(user.data));
-
     document.dispatchEvent(
       new CustomEvent(EVENTS.LOGIN_SUCCESS, {
         bubbles: true,
@@ -38,6 +37,7 @@ const loginUser = async (
 
 export class LoginModal extends HTMLElement {
   private submitting: boolean;
+  private isLoggedIn: boolean;
 
   constructor() {
     super();
@@ -45,6 +45,7 @@ export class LoginModal extends HTMLElement {
     this.onSubmit = this.onSubmit.bind(this);
 
     this.submitting = false;
+    this.isLoggedIn = false;
   }
 
   connectedCallback(): void {
@@ -79,6 +80,7 @@ export class LoginModal extends HTMLElement {
     if (email && password) {
       try {
         await loginUser(email, password);
+        this.isLoggedIn = true;
         this.setFormState(true);
       } catch (error) {
         console.error('Failed to login:', error);
