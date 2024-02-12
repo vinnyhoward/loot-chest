@@ -1,5 +1,5 @@
 import { html } from '../../utils/html';
-import { loginUserUrl } from '../../services/route';
+import { loginUserUrl, signUpUserUrl } from '../../services/route';
 import { EVENTS } from '../../constants/events';
 import '../loader/loader';
 
@@ -31,13 +31,52 @@ const loginUser = async (
       }),
     );
   } else {
-    console.error('Login failed:', user.message);
+    console.error('Log In failed:', user.message);
   }
 };
 
+const signUpUser = async (
+  username: FormDataEntryValue,
+  email: FormDataEntryValue,
+  password: FormDataEntryValue,
+) => {
+  const response = await fetch(signUpUserUrl(), {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+    },
+    body: JSON.stringify({ username, email, password }),
+  });
+
+  if (!response.ok) {
+    throw new Error(`Error: ${response.status}`);
+  }
+
+  const user = await response.json();
+
+  if (user.success && user.token) {
+    localStorage.setItem('token', user.token);
+    localStorage.setItem('user_auth', JSON.stringify(user.data));
+    document.dispatchEvent(
+      new CustomEvent(EVENTS.LOGIN_SUCCESS, {
+        bubbles: true,
+        composed: true,
+      }),
+    );
+  } else {
+    console.error('Sign Up failed:', user.message);
+  }
+};
+
+enum AuthState {
+  LOGIN,
+  SIGNUP,
+  FORGOT_PASSWORD,
+}
+
 export class LoginModal extends HTMLElement {
   private submitting: boolean;
-  private isLoggedIn: boolean;
+  private authState: AuthState;
 
   constructor() {
     super();
@@ -45,7 +84,7 @@ export class LoginModal extends HTMLElement {
     this.onSubmit = this.onSubmit.bind(this);
 
     this.submitting = false;
-    this.isLoggedIn = false;
+    this.authState = AuthState.LOGIN;
   }
 
   connectedCallback(): void {
@@ -58,13 +97,27 @@ export class LoginModal extends HTMLElement {
       this.style.display = 'none';
     } else {
       this.render();
-      this.attachFormSubmitListener();
+      this.attachListeners();
     }
   }
 
-  private attachFormSubmitListener(): void {
-    const form = this.shadowRoot?.querySelector('.modal__form');
+  private attachListeners(): void {
+    const form = this.shadowRoot?.querySelector('.modal__login-form');
     form?.addEventListener('submit', this.onSubmit);
+
+    const signUpButton = this.shadowRoot?.querySelector(
+      '.modal__footer-button',
+    );
+    signUpButton?.addEventListener('click', () => {
+      if (this.authState === AuthState.LOGIN) {
+        this.authState = AuthState.SIGNUP;
+      } else {
+        this.authState = AuthState.LOGIN;
+      }
+
+      this.render();
+      this.attachListeners();
+    });
   }
 
   private async onSubmit(event: Event): Promise<void> {
@@ -76,18 +129,30 @@ export class LoginModal extends HTMLElement {
 
     const email: FormDataEntryValue | null = formData.get('email');
     const password: FormDataEntryValue | null = formData.get('password');
+    const username: FormDataEntryValue | null = formData.get('email');
 
-    if (email && password) {
+    if (this.authState === AuthState.LOGIN && email && password) {
+      this.setFormState(true);
       try {
         await loginUser(email, password);
-        this.isLoggedIn = true;
-        this.setFormState(true);
       } catch (error) {
-        console.error('Failed to login:', error);
         this.showError();
-      } finally {
-        this.setFormState(false);
       }
+      this.setFormState(false);
+    } else {
+      this.showError();
+    }
+
+    if (this.authState === AuthState.SIGNUP && email && password && username) {
+      this.setFormState(true);
+      try {
+        await signUpUser(username, email, password);
+      } catch (error) {
+        this.showError();
+      }
+      this.setFormState(false);
+    } else {
+      this.showError();
     }
   }
 
@@ -117,7 +182,7 @@ export class LoginModal extends HTMLElement {
       '.input_field',
     ) as NodeListOf<HTMLInputElement>;
 
-    if (errorContainer && errorText) {
+    if (errorContainer && errorText && this.authState === AuthState.LOGIN) {
       errorContainer.style.display = 'flex';
       errorText.textContent = 'Invalid email or password';
 
@@ -126,6 +191,29 @@ export class LoginModal extends HTMLElement {
         inputField.value = '';
       });
     }
+
+    if (errorContainer && errorText && this.authState === AuthState.SIGNUP) {
+      errorContainer.style.display = 'flex';
+      errorText.textContent = 'Incorrect email, username or password';
+
+      inputFields.forEach((inputField) => {
+        inputField.style.borderColor = 'red';
+        inputField.value = '';
+      });
+    }
+  }
+
+  private authButtonText(): string {
+    if (this.authState === AuthState.LOGIN) return 'Login';
+    if (this.authState === AuthState.SIGNUP) return 'Sign up';
+    if (this.authState === AuthState.FORGOT_PASSWORD) return 'Reset password';
+    return '';
+  }
+
+  private secondaryAuthButtonText(): string {
+    if (this.authState === AuthState.LOGIN) return 'Sign up';
+    if (this.authState === AuthState.SIGNUP) return 'Login';
+    return '';
   }
 
   private render(): void {
@@ -293,6 +381,7 @@ export class LoginModal extends HTMLElement {
         }
 
         .modal__footer-button {
+          cursor: pointer;
           font-weight: 600;
           text-transform: none;
           color: #974af4;
@@ -322,14 +411,29 @@ export class LoginModal extends HTMLElement {
               <div class="line"></div>
             </div>
             <div class="modal__body">
-              <form class="modal__form">
+              <form class="modal__login-form">
+                ${this.authState === AuthState.SIGNUP
+                  ? html`
+                      <div>
+                        <input
+                          class="input_field"
+                          type="text"
+                          id="username"
+                          name="username"
+                          placeholder="Username"
+                        />
+                      </div>
+                    `
+                  : ''}
                 <div>
                   <input
                     class="input_field"
                     type="text"
                     id="email"
                     name="email"
-                    placeholder="Username or email"
+                    placeholder=${this.authState === AuthState.LOGIN
+                      ? 'Email or username'
+                      : 'Email'}
                   />
                 </div>
 
@@ -342,9 +446,12 @@ export class LoginModal extends HTMLElement {
                     placeholder="Password"
                   />
                 </div>
-                <div class="forgot-password">
-                  <a href="#">Forgot Password?</a>
-                </div>
+
+                ${this.authState === AuthState.LOGIN
+                  ? html`<div class="forgot-password">
+                      <a href="#">Forgot Password?</a>
+                    </div>`
+                  : ''}
 
                 <div class="auth-form-error">
                   <span class="error-message"> Invalid email or password </span>
@@ -352,7 +459,7 @@ export class LoginModal extends HTMLElement {
                 <button type="submit">
                   ${this.submitting
                     ? html`<loader-component></loader-component>`
-                    : 'Login'}
+                    : this.authButtonText()}
                 </button>
               </form>
               <div class="modal__separator-text">
@@ -365,7 +472,9 @@ export class LoginModal extends HTMLElement {
                 <span class="modal__footer-caption"
                   >Don't have an account?</span
                 >
-                <a class="modal__footer-button" href="#">Sign up</a>
+                <div class="modal__footer-button">
+                  ${this.secondaryAuthButtonText()}
+                </div>
               </div>
             </div>
           </div>
