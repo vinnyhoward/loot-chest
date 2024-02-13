@@ -12,8 +12,8 @@ export const EVENTS: Record<string, string> = {
   ASSETS_LOADING_FAILURE: 'assets-loading-failure',
   ASSETS_LOADING_SUCCESS: 'assets-loading-success',
 
-  SWITCH_AUTH_MODAL: 'switch-auth-modal',
-  SWITCH_AUTH_MODAL_LOADING: 'switch-auth-modal-loading',
-  SWITCH_AUTH_MODAL_SUCCESS: 'switch-auth-modal-success',
-  SWITCH_AUTH_MODAL_FAILURE: 'switch-auth-modal-failure',
+  TOAST_SUCCESS: 'toast-success',
+  TOAST_ERROR: 'toast-error',
+  TOAST_INFO: 'toast-info',
+  TOAST_WARNING: 'toast-warning',
 };

@@ -3,6 +3,7 @@ import Experience from './three/experience/Experience';
 import './components/login-modal/login-modal';
 import './components/loading-bar/loading-bar';
 import './components/dropdown-menu/dropdown-menu';
+import './components/toast-notification/toast-notification';
 import { html } from './utils/html';
 import { EVENTS } from './constants/events';
 
@@ -53,6 +54,7 @@ export default class App extends HTMLElement {
         <login-modal></login-modal>
         <loading-bar></loading-bar>
         <dropdown-menu></dropdown-menu>
+        <toast-notification></toast-notification>
         <canvas class="webgl"></canvas>
       </div>
     `;

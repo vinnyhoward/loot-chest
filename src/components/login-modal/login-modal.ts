@@ -32,9 +32,10 @@ const loginUser = async (
     localStorage.setItem('token', user.token);
     localStorage.setItem('user_auth', JSON.stringify(user.data));
     document.dispatchEvent(
-      new CustomEvent(EVENTS.LOGIN_SUCCESS, {
+      new CustomEvent(EVENTS.TOAST_SUCCESS, {
         bubbles: true,
         composed: true,
+        detail: { message: 'Logged in successfully' },
       }),
     );
   } else {
@@ -65,9 +66,10 @@ const signUpUser = async (
     localStorage.setItem('token', user.token);
     localStorage.setItem('user_auth', JSON.stringify(user.data));
     document.dispatchEvent(
-      new CustomEvent(EVENTS.LOGIN_SUCCESS, {
+      new CustomEvent(EVENTS.TOAST_SUCCESS, {
         bubbles: true,
         composed: true,
+        detail: { message: 'Signed up successfully' },
       }),
     );
   } else {
@@ -87,6 +89,16 @@ const forgotPassword = async (email: FormDataEntryValue) => {
   if (!response.ok) {
     throw new Error(`Error: ${response.status}`);
   }
+
+  if (response.status === 200) {
+    document.dispatchEvent(
+      new CustomEvent(EVENTS.TOAST_SUCCESS, {
+        bubbles: true,
+        composed: true,
+        detail: { message: 'Password reset link sent' },
+      }),
+    );
+  }
 };
 
 const resetPassword = async (
@@ -103,6 +115,16 @@ const resetPassword = async (
 
   if (!response.ok) {
     throw new Error(`Error: ${response.status}`);
+  }
+
+  if (response.status === 200) {
+    document.dispatchEvent(
+      new CustomEvent(EVENTS.TOAST_SUCCESS, {
+        bubbles: true,
+        composed: true,
+        detail: { message: 'Password reset successfully' },
+      }),
+    );
   }
 };
 
