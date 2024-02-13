@@ -1,5 +1,10 @@
 import { html } from '../../utils/html';
-import { loginUserUrl, signUpUserUrl } from '../../services/route';
+import {
+  loginUserUrl,
+  signUpUserUrl,
+  forgotPasswordUrl,
+  resetPasswordUrl,
+} from '../../services/route';
 import { EVENTS } from '../../constants/events';
 import { validateEmail } from '../../utils/validateEmail';
 import { validatePassword } from '../../utils/validatePassword';
@@ -70,15 +75,50 @@ const signUpUser = async (
   }
 };
 
+const forgotPassword = async (email: FormDataEntryValue) => {
+  const response = await fetch(forgotPasswordUrl(), {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+    },
+    body: JSON.stringify({ email }),
+  });
+
+  if (!response.ok) {
+    throw new Error(`Error: ${response.status}`);
+  }
+};
+
+const resetPassword = async (
+  password: FormDataEntryValue,
+  token: FormDataEntryValue,
+) => {
+  const response = await fetch(resetPasswordUrl(), {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+    },
+    body: JSON.stringify({ password, token }),
+  });
+
+  if (!response.ok) {
+    throw new Error(`Error: ${response.status}`);
+  }
+};
+
 enum AuthState {
   LOGIN,
   SIGNUP,
   FORGOT_PASSWORD,
+  RESET_PASSWORD,
+  RESET_PASSWORD_SUCCESS,
+  FORGOT_PASSWORD_SUCCESS,
 }
 
 export class LoginModal extends HTMLElement {
   private submitting: boolean;
   private authState: AuthState;
+  private resetPasswordToken: string;
 
   constructor() {
     super();
@@ -87,6 +127,7 @@ export class LoginModal extends HTMLElement {
 
     this.submitting = false;
     this.authState = AuthState.LOGIN;
+    this.resetPasswordToken = '';
   }
 
   connectedCallback(): void {
@@ -98,6 +139,19 @@ export class LoginModal extends HTMLElement {
     if (token) {
       this.style.display = 'none';
     } else {
+      const params = new URLSearchParams(window.location.search);
+      const resetPassToken = params.get('reset-password-token');
+      if (resetPassToken) {
+        this.resetPasswordToken = resetPassToken;
+        this.authState = AuthState.RESET_PASSWORD;
+
+        params.delete('reset-password-token');
+        const newUrl =
+          window.location.pathname +
+          (params.toString() ? '?' + params.toString() : '');
+        window.history.replaceState(null, '', newUrl);
+      }
+
       this.render();
       this.attachListeners();
     }
@@ -137,6 +191,13 @@ export class LoginModal extends HTMLElement {
     passwordField?.addEventListener('focus', () => {
       console.log('User has clicked or tabbed into the input field.');
     });
+
+    const forgotPassword = this.shadowRoot?.querySelector('.forgot-password');
+    forgotPassword?.addEventListener('click', () => {
+      this.authState = AuthState.FORGOT_PASSWORD;
+      this.render();
+      this.attachListeners();
+    });
   }
 
   private async onSubmit(event: Event): Promise<void> {
@@ -148,9 +209,113 @@ export class LoginModal extends HTMLElement {
 
     const email: FormDataEntryValue | null = formData.get('email');
     const password: FormDataEntryValue | null = formData.get('password');
+    const confirmedPassword: FormDataEntryValue | null =
+      formData.get('confirm_password');
     const username: FormDataEntryValue | null = formData.get('email');
+
     const isPasswordInvalid = !validatePassword(password as string);
     const isEmailInvalid = !validateEmail(email as string);
+
+    if (this.authState === AuthState.FORGOT_PASSWORD) {
+      if (isEmailInvalid) {
+        const emailField = this.shadowRoot?.querySelector(
+          '.email_field',
+        ) as HTMLElement;
+        const errorContainer = this.shadowRoot?.querySelector(
+          '.auth-form-error',
+        ) as HTMLElement;
+        const errorText = this.shadowRoot?.querySelector(
+          '.error-message',
+        ) as HTMLElement;
+        if (emailField) {
+          emailField.style.borderColor = 'red';
+          errorContainer.style.display = 'flex';
+          errorText.textContent = 'Invalid email';
+        }
+      }
+
+      if (email && !isEmailInvalid) {
+        this.setFormState(true);
+        try {
+          await forgotPassword(email);
+          this.authState = AuthState.FORGOT_PASSWORD_SUCCESS;
+        } catch (error) {
+          this.showError();
+        }
+        this.setFormState(false);
+      }
+
+      this.render();
+      return;
+    }
+
+    if (this.authState === AuthState.RESET_PASSWORD) {
+      if (password !== confirmedPassword) {
+        const passwordFields = this.shadowRoot?.querySelectorAll(
+          '.password_field',
+        ) as NodeListOf<HTMLInputElement>;
+        const errorContainer = this.shadowRoot?.querySelector(
+          '.auth-form-error',
+        ) as HTMLElement;
+        const errorText = this.shadowRoot?.querySelector(
+          '.error-message',
+        ) as HTMLElement;
+
+        if (passwordFields) {
+          passwordFields.forEach((passwordField) => {
+            passwordField.style.borderColor = 'red';
+          });
+          errorContainer.style.display = 'flex';
+          errorText.textContent = 'Passwords do not match';
+        }
+      }
+
+      if (isPasswordInvalid) {
+        const passwordFields = this.shadowRoot?.querySelectorAll(
+          '.password_field',
+        ) as NodeListOf<HTMLInputElement>;
+        const errorContainer = this.shadowRoot?.querySelector(
+          '.auth-form-error',
+        ) as HTMLElement;
+        const errorText = this.shadowRoot?.querySelector(
+          '.error-message',
+        ) as HTMLElement;
+        if (passwordFields) {
+          passwordFields.forEach((passwordField) => {
+            passwordField.style.borderColor = 'red';
+          });
+          errorContainer.style.display = 'flex';
+          errorText.textContent = 'Invalid password';
+        }
+      }
+
+      if (password && password === confirmedPassword && !isPasswordInvalid) {
+        this.setFormState(true);
+        try {
+          await resetPassword(confirmedPassword, this.resetPasswordToken);
+          this.authState = AuthState.LOGIN;
+        } catch (error) {
+          console.error('Failed to reset password:', error);
+          const passwordFields = this.shadowRoot?.querySelectorAll(
+            '.password_field',
+          ) as NodeListOf<HTMLInputElement>;
+          const errorContainer = this.shadowRoot?.querySelector(
+            '.auth-form-error',
+          ) as HTMLElement;
+          const errorText = this.shadowRoot?.querySelector(
+            '.error-message',
+          ) as HTMLElement;
+          if (passwordFields) {
+            passwordFields.forEach((passwordField) => {
+              passwordField.style.borderColor = 'red';
+            });
+            errorContainer.style.display = 'flex';
+            errorText.textContent = 'Something went wrong. Please try again';
+          }
+        }
+        this.setFormState(false);
+      }
+    }
 
     if (email && isEmailInvalid) {
       const emailField = this.shadowRoot?.querySelector(
@@ -217,6 +382,7 @@ export class LoginModal extends HTMLElement {
       try {
         await loginUser(email, password);
       } catch (error) {
+        console.error('Failed to log in:', error);
         this.showError();
       }
       this.setFormState(false);
@@ -285,15 +451,29 @@ export class LoginModal extends HTMLElement {
   }
 
   private authButtonText(): string {
+    if (this.authState === AuthState.RESET_PASSWORD) return 'Reset password';
+    if (this.authState === AuthState.FORGOT_PASSWORD)
+      return 'Send reset password link';
     if (this.authState === AuthState.LOGIN) return 'Login';
     if (this.authState === AuthState.SIGNUP) return 'Sign up';
-    if (this.authState === AuthState.FORGOT_PASSWORD) return 'Reset password';
+    if (this.authState === AuthState.FORGOT_PASSWORD_SUCCESS) return 'Resend';
     return '';
   }
 
   private secondaryAuthButtonText(): string {
     if (this.authState === AuthState.LOGIN) return 'Sign up';
     if (this.authState === AuthState.SIGNUP) return 'Login';
+    if (
+      this.authState === AuthState.FORGOT_PASSWORD ||
+      this.authState === AuthState.FORGOT_PASSWORD_SUCCESS ||
+      this.authState === AuthState.RESET_PASSWORD
+    )
+      return 'Login';
+    return '';
+  }
+
+  private passwordValidationText(): string {
+    // TODO: render password validation text
     return '';
   }
 
@@ -408,6 +588,7 @@ export class LoginModal extends HTMLElement {
         }
 
         .forgot-password {
+          cursor: pointer;
           margin-bottom: 20px;
           color: #acbcc0;
           font-family: 'Hind', sans-serif;
@@ -494,6 +675,22 @@ export class LoginModal extends HTMLElement {
           margin: 0;
           padding: 20px;
         }
+
+        .forgot-password__container {
+          display: flex;
+          flex-direction: column;
+          align-items: center;
+          margin-bottom: 20px;
+        }
+
+        .forgot-caption {
+          color: #acbcc0;
+          font-family: 'Hind', sans-serif;
+          font-weight: 400;
+          font-style: normal;
+          font-size: 14px;
+          text-transform: none;
+        }
       </style>
       <div>
         <div class="modal__container">
@@ -520,9 +717,19 @@ export class LoginModal extends HTMLElement {
             </div>
             <div class="modal__body">
               <form class="modal__login-form">
+                ${this.authState === AuthState.FORGOT_PASSWORD ||
+                this.authState === AuthState.FORGOT_PASSWORD_SUCCESS
+                  ? html`
+                      <div class="forgot-password__container">
+                        <div class="forgot-caption">
+                          Enter your email to reset your password
+                        </div>
+                      </div>
+                    `
+                  : ''}
                 ${this.authState === AuthState.SIGNUP
                   ? html`
-                      <div>
+                      <div class="">
                         <input
                           class="input_field"
                           type="text"
@@ -533,31 +740,54 @@ export class LoginModal extends HTMLElement {
                       </div>
                     `
                   : ''}
-                <div>
-                  <input
-                    class="input_field email_field"
-                    type="text"
-                    id="email"
-                    name="email"
-                    placeholder=${this.authState === AuthState.LOGIN
-                      ? 'Email or username'
-                      : 'Email'}
-                  />
-                </div>
-
-                <div>
-                  <input
-                    class="input_field password_field"
-                    type="password"
-                    id="password"
-                    name="password"
-                    placeholder="Password"
-                  />
-                </div>
-
+                ${this.authState !== AuthState.RESET_PASSWORD
+                  ? html`
+                      <div>
+                        <input
+                          class="input_field email_field"
+                          type="text"
+                          id="email"
+                          name="email"
+                          placeholder=${this.authState === AuthState.LOGIN
+                            ? 'Email or username'
+                            : 'Email'}
+                        />
+                      </div>
+                    `
+                  : ''}
+                ${this.authState !== AuthState.FORGOT_PASSWORD &&
+                this.authState !== AuthState.FORGOT_PASSWORD_SUCCESS
+                  ? html`
+                      <div>
+                        <input
+                          class="input_field password_field"
+                          type="password"
+                          id="password"
+                          name="password"
+                          placeholder="Password"
+                        />
+                      </div>
+                    `
+                  : ''}
+                ${this.authState === AuthState.RESET_PASSWORD
+                  ? html`
+                      <div>
+                        <input
+                          class="input_field password_field"
+                          type="password"
+                          id="confirm_password"
+                          name="confirm_password"
+                          placeholder="Confirm Password"
+                        />
+                      </div>
+                    `
+                  : ''}
+                ${this.authState === AuthState.SIGNUP
+                  ? html` <div>${this.passwordValidationText()}</div> `
+                  : ''}
                 ${this.authState === AuthState.LOGIN
                   ? html`<div class="forgot-password">
-                      <a href="#">Forgot Password?</a>
+                      <div>Forgot Password?</div>
                     </div>`
                   : ''}
 

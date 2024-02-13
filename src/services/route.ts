@@ -4,6 +4,8 @@ export const getAllUsersAdminUrl = () => `${BASE_URL}/users/all`;
 export const getUserByIdAdminUrl = (id: string) => `${BASE_URL}/users/${id}`;
 export const signUpUserUrl = () => `${BASE_URL}/users/signup`;
 export const loginUserUrl = () => `${BASE_URL}/users/login`;
+export const forgotPasswordUrl = () => `${BASE_URL}/users/forgot-password`;
+export const resetPasswordUrl = () => `${BASE_URL}/users/reset-password`;
 export const getUserProfileUrl = () => `${BASE_URL}/users/me`;
 export const updateUserProfileUrl = () => `${BASE_URL}/users/me`;
 
