@@ -1,6 +1,8 @@
 import { html } from '../../utils/html';
 import { loginUserUrl, signUpUserUrl } from '../../services/route';
 import { EVENTS } from '../../constants/events';
+import { validateEmail } from '../../utils/validateEmail';
+import { validatePassword } from '../../utils/validatePassword';
 import '../loader/loader';
 
 const loginUser = async (
@@ -108,6 +110,7 @@ export class LoginModal extends HTMLElement {
     const signUpButton = this.shadowRoot?.querySelector(
       '.modal__footer-button',
     );
+
     signUpButton?.addEventListener('click', () => {
       if (this.authState === AuthState.LOGIN) {
         this.authState = AuthState.SIGNUP;
@@ -117,6 +120,22 @@ export class LoginModal extends HTMLElement {
 
       this.render();
       this.attachListeners();
+    });
+
+    const close = this.shadowRoot?.querySelector(
+      '.close__button',
+    ) as HTMLElement;
+
+    close?.addEventListener('click', () => {
+      this.style.display = 'none';
+    });
+
+    const passwordField = this.shadowRoot?.querySelector(
+      '.password_field',
+    ) as HTMLInputElement;
+
+    passwordField?.addEventListener('focus', () => {
+      console.log('User has clicked or tabbed into the input field.');
     });
   }
 
@@ -130,6 +149,68 @@ export class LoginModal extends HTMLElement {
     const email: FormDataEntryValue | null = formData.get('email');
     const password: FormDataEntryValue | null = formData.get('password');
     const username: FormDataEntryValue | null = formData.get('email');
+    const isPasswordInvalid = !validatePassword(password as string);
+    const isEmailInvalid = !validateEmail(email as string);
+
+    if (email && isEmailInvalid) {
+      const emailField = this.shadowRoot?.querySelector(
+        '.email_field',
+      ) as HTMLElement;
+      const errorContainer = this.shadowRoot?.querySelector(
+        '.auth-form-error',
+      ) as HTMLElement;
+      const errorText = this.shadowRoot?.querySelector(
+        '.error-message',
+      ) as HTMLElement;
+      if (emailField) {
+        emailField.style.borderColor = 'red';
+        errorContainer.style.display = 'flex';
+        errorText.textContent = 'Invalid email';
+      }
+    }
+
+    if (password && isPasswordInvalid) {
+      const passwordField = this.shadowRoot?.querySelector(
+        '.password_field',
+      ) as HTMLElement;
+      const errorContainer = this.shadowRoot?.querySelector(
+        '.auth-form-error',
+      ) as HTMLElement;
+      const errorText = this.shadowRoot?.querySelector(
+        '.error-message',
+      ) as HTMLElement;
+      if (passwordField) {
+        passwordField.style.borderColor = 'red';
+        errorContainer.style.display = 'flex';
+        errorText.textContent = 'Invalid password';
+      }
+    }
+
+    if (isEmailInvalid && isPasswordInvalid) {
+      const emailField = this.shadowRoot?.querySelector(
+        '.email_field',
+      ) as HTMLElement;
+      const passwordField = this.shadowRoot?.querySelector(
+        '.password_field',
+      ) as HTMLElement;
+      const errorContainer = this.shadowRoot?.querySelector(
+        '.auth-form-error',
+      ) as HTMLElement;
+      const errorText = this.shadowRoot?.querySelector(
+        '.error-message',
+      ) as HTMLElement;
+
+      if (emailField && passwordField) {
+        emailField.style.borderColor = 'red';
+        passwordField.style.borderColor = 'red';
+        errorContainer.style.display = 'flex';
+        errorText.textContent = 'Invalid email and password';
+      }
+
+      return;
+    }
+
+    if (isPasswordInvalid || isEmailInvalid) return;
 
     if (this.authState === AuthState.LOGIN && email && password) {
       this.setFormState(true);
@@ -278,7 +359,7 @@ export class LoginModal extends HTMLElement {
           background-color: #f0f0f0;
         }
         .modal__logo {
-          margin: 25px 0;
+          margin: 0 0 25px 0;
           object-fit: contain;
           width: 260px;
         }
@@ -400,12 +481,39 @@ export class LoginModal extends HTMLElement {
         }
 
         .auth-form-error {
-          display: none;
+          display:4 none;
+        }
+
+        .close__container {
+          display: flex;
+          justify-content: flex-end;
+        }
+
+        .close__button {
+          cursor: pointer;
+          margin: 0;
+          padding: 20px;
         }
       </style>
       <div>
         <div class="modal__container">
           <div class="modal">
+            <div class="close__container">
+              <span class="close__button"
+                ><svg
+                  width="24"
+                  height="24"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  xmlns="http://www.w3.org/2000/svg"
+                >
+                  <path
+                    d="M13.414 12L18.707 6.70695C19.098 6.31695 19.098 5.68301 18.707 5.29301C18.316 4.90201 17.684 4.90201 17.293 5.29301L12 10.586L6.70701 5.29301C6.31601 4.90201 5.68401 4.90201 5.29301 5.29301C4.90201 5.68301 4.90201 6.31695 5.29301 6.70695L10.586 12L5.29301 17.293C4.90201 17.683 4.90201 18.3169 5.29301 18.7069C5.48801 18.9019 5.74401 19 6.00001 19C6.25601 19 6.51201 18.9019 6.70701 18.7069L12 13.414L17.293 18.7069C17.488 18.9019 17.744 19 18 19C18.256 19 18.512 18.9019 18.707 18.7069C19.098 18.3169 19.098 17.683 18.707 17.293L13.414 12Z"
+                    fill="#25314C"
+                  />
+                </svg>
+              </span>
+            </div>
             <div class="modal__header">
               <img class="modal__logo" src="/logos/temp_logo.png" alt="logo" />
               <div class="line"></div>
@@ -427,7 +535,7 @@ export class LoginModal extends HTMLElement {
                   : ''}
                 <div>
                   <input
-                    class="input_field"
+                    class="input_field email_field"
                     type="text"
                     id="email"
                     name="email"
@@ -439,7 +547,7 @@ export class LoginModal extends HTMLElement {
 
                 <div>
                   <input
-                    class="input_field"
+                    class="input_field password_field"
                     type="password"
                     id="password"
                     name="password"
@@ -454,7 +562,7 @@ export class LoginModal extends HTMLElement {
                   : ''}
 
                 <div class="auth-form-error">
-                  <span class="error-message"> Invalid email or password </span>
+                  <span class="error-message"></span>
                 </div>
                 <button type="submit">
                   ${this.submitting
