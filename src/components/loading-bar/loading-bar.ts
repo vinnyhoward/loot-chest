@@ -1,6 +1,5 @@
 import gsap from 'gsap';
 import { html } from '../../utils/html';
-// @ts-ignore
 import { EVENTS } from '../../constants/events';
 
 export default class LoadingBar extends HTMLElement {
@@ -16,10 +15,12 @@ export default class LoadingBar extends HTMLElement {
 
   connectedCallback(): void {
     this.render();
+
     document.addEventListener(
       EVENTS.LOADING_PROGRESS,
       this.handleLoadingProgress.bind(this),
     );
+
     document.addEventListener(
       EVENTS.SHOW_LOADING,
       this.showLoadingScreen.bind(this),
@@ -30,7 +31,7 @@ export default class LoadingBar extends HTMLElement {
     );
   }
 
-  public handleLoadingProgress(event: CustomEvent): void {
+  public handleLoadingProgress(event: any): void {
     const { progressRatio } = event.detail;
     this.updateLoadingBar(progressRatio);
   }
@@ -47,11 +48,13 @@ export default class LoadingBar extends HTMLElement {
       duration: 0.25,
       opacity: 1,
       delay: 0.25,
+      display: 'block',
     });
     gsap.to(this.loadingBarContainerElement, {
       duration: 0.25,
       opacity: 1,
       delay: 0.25,
+      display: 'block',
     });
   }
 
@@ -68,11 +71,13 @@ export default class LoadingBar extends HTMLElement {
         duration: 2,
         opacity: 0,
         delay: 0,
+        display: 'none',
       });
       gsap.to(this.loadingBarContainerElement, {
         duration: 2,
         opacity: 0,
         delay: 0,
+        display: 'none',
       });
     }, 2000);
   }

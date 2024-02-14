@@ -1,4 +1,5 @@
 // @ts-nocheck
+import gsap from 'gsap';
 import Experience from './three/experience/Experience';
 import './components/login-modal/login-modal';
 import './components/loading-bar/loading-bar';
@@ -45,6 +46,19 @@ export default class App extends HTMLElement {
       .catch((error) => {
         console.error('Failed to fetch assets:', error);
       });
+
+    document.addEventListener(EVENTS.SHOW_MENU, () => {
+      const app = this.shadowRoot.querySelector('.app');
+      console.log('app', app);
+      if (app) {
+        gsap.to(app, {
+          delay: 3.5,
+          duration: 0.5,
+          opacity: 1,
+          display: 'block',
+        });
+      }
+    });
   }
 
   render() {
@@ -71,12 +85,19 @@ export default class App extends HTMLElement {
           height: 100%;
           z-index: -1;
         }
+
+        .app {
+          display: none;
+          opacity: 0;
+        }
       </style>
       <div>
-        <login-modal></login-modal>
+        <div class="app">
+          <login-modal></login-modal>
+          <dropdown-menu></dropdown-menu>
+          <toast-notification></toast-notification>
+        </div>
         <loading-bar></loading-bar>
-        <dropdown-menu></dropdown-menu>
-        <toast-notification></toast-notification>
         <canvas class="webgl"></canvas>
       </div>
     `;

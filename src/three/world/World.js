@@ -3,6 +3,7 @@ import Environment from './Environment';
 import Trapdoor from './Trapdoor';
 import Physics from './Physics';
 import LootChest from './LootChest';
+import { EVENTS } from '../../constants/events';
 
 export default class World {
   constructor() {
@@ -25,6 +26,8 @@ export default class World {
         setTimeout(() => {
           this.lootChest.setLootChest(chestAssets[0].name);
         }, 3000);
+
+        document.dispatchEvent(new CustomEvent(EVENTS.SHOW_MENU));
       }
     });
   }

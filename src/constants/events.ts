@@ -1,4 +1,7 @@
 export const EVENTS: Record<string, string> = {
+  SHOW_MENU: 'show-menu',
+  HIDE_MENU: 'hide-menu',
+
   SHOW_LOADING: 'show-loading',
   HIDE_LOADING: 'hide-loading',
   LOADING_PROGRESS: 'loading-progress',
