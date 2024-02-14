@@ -50,6 +50,28 @@ export default class App extends HTMLElement {
   render() {
     if (!this.shadowRoot) return;
     this.shadowRoot.innerHTML = html`
+      <style>
+        * {
+          margin: 0;
+          padding: 0;
+          box-sizing: border-box;
+          overflow-y: hidden;
+          overflow-x: hidden;
+        }
+
+        body {
+          overflow: hidden;
+        }
+
+        .webgl {
+          position: fixed;
+          top: 0;
+          left: 0;
+          width: 100%;
+          height: 100%;
+          z-index: -1;
+        }
+      </style>
       <div>
         <login-modal></login-modal>
         <loading-bar></loading-bar>

@@ -1,3 +1,4 @@
+import { v4 as uuidv4 } from 'uuid';
 import { html } from '../../utils/html';
 import {
   loginUserUrl,
@@ -9,6 +10,7 @@ import { EVENTS } from '../../constants/events';
 import { validateEmail } from '../../utils/validateEmail';
 import { validatePassword } from '../../utils/validatePassword';
 import '../loader/loader';
+import { Notification, NotificationType } from '../../types';
 
 const loginUser = async (
   email: FormDataEntryValue,
@@ -31,11 +33,20 @@ const loginUser = async (
   if (user.success && user.token) {
     localStorage.setItem('token', user.token);
     localStorage.setItem('user_auth', JSON.stringify(user.data));
+
+    const detail: Notification = {
+      title: 'Logged in successfully',
+      message: 'Welcome back',
+      id: uuidv4(),
+      type: NotificationType.SUCCESS,
+      duration: 4000,
+    };
+
     document.dispatchEvent(
       new CustomEvent(EVENTS.TOAST_SUCCESS, {
         bubbles: true,
         composed: true,
-        detail: { message: 'Logged in successfully' },
+        detail,
       }),
     );
   } else {
@@ -65,11 +76,20 @@ const signUpUser = async (
   if (user.success && user.token) {
     localStorage.setItem('token', user.token);
     localStorage.setItem('user_auth', JSON.stringify(user.data));
+
+    const detail: Notification = {
+      title: 'Signed up successfully',
+      message: 'Welcome to the community',
+      id: uuidv4(),
+      type: NotificationType.SUCCESS,
+      duration: 4000,
+    };
+
     document.dispatchEvent(
       new CustomEvent(EVENTS.TOAST_SUCCESS, {
         bubbles: true,
         composed: true,
-        detail: { message: 'Signed up successfully' },
+        detail,
       }),
     );
   } else {
@@ -91,11 +111,19 @@ const forgotPassword = async (email: FormDataEntryValue) => {
   }
 
   if (response.status === 200) {
+    const detail: Notification = {
+      title: 'Password reset link sent',
+      message: 'Check your email',
+      id: uuidv4(),
+      type: NotificationType.ERROR,
+      duration: 4000,
+    };
+
     document.dispatchEvent(
       new CustomEvent(EVENTS.TOAST_SUCCESS, {
         bubbles: true,
         composed: true,
-        detail: { message: 'Password reset link sent' },
+        detail,
       }),
     );
   }
@@ -118,11 +146,18 @@ const resetPassword = async (
   }
 
   if (response.status === 200) {
+    const detail: Notification = {
+      title: 'Password reset successfully',
+      message: 'Password reset successfully',
+      id: uuidv4(),
+      type: NotificationType.SUCCESS,
+      duration: 4000,
+    };
     document.dispatchEvent(
       new CustomEvent(EVENTS.TOAST_SUCCESS, {
         bubbles: true,
         composed: true,
-        detail: { message: 'Password reset successfully' },
+        detail,
       }),
     );
   }
@@ -262,6 +297,7 @@ export class LoginModal extends HTMLElement {
           await forgotPassword(email);
           this.authState = AuthState.FORGOT_PASSWORD_SUCCESS;
         } catch (error) {
+          console.error('Failed to send reset password link:', error);
           this.showError();
         }
         this.setFormState(false);
