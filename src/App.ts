@@ -49,13 +49,13 @@ export default class App extends HTMLElement {
 
     document.addEventListener(EVENTS.SHOW_MENU, () => {
       const app = this.shadowRoot.querySelector('.app');
-      console.log('app', app);
       if (app) {
         gsap.to(app, {
           delay: 3.5,
           duration: 0.5,
           opacity: 1,
           display: 'block',
+          ease: 'power1.out',
         });
       }
     });

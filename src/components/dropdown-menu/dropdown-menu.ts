@@ -112,6 +112,10 @@ export class DropdownMenu extends HTMLElement {
 
   render() {
     if (!this.shadowRoot) return;
+    const chestList = this._chests.filter((chest) => {
+      const isDraft = chest._id.split('.').length > 1;
+      return chest._id !== this.state.selectedItem._id && !isDraft;
+    });
 
     this.shadowRoot.innerHTML = html`
       <style>
@@ -238,8 +242,7 @@ export class DropdownMenu extends HTMLElement {
             : html`<div>Loading...</div>`}
 
           <ul class="dropdown__list">
-            ${this._chests
-              .filter((chest) => chest._id !== this.state.selectedItem._id)
+            ${chestList
               .map((chest) => {
                 const url = urlFor(chest.chestIcon.asset._ref)
                   .width(50)

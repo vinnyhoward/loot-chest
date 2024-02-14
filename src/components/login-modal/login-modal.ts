@@ -1,167 +1,15 @@
-import { v4 as uuidv4 } from 'uuid';
-import { html } from '../../utils/html';
+import gsap from 'gsap';
 import {
-  loginUserUrl,
-  signUpUserUrl,
-  forgotPasswordUrl,
-  resetPasswordUrl,
-} from '../../services/route';
-import { EVENTS } from '../../constants/events';
+  loginUser,
+  signUpUser,
+  forgotPassword,
+  resetPassword,
+} from '../../services/auth';
+import { html } from '../../utils/html';
 import { validateEmail } from '../../utils/validateEmail';
 import { validatePassword } from '../../utils/validatePassword';
+import { EVENTS } from '../../constants/events';
 import '../loader/loader';
-import { Notification, NotificationType } from '../../types';
-
-const loginUser = async (
-  email: FormDataEntryValue,
-  password: FormDataEntryValue,
-) => {
-  const response = await fetch(loginUserUrl(), {
-    method: 'POST',
-    headers: {
-      'Content-Type': 'application/json',
-    },
-    body: JSON.stringify({ email, password }),
-  });
-
-  if (!response.ok) {
-    throw new Error(`Error: ${response.status}`);
-  }
-
-  const user = await response.json();
-
-  if (user.success && user.token) {
-    localStorage.setItem('token', user.token);
-    localStorage.setItem('user_auth', JSON.stringify(user.data));
-
-    const detail: Notification = {
-      title: 'Logged in successfully',
-      message: 'Welcome back',
-      id: uuidv4(),
-      type: NotificationType.SUCCESS,
-      duration: 4000,
-    };
-
-    document.dispatchEvent(
-      new CustomEvent(EVENTS.TOAST_SUCCESS, {
-        bubbles: true,
-        composed: true,
-        detail,
-      }),
-    );
-  } else {
-    console.error('Log In failed:', user.message);
-  }
-};
-
-const signUpUser = async (
-  username: FormDataEntryValue,
-  email: FormDataEntryValue,
-  password: FormDataEntryValue,
-) => {
-  const response = await fetch(signUpUserUrl(), {
-    method: 'POST',
-    headers: {
-      'Content-Type': 'application/json',
-    },
-    body: JSON.stringify({ username, email, password }),
-  });
-
-  if (!response.ok) {
-    throw new Error(`Error: ${response.status}`);
-  }
-
-  const user = await response.json();
-
-  if (user.success && user.token) {
-    localStorage.setItem('token', user.token);
-    localStorage.setItem('user_auth', JSON.stringify(user.data));
-
-    const detail: Notification = {
-      title: 'Signed up successfully',
-      message: 'Welcome to the community',
-      id: uuidv4(),
-      type: NotificationType.SUCCESS,
-      duration: 4000,
-    };
-
-    document.dispatchEvent(
-      new CustomEvent(EVENTS.TOAST_SUCCESS, {
-        bubbles: true,
-        composed: true,
-        detail,
-      }),
-    );
-  } else {
-    console.error('Sign Up failed:', user.message);
-  }
-};
-
-const forgotPassword = async (email: FormDataEntryValue) => {
-  const response = await fetch(forgotPasswordUrl(), {
-    method: 'POST',
-    headers: {
-      'Content-Type': 'application/json',
-    },
-    body: JSON.stringify({ email }),
-  });
-
-  if (!response.ok) {
-    throw new Error(`Error: ${response.status}`);
-  }
-
-  if (response.status === 200) {
-    const detail: Notification = {
-      title: 'Password reset link sent',
-      message: 'Check your email',
-      id: uuidv4(),
-      type: NotificationType.ERROR,
-      duration: 4000,
-    };
-
-    document.dispatchEvent(
-      new CustomEvent(EVENTS.TOAST_SUCCESS, {
-        bubbles: true,
-        composed: true,
-        detail,
-      }),
-    );
-  }
-};
-
-const resetPassword = async (
-  password: FormDataEntryValue,
-  token: FormDataEntryValue,
-) => {
-  const response = await fetch(resetPasswordUrl(), {
-    method: 'POST',
-    headers: {
-      'Content-Type': 'application/json',
-    },
-    body: JSON.stringify({ password, token }),
-  });
-
-  if (!response.ok) {
-    throw new Error(`Error: ${response.status}`);
-  }
-
-  if (response.status === 200) {
-    const detail: Notification = {
-      title: 'Password reset successfully',
-      message: 'Password reset successfully',
-      id: uuidv4(),
-      type: NotificationType.SUCCESS,
-      duration: 4000,
-    };
-    document.dispatchEvent(
-      new CustomEvent(EVENTS.TOAST_SUCCESS, {
-        bubbles: true,
-        composed: true,
-        detail,
-      }),
-    );
-  }
-};
 
 enum AuthState {
   LOGIN,
@@ -190,11 +38,11 @@ export class LoginModal extends HTMLElement {
   connectedCallback(): void {
     const token = localStorage.getItem('token');
     document.addEventListener(EVENTS.LOGIN_SUCCESS, () => {
-      this.style.display = 'none';
+      this.hide();
     });
 
     if (token) {
-      this.style.display = 'none';
+      this.hide();
     } else {
       const params = new URLSearchParams(window.location.search);
       const resetPassToken = params.get('reset-password-token');
@@ -238,7 +86,7 @@ export class LoginModal extends HTMLElement {
     ) as HTMLElement;
 
     close?.addEventListener('click', () => {
-      this.style.display = 'none';
+      this.hide();
     });
 
     const passwordField = this.shadowRoot?.querySelector(
@@ -254,6 +102,26 @@ export class LoginModal extends HTMLElement {
       this.authState = AuthState.FORGOT_PASSWORD;
       this.render();
       this.attachListeners();
+    });
+  }
+
+  public hide(): void {
+    gsap.to(this, {
+      duration: 0.2,
+      delay: 0.1,
+      opacity: 0,
+      display: 'none',
+      ease: 'power1.out',
+    });
+  }
+
+  public show(): void {
+    gsap.to(this, {
+      duration: 0.2,
+      delay: 0.1,
+      opacity: 1,
+      display: 'block',
+      ease: 'power1.out',
     });
   }
 
@@ -273,7 +141,10 @@ export class LoginModal extends HTMLElement {
     const isPasswordInvalid = !validatePassword(password as string);
     const isEmailInvalid = !validateEmail(email as string);
 
-    if (this.authState === AuthState.FORGOT_PASSWORD) {
+    if (
+      this.authState === AuthState.FORGOT_PASSWORD ||
+      this.authState === AuthState.FORGOT_PASSWORD_SUCCESS
+    ) {
       if (isEmailInvalid) {
         const emailField = this.shadowRoot?.querySelector(
           '.email_field',
@@ -304,6 +175,7 @@ export class LoginModal extends HTMLElement {
       }
 
       this.render();
+      this.attachListeners();
       return;
     }
 
@@ -375,40 +247,6 @@ export class LoginModal extends HTMLElement {
       }
     }
 
-    if (email && isEmailInvalid) {
-      const emailField = this.shadowRoot?.querySelector(
-        '.email_field',
-      ) as HTMLElement;
-      const errorContainer = this.shadowRoot?.querySelector(
-        '.auth-form-error',
-      ) as HTMLElement;
-      const errorText = this.shadowRoot?.querySelector(
-        '.error-message',
-      ) as HTMLElement;
-      if (emailField) {
-        emailField.style.borderColor = 'red';
-        errorContainer.style.display = 'flex';
-        errorText.textContent = 'Invalid email';
-      }
-    }
-
-    if (password && isPasswordInvalid) {
-      const passwordField = this.shadowRoot?.querySelector(
-        '.password_field',
-      ) as HTMLElement;
-      const errorContainer = this.shadowRoot?.querySelector(
-        '.auth-form-error',
-      ) as HTMLElement;
-      const errorText = this.shadowRoot?.querySelector(
-        '.error-message',
-      ) as HTMLElement;
-      if (passwordField) {
-        passwordField.style.borderColor = 'red';
-        errorContainer.style.display = 'flex';
-        errorText.textContent = 'Invalid password';
-      }
-    }
-
     if (isEmailInvalid && isPasswordInvalid) {
       const emailField = this.shadowRoot?.querySelector(
         '.email_field',
@@ -433,31 +271,65 @@ export class LoginModal extends HTMLElement {
       return;
     }
 
-    if (isPasswordInvalid || isEmailInvalid) return;
+    if (email && isEmailInvalid) {
+      const emailField = this.shadowRoot?.querySelector(
+        '.email_field',
+      ) as HTMLElement;
+      const errorContainer = this.shadowRoot?.querySelector(
+        '.auth-form-error',
+      ) as HTMLElement;
+      const errorText = this.shadowRoot?.querySelector(
+        '.error-message',
+      ) as HTMLElement;
+      if (emailField) {
+        emailField.style.borderColor = 'red';
+        errorContainer.style.display = 'flex';
+        errorText.textContent = 'Invalid email';
+      }
 
+      return;
+    }
+
+    if (password && isPasswordInvalid) {
+      const passwordField = this.shadowRoot?.querySelector(
+        '.password_field',
+      ) as HTMLElement;
+      const errorContainer = this.shadowRoot?.querySelector(
+        '.auth-form-error',
+      ) as HTMLElement;
+      const errorText = this.shadowRoot?.querySelector(
+        '.error-message',
+      ) as HTMLElement;
+      if (passwordField) {
+        passwordField.style.borderColor = 'red';
+        errorContainer.style.display = 'flex';
+        errorText.textContent = 'Invalid password';
+      }
+
+      return;
+    }
     if (this.authState === AuthState.LOGIN && email && password) {
       this.setFormState(true);
       try {
         await loginUser(email, password);
+        this.hide();
       } catch (error) {
         console.error('Failed to log in:', error);
         this.showError();
       }
-      this.setFormState(false);
-    } else {
-      this.showError();
+      return this.setFormState(false);
     }
 
     if (this.authState === AuthState.SIGNUP && email && password && username) {
       this.setFormState(true);
       try {
         await signUpUser(username, email, password);
+        this.hide();
       } catch (error) {
+        console.error('Failed to sign up:', error);
         this.showError();
       }
       this.setFormState(false);
-    } else {
-      this.showError();
     }
   }
 

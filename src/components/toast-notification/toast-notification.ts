@@ -14,10 +14,12 @@ const initialState: Notification = {
 
 export class ToastNotifications extends HTMLElement {
   private _notification: Notification = initialState;
+  private _updateProgressInterval: any;
 
   constructor() {
     super();
     this.attachShadow({ mode: 'open' });
+    this._updateProgressInterval = null;
   }
 
   set notification(data: Notification) {
@@ -62,8 +64,9 @@ export class ToastNotifications extends HTMLElement {
     }
   }
 
-  hide(): void {
+  hideWithDelay(): void {
     if (!this.shadowRoot) return;
+    clearInterval(this._updateProgressInterval);
     const toast = this.shadowRoot.querySelector('.toast') as HTMLElement;
     const toastContainer = this.shadowRoot.querySelector(
       '.toast__container',
@@ -78,6 +81,27 @@ export class ToastNotifications extends HTMLElement {
     gsap.to(toastContainer, {
       duration: 0.2,
       delay: 0.5,
+      opacity: 0,
+      display: 'none',
+    });
+    this._notification = initialState;
+  }
+
+  hide(): void {
+    if (!this.shadowRoot) return;
+    clearInterval(this._updateProgressInterval);
+    const toast = this.shadowRoot.querySelector('.toast') as HTMLElement;
+    const toastContainer = this.shadowRoot.querySelector(
+      '.toast__container',
+    ) as HTMLElement;
+    gsap.to(toast, {
+      duration: 0.2,
+      x: 100,
+      opacity: 0,
+      display: 'none',
+    });
+    gsap.to(toastContainer, {
+      duration: 0.2,
       opacity: 0,
       display: 'none',
     });
@@ -107,15 +131,15 @@ export class ToastNotifications extends HTMLElement {
     const totalDuration = this._notification.duration;
     let elapsed = 0;
 
-    const updateProgressInterval = setInterval(() => {
+    this._updateProgressInterval = setInterval(() => {
       elapsed += 100;
       const progressRatio = elapsed / totalDuration;
 
       this.updateLoadingBar(progressRatio);
 
       if (elapsed >= totalDuration) {
-        clearInterval(updateProgressInterval);
-        this.hide();
+        clearInterval(this._updateProgressInterval);
+        this.hideWithDelay();
       }
     }, 100);
   }
@@ -235,7 +259,7 @@ export class ToastNotifications extends HTMLElement {
           position: absolute;
           bottom: 0;
           left: 0;
-          height: 5px;
+          height: 2.5px;
           width: 0%;
         }
 
