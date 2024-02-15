@@ -49,8 +49,7 @@ export default class Music {
   }
 
   remove() {
-    this.removeOceanAmbience();
-    this.removeMetaMapTheme();
+    // this.removeOceanAmbience();
     this.removeLootChestTheme();
   }
 }

@@ -34,6 +34,8 @@ export class OpenButton extends HTMLElement {
         this.showLoginMenu();
       } else {
         // do open logic here
+        // @ts-ignore
+        window.experience.world.lootChest.startOpeningCutScene();
       }
     });
   }

@@ -1,14 +1,17 @@
 import * as THREE from 'three';
+import * as TWEEN from '@tweenjs/tween.js';
 
 export default class LootChest {
   constructor() {
     this.experience = window.experience;
     this.debug = this.experience.debug;
     this.scene = this.experience.scene;
+    this.camera = this.experience.camera;
     this.resources = this.experience.resources;
     this.time = this.experience.time;
     this.resource = this.resources.items;
     this.physics = this.experience.world.physics;
+    this.music = this.experience.world.music;
     this.isChestPhysicsSet = false;
     this.sceneLoaded = false;
 
@@ -131,6 +134,127 @@ export default class LootChest {
         resolve();
       });
     });
+  }
+
+  startOpeningCutScene() {
+    // hide UI
+    // show skip button
+
+    this.music.setLootChestOpeningTheme(false);
+    this.music.removeLootChestTheme();
+    this.camera.controls.enabled = false;
+    console.log('1', this);
+    const firstTweenDuration = 2000;
+    const firstCoords = {
+      x: -4,
+      y: 3,
+      z: 2.5,
+    };
+    console.log('2');
+    new TWEEN.Tween(firstCoords)
+      .to(
+        {
+          x: firstCoords.x - 0.35,
+          y: firstCoords.y,
+          z: firstCoords.z - 0.25,
+        },
+        firstTweenDuration,
+      )
+      .easing(TWEEN.Easing.Quadratic.In)
+      .onUpdate(() => {
+        this.camera.instance.position.set(
+          firstCoords.x,
+          firstCoords.y,
+          firstCoords.z,
+        );
+        this.camera.instance.lookAt(this.model.position);
+      })
+      .start();
+
+    this.timerOne = setTimeout(() => {
+      const secondTweenDuration = 2000;
+      const secondCoords = {
+        x: 4,
+        y: 3,
+        z: 2.5,
+      };
+      new TWEEN.Tween(secondCoords)
+        .to(
+          {
+            x: secondCoords.x - 0.25,
+            y: secondCoords.y,
+            z: secondCoords.z - 0.45,
+          },
+          secondTweenDuration,
+        )
+        .easing(TWEEN.Easing.Quadratic.In)
+        .onUpdate(() => {
+          this.camera.instance.position.set(
+            secondCoords.x,
+            secondCoords.y,
+            secondCoords.z,
+          );
+          this.camera.instance.lookAt(this.model.position);
+        })
+        .start();
+    }, 2000);
+
+    this.timerTwo = setTimeout(() => {
+      const tweenDuration = 3800;
+      const thirdCoords = {
+        x: 0,
+        y: 3.5,
+        z: 5,
+      };
+      new TWEEN.Tween(thirdCoords)
+        .to(
+          { x: thirdCoords.x, y: thirdCoords.y, z: thirdCoords.z - 1.75 },
+          tweenDuration,
+        )
+        .easing(TWEEN.Easing.Quadratic.In)
+        .onUpdate(() => {
+          this.camera.instance.position.set(
+            thirdCoords.x,
+            thirdCoords.y,
+            thirdCoords.z,
+          );
+          this.camera.instance.lookAt(this.model.position);
+        })
+        .start();
+    }, 4000);
+
+    this.timerThree = setTimeout(() => {
+      const tweenDuration = 1000;
+      const thirdCoords = {
+        x: this.camera.instance.position.x,
+        y: this.camera.instance.position.y,
+        z: this.camera.instance.position.z,
+      };
+      new TWEEN.Tween(thirdCoords)
+        .to(
+          { x: thirdCoords.x, y: thirdCoords.y + 2, z: thirdCoords.z + 2.5 },
+          tweenDuration,
+        )
+        .easing(TWEEN.Easing.Quadratic.In)
+        .onUpdate(() => {
+          this.camera.instance.position.set(
+            thirdCoords.x,
+            thirdCoords.y,
+            thirdCoords.z,
+          );
+          this.camera.instance.lookAt(this.model.position);
+        })
+        .start();
+
+      this.camera.controls.enabled = true;
+      this.music.removeLootChestOpeningTheme(false);
+      // hide skip button
+    }, 10000);
+
+    this.timerFour = setTimeout(() => {
+      // show UI
+      if (!endMusic) this.music.setLootChestTheme(true);
+    }, 12000);
   }
 
   remove() {

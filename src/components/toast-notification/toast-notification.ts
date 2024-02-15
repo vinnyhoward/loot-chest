@@ -71,6 +71,7 @@ export class ToastNotifications extends HTMLElement {
     const toastContainer = this.shadowRoot.querySelector(
       '.toast__container',
     ) as HTMLElement;
+
     gsap.to(toast, {
       duration: 0.2,
       delay: 0.5,
@@ -78,12 +79,14 @@ export class ToastNotifications extends HTMLElement {
       opacity: 0,
       display: 'none',
     });
+
     gsap.to(toastContainer, {
       duration: 0.2,
       delay: 0.5,
       opacity: 0,
       display: 'none',
     });
+
     this._notification = initialState;
   }
 

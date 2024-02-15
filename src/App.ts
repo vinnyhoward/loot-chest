@@ -16,6 +16,7 @@ const fetchAssets = async () => {
     if (!response.ok) {
       throw new Error(`Error: ${response.status}`);
     }
+
     const chests = await response.json();
     return chests.data;
   } catch (error) {

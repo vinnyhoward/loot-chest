@@ -134,9 +134,9 @@ export class DropdownMenu extends HTMLElement {
 
         .dropdown__container {
           cursor: pointer;
-          position: absolute;
-          top: 10%;
-          left: 70%;
+          position: fixed;
+          top: 75px;
+          right: 75px;
           width: 320px;
           height: 50px;
           opacity: 1;
