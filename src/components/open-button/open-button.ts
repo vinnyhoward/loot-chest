@@ -30,7 +30,6 @@ export class OpenButton extends HTMLElement {
       });
 
       const token = localStorage.getItem('token');
-      console.log('token:', token);
       if (!token) {
         this.showLoginMenu();
       } else {
@@ -57,7 +56,7 @@ export class OpenButton extends HTMLElement {
         }
 
         .open__button {
-          position: absolute;
+          position: fixed;
           right: 50%;
           top: 90%;
           transform: translate(50%, -50%);

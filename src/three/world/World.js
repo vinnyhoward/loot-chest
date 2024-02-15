@@ -3,6 +3,7 @@ import Environment from './Environment';
 import Trapdoor from './Trapdoor';
 import Physics from './Physics';
 import LootChest from './LootChest';
+import Music from './Music';
 import { EVENTS } from '../../constants/events';
 
 export default class World {
@@ -11,8 +12,10 @@ export default class World {
     this.scene = this.experience.scene;
     this.resources = this.experience.resources;
     this.physics = new Physics();
+    this.music = new Music();
 
     this.resources.on('ready', () => {
+      this.music.setLootChestTheme(true);
       this.environment = new Environment();
       this.trapdoor = new Trapdoor();
       this.lootChest = new LootChest();

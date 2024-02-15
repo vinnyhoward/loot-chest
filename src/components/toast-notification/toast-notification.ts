@@ -174,15 +174,15 @@ export class ToastNotifications extends HTMLElement {
   iconType(): string {
     switch (this._notification.type) {
       case NotificationType.SUCCESS:
-        return '/public/icons/svg/success.svg';
+        return '/icons/svg/success.svg';
       case NotificationType.ERROR:
-        return '/public/icons/svg/error.svg';
+        return '/icons/svg/error.svg';
       case NotificationType.WARNING:
-        return '/public/icons/svg/warning.svg';
+        return '/icons/svg/warning.svg';
       case NotificationType.INFO:
-        return '/public/icons/svg/info.svg';
+        return '/icons/svg/info.svg';
       default:
-        return '/public/icons/svg/question.svg';
+        return '/icons/svg/question.svg';
     }
   }
 
@@ -190,8 +190,10 @@ export class ToastNotifications extends HTMLElement {
     if (!this.shadowRoot) return;
     this.shadowRoot.innerHTML = html`
       <style>
-        @import url('https://fonts.googleapis.com/css2?family=Montserrat:ital,wght@0,100..900;1,100..900&display=swap');
-        @import url('https://fonts.googleapis.com/css2?family=Hind:wght@300;400;500;600;700&family=Montserrat:ital,wght@0,100..900;1,100..900&display=swap');
+        {
+          @import url('https://fonts.googleapis.com/css2?family=Montserrat:ital,wght@0,100..900;1,100..900&display=swap');
+          @import url('https://fonts.googleapis.com/css2?family=Hind:wght@300;400;500;600;700&family=Montserrat:ital,wght@0,100..900;1,100..900&display=swap');
+        }
 
         * {
           box-sizing: border-box;
@@ -204,10 +206,10 @@ export class ToastNotifications extends HTMLElement {
 
         .toast__container {
           cursor: pointer;
-          position: fixed; /* This positions the toast relative to the viewport */
-          bottom: 20px; /* Adjust as needed for spacing from the bottom edge of the viewport */
-          right: 20px; /* Adjust as needed for spacing from the left edge of the viewport */
-          z-index: 1000; /* Ensures the toast is above other content */
+          position: fixed;
+          bottom: 20px;
+          right: 20px;
+          z-index: 1000;
         }
 
         .toast {
@@ -298,7 +300,7 @@ export class ToastNotifications extends HTMLElement {
             </div>
           </div>
           <div class="toast__close-icon">
-            <img src="/public/icons/svg/close.svg" alt="icon" />
+            <img src="/icons/svg/close.svg" alt="icon" />
           </div>
 
           <div class="toast__progress-bar"></div>

@@ -51,7 +51,6 @@ export class DropdownMenu extends HTMLElement {
     window.experience.world.lootChest.animation.actions.fall.reset();
     // @ts-ignore
     window.experience.world.lootChest.animation.actions.fall.play();
-
     setTimeout(() => {
       // @ts-ignore
       window.experience.world.lootChest.setLootChest(
