@@ -12,8 +12,13 @@ export default class LootChest {
     this.resource = this.resources.items;
     this.physics = this.experience.world.physics;
     this.music = this.experience.world.music;
+    this.trapdoor = this.experience.world.trapdoor;
     this.isChestPhysicsSet = false;
     this.sceneLoaded = false;
+    this.timerOne = null;
+    this.timerTwo = null;
+    this.timerThree = null;
+    this.timerFour = null;
 
     this.animation = {};
     if (this.debug.active) {
@@ -23,6 +28,7 @@ export default class LootChest {
     this.setModel = this.setModel.bind(this);
     this.setAnimation = this.setAnimation.bind(this);
     this.setLootChest = this.setLootChest.bind(this);
+    this.getLootChest = this.getLootChest.bind(this);
   }
 
   setLootChest(assetName) {
@@ -136,21 +142,29 @@ export default class LootChest {
     });
   }
 
-  startOpeningCutScene() {
+  getLootChest(chestFileName) {
+    this.trapdoor.openTrapdoor();
+    this.animation.actions.fall.reset();
+    this.animation.actions.fall.play();
+
+    setTimeout(() => {
+      this.setLootChest(chestFileName);
+    }, 650);
+  }
+
+  startOpeningCutScene(tempCallback) {
     // hide UI
     // show skip button
 
     this.music.setLootChestOpeningTheme(false);
     this.music.removeLootChestTheme();
     this.camera.controls.enabled = false;
-    console.log('1', this);
     const firstTweenDuration = 2000;
     const firstCoords = {
       x: -4,
       y: 3,
       z: 2.5,
     };
-    console.log('2');
     new TWEEN.Tween(firstCoords)
       .to(
         {
@@ -253,8 +267,26 @@ export default class LootChest {
 
     this.timerFour = setTimeout(() => {
       // show UI
-      if (!endMusic) this.music.setLootChestTheme(true);
+      tempCallback();
+      this.music.setLootChestTheme(true);
     }, 12000);
+  }
+
+  endOpeningCutScene(tempCallback) {
+    TWEEN.removeAll();
+    this.camera.controls.enabled = true;
+    this.camera.instance.position.set(0, 3, 5);
+    this.camera.instance.lookAt(this.model.position);
+    this.camera.controls.update();
+
+    clearTimeout(this.timerOne);
+    clearTimeout(this.timerTwo);
+    clearTimeout(this.timerThree);
+    clearTimeout(this.timerFour);
+
+    this.music.removeLootChestOpeningTheme(false);
+    this.music.setLootChestTheme(true);
+    tempCallback();
   }
 
   remove() {

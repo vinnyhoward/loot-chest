@@ -3,13 +3,13 @@ import { EVENTS } from '../../constants/events';
 import { html } from '../../utils/html';
 
 export class OpenButton extends HTMLElement {
-  private state: { isLoggedIn: any };
+  private state: { isOpening: any };
 
   constructor() {
     super();
     this.attachShadow({ mode: 'open' });
     this.state = {
-      isLoggedIn: false,
+      isOpening: false,
     };
   }
 
@@ -33,9 +33,27 @@ export class OpenButton extends HTMLElement {
       if (!token) {
         this.showLoginMenu();
       } else {
-        // do open logic here
-        // @ts-ignore
-        window.experience.world.lootChest.startOpeningCutScene();
+        // TODO: This is a temporary solution to
+        // show the opening cutscene and skip logic
+        const tempCallback = () => {
+          this.state.isOpening = false;
+          this.render();
+          this.attachEventListeners();
+        };
+
+        if (!this.state.isOpening) {
+          console.log('open');
+          this.state.isOpening = true;
+          // @ts-ignore
+          window.experience.world.lootChest.startOpeningCutScene(tempCallback);
+        } else {
+          console.log('close');
+          this.state.isOpening = true;
+          // @ts-ignore
+          window.experience.world.lootChest.endOpeningCutScene(tempCallback);
+        }
+        this.render();
+        this.attachEventListeners();
       }
     });
   }
@@ -82,11 +100,14 @@ export class OpenButton extends HTMLElement {
           font-size: 1rem;
           font-weight: 900;
           font-family: 'Montserrat', sans-serif;
+          text-transform: uppercase;
         }
       </style>
       <div class="open__button">
         <div class="open__container">
-          <span class="open__text">OPEN</span>
+          <span class="open__text"
+            >${this.state.isOpening ? 'Skip' : 'Open'}</span
+          >
         </div>
       </div>
     `;

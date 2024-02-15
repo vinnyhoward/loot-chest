@@ -46,17 +46,9 @@ export class DropdownMenu extends HTMLElement {
     );
 
     // @ts-ignore
-    window.experience.world.trapdoor.openTrapdoor();
-    // @ts-ignore
-    window.experience.world.lootChest.animation.actions.fall.reset();
-    // @ts-ignore
-    window.experience.world.lootChest.animation.actions.fall.play();
-    setTimeout(() => {
-      // @ts-ignore
-      window.experience.world.lootChest.setLootChest(
-        this.state.selectedItem.fileChestName,
-      );
-    }, 650);
+    window.experience.world.lootChest.getLootChest(
+      this.state.selectedItem.fileChestName,
+    );
 
     this.render();
     this.attachEventListeners();
