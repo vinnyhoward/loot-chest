@@ -112,8 +112,10 @@ export class ToastNotifications extends HTMLElement {
     if (!this.shadowRoot) return;
     const toast = this.shadowRoot.querySelector('.toast') as HTMLElement;
 
-    gsap.set(toast, { x: '100%', opacity: 0 });
+    // Ensure toast is initially off-screen to the left
+    gsap.set(toast, { x: '-100%', opacity: 0 });
 
+    // Animate toast coming in from the left
     gsap.to(toast, {
       x: '0%',
       opacity: 1,
@@ -202,9 +204,10 @@ export class ToastNotifications extends HTMLElement {
 
         .toast__container {
           cursor: pointer;
-          position: absolute;
-          top: 90%;
-          left: 76%;
+          position: fixed; /* This positions the toast relative to the viewport */
+          bottom: 20px; /* Adjust as needed for spacing from the bottom edge of the viewport */
+          right: 20px; /* Adjust as needed for spacing from the left edge of the viewport */
+          z-index: 1000; /* Ensures the toast is above other content */
         }
 
         .toast {

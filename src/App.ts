@@ -5,6 +5,7 @@ import './components/login-modal/login-modal';
 import './components/loading-bar/loading-bar';
 import './components/dropdown-menu/dropdown-menu';
 import './components/toast-notification/toast-notification';
+import './components/open-button/open-button';
 import { html } from './utils/html';
 import { EVENTS } from './constants/events';
 
@@ -96,6 +97,7 @@ export default class App extends HTMLElement {
           <login-modal></login-modal>
           <dropdown-menu></dropdown-menu>
           <toast-notification></toast-notification>
+          <open-button></open-button>
         </div>
         <loading-bar></loading-bar>
         <canvas class="webgl"></canvas>

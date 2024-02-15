@@ -36,11 +36,11 @@ export class LoginModal extends HTMLElement {
   }
 
   connectedCallback(): void {
-    const token = localStorage.getItem('token');
     document.addEventListener(EVENTS.LOGIN_SUCCESS, () => {
       this.hide();
     });
 
+    const token = localStorage.getItem('token');
     if (token) {
       this.hide();
     } else {
@@ -59,6 +59,14 @@ export class LoginModal extends HTMLElement {
 
       this.render();
       this.attachListeners();
+      if (!this.shadowRoot) return;
+
+      // TODO: Fix this hack of hiding the modal on load
+      gsap.to(this, {
+        duration: 0.0,
+        opacity: 0,
+        display: 'none',
+      });
     }
   }
 
@@ -89,6 +97,13 @@ export class LoginModal extends HTMLElement {
       this.hide();
     });
 
+    const parent = this.shadowRoot?.querySelector('.modal__parent');
+    parent?.addEventListener('click', (e) => {
+      if (e.target === parent) {
+        this.hide();
+      }
+    });
+
     const passwordField = this.shadowRoot?.querySelector(
       '.password_field',
     ) as HTMLInputElement;
@@ -103,6 +118,9 @@ export class LoginModal extends HTMLElement {
       this.render();
       this.attachListeners();
     });
+
+    document.addEventListener(EVENTS.SHOW_LOGIN_MENU, this.show.bind(this));
+    document.addEventListener(EVENTS.HIDE_LOGIN_MENU, this.hide.bind(this));
   }
 
   public hide(): void {
@@ -440,6 +458,18 @@ export class LoginModal extends HTMLElement {
           text-transform: uppercase;
         }
 
+        .modal__parent {
+          width: 100%;
+          height: 100%;
+          position: fixed;
+          top: 0;
+          left: 0;
+          display: flex;
+          justify-content: center;
+          align-items: center;
+          z-index: 100;
+        }
+
         .modal__container {
           position: absolute;
           top: 50%;
@@ -622,7 +652,8 @@ export class LoginModal extends HTMLElement {
           text-transform: none;
         }
       </style>
-      <div>
+
+      <div class="modal__parent">
         <div class="modal__container">
           <div class="modal">
             <div class="close__container">
