@@ -58,6 +58,11 @@ export default class Trapdoor {
     this.animation.actions.openAndClose.clampWhenFinished = true;
   }
 
+  openTrapdoor() {
+    this.animation.actions.openAndClose.reset();
+    this.animation.actions.openAndClose.play();
+  }
+
   remove() {
     this.scene.remove(this.model);
 
