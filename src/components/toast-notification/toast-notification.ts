@@ -131,7 +131,6 @@ export class ToastNotifications extends HTMLElement {
       opacity: 1,
       duration: 0.5,
       ease: 'power1.out',
-      onComplete: () => console.log('Toast animation complete'),
     });
 
     this.hideAfterDuration();

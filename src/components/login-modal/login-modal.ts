@@ -110,7 +110,7 @@ export class LoginModal extends HTMLElement {
     ) as HTMLInputElement;
 
     passwordField?.addEventListener('focus', () => {
-      console.log('User has clicked or tabbed into the input field.');
+      // console.log('User has clicked or tabbed into the input field.');
     });
 
     const forgotPassword = this.shadowRoot?.querySelector('.forgot-password');

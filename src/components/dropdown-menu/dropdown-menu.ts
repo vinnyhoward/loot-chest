@@ -4,20 +4,20 @@ import { urlFor } from '../../services/sanity';
 import { EVENTS } from '../../constants/events';
 
 export class DropdownMenu extends HTMLElement {
-  private state: { selectedItem: any };
+  private state: { selectedChest: any };
   private _chests: any[] = [];
 
   constructor() {
     super();
     this.attachShadow({ mode: 'open' });
     this.state = {
-      selectedItem: this._chests[0],
+      selectedChest: this._chests[0],
     };
   }
 
   set chests(data) {
     this._chests = data;
-    this.state.selectedItem = data.length > 0 ? data[0] : null;
+    this.state.selectedChest = data.length > 0 ? data[0] : null;
     this.render();
     this.attachEventListeners();
   }
@@ -36,7 +36,7 @@ export class DropdownMenu extends HTMLElement {
       (chest) => chest._id === selectedChestId,
     );
     if (!selectedChest) return;
-    this.state.selectedItem = selectedChest;
+    this.state.selectedChest = selectedChest;
     document.dispatchEvent(
       new CustomEvent(EVENTS.CHEST_SELECTED, {
         detail: { selectedChest },
@@ -47,7 +47,7 @@ export class DropdownMenu extends HTMLElement {
 
     // @ts-ignore
     window.experience.world.lootChest.getLootChest(
-      this.state.selectedItem.fileChestName,
+      this.state.selectedChest.fileChestName,
     );
 
     this.render();
@@ -115,7 +115,7 @@ export class DropdownMenu extends HTMLElement {
     if (!this.shadowRoot) return;
     const chestList = this._chests.filter((chest) => {
       const isDraft = chest._id.split('.').length > 1;
-      return chest._id !== this.state.selectedItem._id && !isDraft;
+      return chest._id !== this.state.selectedChest._id && !isDraft;
     });
 
     this.shadowRoot.innerHTML = html`
@@ -217,13 +217,13 @@ export class DropdownMenu extends HTMLElement {
                 <div class="dropdown__chest-info">
                   <img
                     class="dropdown__chest-icon"
-                    src="${urlFor(this.state.selectedItem.chestIcon.asset._ref)
+                    src="${urlFor(this.state.selectedChest.chestIcon.asset._ref)
                       .width(50)
                       .height(50)
                       .url()}"
-                    alt="${this.state.selectedItem.chestName}"
+                    alt="${this.state.selectedChest.chestName}"
                   />
-                  <span>${this.state.selectedItem.chestName}</span>
+                  <span>${this.state.selectedChest.chestName}</span>
                 </div>
 
                 <svg
