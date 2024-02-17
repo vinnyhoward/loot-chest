@@ -9,21 +9,7 @@ import './components/open-button/open-button';
 import './components/chest-info-modal/chest-info-modal';
 import { html } from './utils/html';
 import { EVENTS } from './constants/events';
-
-const fetchAssets = async () => {
-  try {
-    const response = await fetch(`${import.meta.env.VITE_API_URL}/chests/all`);
-
-    if (!response.ok) {
-      throw new Error(`Error: ${response.status}`);
-    }
-
-    const chests = await response.json();
-    return chests.data;
-  } catch (error) {
-    console.error('Failed to fetch chests:', error);
-  }
-};
+import { fetchAssets } from './services/chests';
 
 export default class App extends HTMLElement {
   constructor() {

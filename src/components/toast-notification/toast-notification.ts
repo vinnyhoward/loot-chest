@@ -44,14 +44,6 @@ export class ToastNotifications extends HTMLElement {
     ) as HTMLElement;
     gsap.to(toast, { duration: 0, x: 100, opacity: 0, display: 'none' });
     gsap.to(toastContainer, { duration: 0, opacity: 0, display: 'none' });
-
-    document.addEventListener(EVENTS.TOAST_SUCCESS, (event: any) => {
-      this._notification = event.detail;
-
-      this.show();
-      this.render();
-      this.attachEventListeners();
-    });
   }
 
   attachEventListeners(): void {
@@ -62,6 +54,21 @@ export class ToastNotifications extends HTMLElement {
     if (closeIcon) {
       closeIcon.addEventListener('click', this.hide.bind(this));
     }
+    document.addEventListener(EVENTS.TOAST_SUCCESS, (event: any) => {
+      this._notification = event.detail;
+
+      this.show();
+      this.render();
+      this.attachEventListeners();
+    });
+
+    document.addEventListener(EVENTS.TOAST_AWARDED_KEY, (event: any) => {
+      this._notification = event.detail;
+
+      this.show();
+      this.render();
+      this.attachEventListeners();
+    });
   }
 
   hideWithDelay(): void {
@@ -165,6 +172,9 @@ export class ToastNotifications extends HTMLElement {
       case NotificationType.INFO:
         progressBar?.classList.add('info');
         break;
+      case NotificationType.AWARDED:
+        progressBar?.classList.add('awarded');
+        break;
       default:
         progressBar?.classList.add('custom');
     }
@@ -184,6 +194,8 @@ export class ToastNotifications extends HTMLElement {
         return '/icons/svg/warning.svg';
       case NotificationType.INFO:
         return '/icons/svg/info.svg';
+      case NotificationType.AWARDED:
+        return '/icons/png/key_icon.png';
       default:
         return '/icons/svg/question.svg';
     }
@@ -252,7 +264,7 @@ export class ToastNotifications extends HTMLElement {
 
         .toast__caption {
           font-size: 0.9rem;
-          color: #acbcc0;
+          color: #95A0BA;
           font-family: 'Hind', sans-serif;
           font-weight: 500;
           font-style: normal;
@@ -268,6 +280,11 @@ export class ToastNotifications extends HTMLElement {
           left: 0;
           height: 2.5px;
           width: 0%;
+        }
+
+        .icon {
+          width: 45px;
+          height: 45px;
         }
 
         .success {
@@ -289,15 +306,31 @@ export class ToastNotifications extends HTMLElement {
         .custom {
           background-color: #00b4ff;
         }
+
+        .awarded {
+          background-color: #974AF4;
+        }
+
+        .key__text {
+          color: #974AF4;
+          font-family: 'Montserrat', sans-serif;
+          font-weight: 900;
+          font-size: 1rem;
+        }
       </style>
       <div class="toast__container">
         <div class="toast">
           <div class="toast-content">
             <div class="toast__icon">
-              <img src=${this.iconType()} alt="icon" />
+              <img class="icon" src=${this.iconType()} alt="icon" />
             </div>
             <div class="toast_body">
-              <h3 class="toast__title">${this._notification.title}</h3>
+              <h3 class="toast__title">
+                ${this._notification.title}
+                ${this._notification.type === NotificationType.AWARDED
+                  ? html`<span class="key__text">x3</span>`
+                  : ''}
+              </h3>
               <p class="toast__caption">${this._notification.message}</p>
             </div>
           </div>

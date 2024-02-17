@@ -3,6 +3,7 @@ export enum NotificationType {
   ERROR = 'error',
   WARNING = 'warning',
   INFO = 'info',
+  AWARDED = 'AWARDED',
   NONE = 'none',
 }
 
@@ -21,4 +22,19 @@ export interface Notification {
   type: NotificationType;
   duration: Duration;
   currentDuration?: number;
+}
+
+export interface UserLocalStorage {
+  id: string;
+  username: string;
+  email: string;
+}
+
+export interface Keys {
+  id: string;
+  userId: string;
+  awardedAt: Date;
+  usedAt: Date | null;
+  createdAt: Date;
+  updatedAt: Date;
 }

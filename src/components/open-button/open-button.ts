@@ -1,19 +1,63 @@
 import gsap from 'gsap';
+import { v4 as uuidv4 } from 'uuid';
+import { Notification, NotificationType, Duration, Keys } from '../../types';
 import { EVENTS } from '../../constants/events';
 import { html } from '../../utils/html';
+import { awardKey, fetchUserKeys } from '../../services/keys';
 
 export class OpenButton extends HTMLElement {
-  private state: { isOpening: any };
+  private state: {
+    isOpening: boolean;
+    userKeys: Keys[];
+    userToken: string | null;
+  };
 
   constructor() {
     super();
     this.attachShadow({ mode: 'open' });
     this.state = {
       isOpening: false,
+      userKeys: [],
+      userToken: '',
     };
   }
 
   connectedCallback(): void {
+    this.render();
+    this.attachEventListeners();
+    this.state.userToken = localStorage.getItem('token');
+    if (this.state.userToken) {
+      setTimeout(() => this.awardAndFetchKeys(), 3000);
+    }
+  }
+
+  async awardAndFetchKeys(): Promise<void> {
+    const userIsAwarded = await awardKey();
+
+    if (userIsAwarded) {
+      const detail: Notification = {
+        // TODO: Make dynamic based on key amount and just 3
+        title: 'Daily keys earned',
+        message: 'Ready for some new loot?',
+        id: uuidv4(),
+        type: NotificationType.AWARDED,
+        duration: Duration.LONG,
+      };
+
+      document.dispatchEvent(
+        new CustomEvent(EVENTS.TOAST_SUCCESS, {
+          bubbles: true,
+          composed: true,
+          detail,
+        }),
+      );
+    }
+
+    const userKeys: Keys[] = await fetchUserKeys();
+    if (userKeys) {
+      this.state.userKeys = userKeys;
+    }
+
     this.render();
     this.attachEventListeners();
   }
@@ -29,12 +73,9 @@ export class OpenButton extends HTMLElement {
         repeat: 1,
       });
 
-      const token = localStorage.getItem('token');
-      if (!token) {
+      if (!this.state.userToken) {
         this.showLoginMenu();
       } else {
-        // TODO: This is a temporary solution to
-        // show the opening cutscene and skip logic
         const tempCallback = () => {
           this.state.isOpening = false;
           this.render();
@@ -120,7 +161,7 @@ export class OpenButton extends HTMLElement {
           position: absolute;
           width: 55px;
           height: 55px;
-          left: 100px;
+          left: 93px;
           z-index: 0;
         }
       </style>
@@ -130,7 +171,7 @@ export class OpenButton extends HTMLElement {
             >${this.state.isOpening ? 'Skip' : 'Open'}</span
           >
           <img class="key__icon" src="icons/png/key_icon.png" alt="key" />
-          <span class="key__text">x3</span>
+          <span class="key__text">x${this.state.userKeys.length}</span>
         </div>
       </div>
     `;
