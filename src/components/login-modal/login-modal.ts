@@ -28,11 +28,12 @@ export class LoginModal extends HTMLElement {
   constructor() {
     super();
     this.attachShadow({ mode: 'open' });
-    this.onSubmit = this.onSubmit.bind(this);
 
     this.submitting = false;
     this.authState = AuthState.LOGIN;
     this.resetPasswordToken = '';
+
+    this.onSubmit = this.onSubmit.bind(this);
   }
 
   connectedCallback(): void {

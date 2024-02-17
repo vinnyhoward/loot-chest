@@ -246,7 +246,6 @@ export class ToastNotifications extends HTMLElement {
           font-family: 'Montserrat', sans-serif;
           font-weight: 900;
           font-size: 1rem;
-          text-transform: uppercase;
           color: #25314c;
           margin-bottom: 2px;
         }

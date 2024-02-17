@@ -42,12 +42,10 @@ export class OpenButton extends HTMLElement {
         };
 
         if (!this.state.isOpening) {
-          console.log('open');
           this.state.isOpening = true;
           // @ts-ignore
           window.experience.world.lootChest.startOpeningCutScene(tempCallback);
         } else {
-          console.log('close');
           this.state.isOpening = true;
           // @ts-ignore
           window.experience.world.lootChest.endOpeningCutScene(tempCallback);
@@ -82,9 +80,15 @@ export class OpenButton extends HTMLElement {
           transform: translate(50%, -50%);
         }
 
+        .open__button:hover {
+          transform: translate(50%, -50%) scale(1.025);
+          transition: transform 100ms ease-in-out;
+        }
+
         .open__container {
+          position: relative;
           box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
-          width: 180px;
+          width: 200px;
           height: 70px;
           background-color: #fff;
           border-radius: 36px;
@@ -97,10 +101,27 @@ export class OpenButton extends HTMLElement {
 
         .open__text {
           color: #25314c;
-          font-size: 1rem;
-          font-weight: 900;
+          font-size: 1.3rem;
+          font-weight: bolder;
           font-family: 'Montserrat', sans-serif;
           text-transform: uppercase;
+        }
+
+        .key__text {
+          color: #974AF4;
+          font-size: 1.3rem;
+          font-weight: bolder;
+          font-family: 'Montserrat', sans-serif;
+          margin-left: 50px;
+          z-index: 1;
+        }
+
+        .key__icon {
+          position: absolute;
+          width: 55px;
+          height: 55px;
+          left: 100px;
+          z-index: 0;
         }
       </style>
       <div class="open__button">
@@ -108,6 +129,8 @@ export class OpenButton extends HTMLElement {
           <span class="open__text"
             >${this.state.isOpening ? 'Skip' : 'Open'}</span
           >
+          <img class="key__icon" src="icons/png/key_icon.png" alt="key" />
+          <span class="key__text">x3</span>
         </div>
       </div>
     `;
