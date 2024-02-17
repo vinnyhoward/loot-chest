@@ -29,4 +29,7 @@ export const EVENTS: Record<string, string> = {
   TOAST_INFO: 'toast-info',
   TOAST_WARNING: 'toast-warning',
   TOAST_AWARDED_KEY: 'toast-awarded-key',
+
+  // Chest Events
+  CHEST_SELECTED: 'chest-selected',
 };

@@ -1,6 +1,7 @@
 import gsap from 'gsap';
 import { html } from '../../utils/html';
 import { urlFor } from '../../services/sanity';
+import { EVENTS } from '../../constants/events';
 
 export class DropdownMenu extends HTMLElement {
   private state: { selectedItem: any };
@@ -35,11 +36,10 @@ export class DropdownMenu extends HTMLElement {
       (chest) => chest._id === selectedChestId,
     );
     if (!selectedChest) return;
-
     this.state.selectedItem = selectedChest;
     document.dispatchEvent(
-      new CustomEvent('item-selected', {
-        detail: { selectedItem: selectedChestId },
+      new CustomEvent(EVENTS.CHEST_SELECTED, {
+        detail: { selectedChest },
         bubbles: true,
         composed: true,
       }),

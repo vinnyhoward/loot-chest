@@ -28,8 +28,11 @@ export default class App extends HTMLElement {
         }
 
         const dropdownMenu = this.shadowRoot.querySelector('dropdown-menu');
+        const chestInfoModal =
+          this.shadowRoot.querySelector('chest-info-modal');
         if (dropdownMenu) {
           dropdownMenu.chests = assets;
+          chestInfoModal.selectedChest = assets[0];
         }
       })
       .catch((error) => {
@@ -86,8 +89,8 @@ export default class App extends HTMLElement {
           <dropdown-menu></dropdown-menu>
           <toast-notification></toast-notification>
           <open-button></open-button>
-          <chest-info-modal></chest-info-modal>
         </div>
+        <chest-info-modal></chest-info-modal>
         <loading-bar></loading-bar>
         <canvas class="webgl"></canvas>
       </div>
