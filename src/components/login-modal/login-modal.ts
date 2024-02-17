@@ -59,7 +59,7 @@ export class LoginModal extends HTMLElement {
       }
 
       this.render();
-      this.attachListeners();
+      this.attachEventListeners();
       if (!this.shadowRoot) return;
 
       // TODO: Fix this hack of hiding the modal on load
@@ -71,7 +71,7 @@ export class LoginModal extends HTMLElement {
     }
   }
 
-  private attachListeners(): void {
+  private attachEventListeners(): void {
     const form = this.shadowRoot?.querySelector('.modal__login-form');
     form?.addEventListener('submit', this.onSubmit);
 
@@ -87,7 +87,7 @@ export class LoginModal extends HTMLElement {
       }
 
       this.render();
-      this.attachListeners();
+      this.attachEventListeners();
     });
 
     const close = this.shadowRoot?.querySelector(
@@ -117,7 +117,7 @@ export class LoginModal extends HTMLElement {
     forgotPassword?.addEventListener('click', () => {
       this.authState = AuthState.FORGOT_PASSWORD;
       this.render();
-      this.attachListeners();
+      this.attachEventListeners();
     });
 
     document.addEventListener(EVENTS.SHOW_LOGIN_MENU, this.show.bind(this));
@@ -194,7 +194,7 @@ export class LoginModal extends HTMLElement {
       }
 
       this.render();
-      this.attachListeners();
+      this.attachEventListeners();
       return;
     }
 

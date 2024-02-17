@@ -21,6 +21,8 @@ export class ChestInfoModal extends HTMLElement {
     this.state.selectedChest = chest;
     this.state.loading = false;
     this.render();
+    this.attachListeners();
+    this.attachEventListeners();
   }
 
   get selectedChest(): any {
@@ -32,18 +34,47 @@ export class ChestInfoModal extends HTMLElement {
     this.attachEventListeners();
   }
 
-  attachEventListeners(): void {
+  private attachListeners(): void {
+    if (!this.shadowRoot) return;
+
+    const closeIcon = this.shadowRoot.querySelector(
+      '.close__icon',
+    ) as HTMLElement;
+    closeIcon.addEventListener('click', () => {
+      this.hide();
+    });
+
+    const seeMore = this.shadowRoot.querySelector('.see-more') as HTMLElement;
+    seeMore.addEventListener('click', () => {
+      console.log('see more clicked');
+    });
+  }
+
+  private attachEventListeners(): void {
+    if (!this.shadowRoot) return;
+
     document.addEventListener(EVENTS.CHEST_SELECTED, (event: any) => {
       this.selectedChest = event.detail.selectedChest;
       this.state.loading = false;
 
       this.render();
       this.attachEventListeners();
-      console.log('selected chest: ', this.state.selectedChest);
+      this.attachListeners();
     });
   }
 
-  render() {
+  public show() {
+    if (!this.shadowRoot) return;
+    gsap.to(this, { duration: 0.5, opacity: 1, display: 'block' });
+  }
+
+  public hide() {
+    console.log('hiding');
+    if (!this.shadowRoot) return;
+    gsap.to(this, { duration: 0.5, opacity: 0, display: 'none' });
+  }
+
+  public render() {
     if (!this.shadowRoot) return;
     this.shadowRoot.innerHTML = html`
       <style>
@@ -77,16 +108,21 @@ export class ChestInfoModal extends HTMLElement {
         }
 
         .chest__placeholder {
-          height: 180px;
+          height: 140px;
           width: 100%;
         }
 
         .info-modal__header {
           display: flex;
           flex-direction: column;
-          /* align-items: flex-end; */
-          /* justify-content: flex-end; */
-          padding: 20px;
+          margin-bottom: 20px;
+        }
+
+        .close-icon__container {
+          display: flex;
+          flex-direction: column;
+          align-items: flex-end;
+          justify-content: flex-end;
         }
 
         .chest__title {
@@ -104,18 +140,43 @@ export class ChestInfoModal extends HTMLElement {
           align-items: center;
           justify-content: center;
           text-align: center;
+          padding: 20px;
         }
 
         .close__icon {
           width: 20px;
           height: 20px;
+          padding: 20px;
+          z-index: 1000;
+          cursor: pointer;
+        }
+
+        .chest__description {
+          font-size: 0.9rem;
+          color: #707c88;
+          font-family: 'Hind', sans-serif;
+          text-align: left;
+        }
+
+        .see-more {
+          color: #2893ff;
+          font-size: 0.9rem;
+          cursor: pointer;
+          font-weight: 600;
         }
       </style>
       <div class="info-modal">
-        ${this.state.loading
-          ? html`<loading-bar></loading-bar>`
-          : html`
-              <div class="info-modal__container">
+        <div class="info-modal__container">
+          <div class="close-icon__container">
+            <img
+              class="close__icon"
+              src="icons/svg/close.svg"
+              alt="close icon"
+            />
+          </div>
+          ${this.state.loading
+            ? html`<div>Loading...</div>`
+            : html`
                 <div class="info-modal__header">
                   <img
                     class="chest__image"
@@ -127,21 +188,20 @@ export class ChestInfoModal extends HTMLElement {
                       .url()}"
                     alt="Chest"
                   />
-                  <img
-                    class="close__icon"
-                    src="icons/svg/close.svg"
-                    alt="close icon"
-                  />
                   <div class="chest__placeholder"></div>
                   <div class="chest__header-text">
                     <span class="chest__title"
                       >${this.state.selectedChest.chestName}</span
                     >
+                    <p class="chest__description">
+                      ${this.state.selectedChest.chestDescription}
+                      <span class="see-more">See more</span>
+                    </p>
                   </div>
                 </div>
-                <div class="line"></div>
-              </div>
-            `}
+              `}
+          <div class="line"></div>
+        </div>
       </div>
     `;
   }
