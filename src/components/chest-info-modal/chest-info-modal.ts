@@ -3,6 +3,20 @@ import { html } from '../../utils/html';
 import { urlFor } from '../../services/sanity';
 import { EVENTS } from '../../constants/events';
 
+const rarityOrder: any = {
+  common: 1,
+  uncommon: 2,
+  rare: 3,
+  legendary: 4,
+  divine: 5,
+};
+
+const sortRewards = (rewardList: any) => {
+  return rewardList.sort((a: any, b: any) => {
+    return rarityOrder[a.itemRarity] - rarityOrder[b.itemRarity];
+  });
+};
+
 export class ChestInfoModal extends HTMLElement {
   private state: {
     selectedChest: any;
@@ -64,6 +78,7 @@ export class ChestInfoModal extends HTMLElement {
       this.render();
       this.attachEventListeners();
       this.attachListeners();
+      this.updateDescription();
     });
   }
 
@@ -96,6 +111,7 @@ export class ChestInfoModal extends HTMLElement {
   }
 
   public render() {
+    console.log('state', this.state.selectedChest.rewardList);
     if (!this.shadowRoot) return;
     this.shadowRoot.innerHTML = html`
       <style>
@@ -141,7 +157,7 @@ export class ChestInfoModal extends HTMLElement {
         }
 
         .chest__placeholder {
-          height: 120px;
+          height: 100px;
           width: 100%;
         }
 
@@ -257,6 +273,7 @@ export class ChestInfoModal extends HTMLElement {
           width: 40px;
           height: 40px;
           margin-right: 10px;
+          border-radius: 50%;
         }
 
         .reward-name,
@@ -274,26 +291,51 @@ export class ChestInfoModal extends HTMLElement {
           width: 100%;
           padding: 7.5px 20px;
           background: #f0f0f0;
+          border: 0.5px solid #fff;
+          cursor: pointer;
         }
 
         .common {
           background-color: var(--common);
+          border: 2px solid #407BBD;
+          border-bottom: none;
         }
+
+        .common:first-child {
+          border-top: 2px solid #407BBD;
+          border-top-left-radius: 16px;
+          border-top-right-radius: 16px;
+        }
+
 
         .uncommon {
           background-color: var(--uncommon);
+          border: 2px solid #2D4AD9;
+          border-bottom: none;
         }
 
         .rare {
           background-color: var(--rare);
+          border: 2px solid #6339B0;
+          border-bottom: none;
         }
 
         .legendary {
           background-color: var(--legendary);
+          border: 2px solid #9C22AB;
+          border-bottom: none;
         }
 
         .divine {
           background-color: var(--divine);
+          border: 2px solid #B37E2B;
+          border-bottom: none;
+        }
+
+        .divine:last-child {
+          border-bottom: 2px solid #B37E2B;
+          border-bottom-left-radius: 16px;
+          border-bottom-right-radius: 16px;
         }
       </style>
       <div class="info-modal">
@@ -305,30 +347,32 @@ export class ChestInfoModal extends HTMLElement {
               alt="close icon"
             />
           </div>
-          ${this.state.loading
-            ? html`<div>Loading...</div>`
-            : html`
-                <div class="info-modal__header">
-                  <img
-                    class="chest__image"
-                    src="${urlFor(
-                      this.state.selectedChest.chestImage.asset._ref,
-                    )
-                      .width(275)
-                      .height(275)
-                      .url()}"
-                    alt="Chest"
-                  />
-                  <div class="chest__placeholder"></div>
-                  <div class="chest__header-text">
-                    <span class="chest__title"
-                      >${this.state.selectedChest.chestName}</span
-                    >
-                    <p class="chest__description"></p>
-                    <span class="show-more">Show More</span>
+          ${
+            this.state.loading
+              ? html`<div>Loading...</div>`
+              : html`
+                  <div class="info-modal__header">
+                    <img
+                      class="chest__image"
+                      src="${urlFor(
+                        this.state.selectedChest.chestImage.asset._ref,
+                      )
+                        .width(280)
+                        .height(280)
+                        .url()}"
+                      alt="Chest"
+                    />
+                    <div class="chest__placeholder"></div>
+                    <div class="chest__header-text">
+                      <span class="chest__title"
+                        >${this.state.selectedChest.chestName}</span
+                      >
+                      <p class="chest__description"></p>
+                      <span class="show-more">Show More</span>
+                    </div>
                   </div>
-                </div>
-              `}
+                `
+          }
           <div class="line"></div>
           <div class="section-title">
             <p>Reward</p>
@@ -337,66 +381,34 @@ export class ChestInfoModal extends HTMLElement {
 
           <div class="rewards__container">
             <div class="rewards-list__container--outer">
-              <div class="rewards-item__container--inner">
-                <div class="rewards-item__container common">
-                  <div class="icon-name">
-                    <img
-                      class="reward-icon"
-                      src="icons/png/key_icon.png"
-                      alt="key icon"
-                    />
-                    <div class="reward-name">Edenhorde #602</div>
-                  </div>
-                  <div class="quantity">1</div>
-                </div>
-
-                <div class="rewards-item__container uncommon">
-                  <div class="icon-name">
-                    <img
-                      class="reward-icon"
-                      src="icons/png/key_icon.png"
-                      alt="key icon"
-                    />
-                    <div class="reward-name">Edenhorde #602</div>
-                  </div>
-                  <div class="quantity">1</div>
-                </div>
-
-                <div class="rewards-item__container rare">
-                  <div class="icon-name">
-                    <img
-                      class="reward-icon"
-                      src="icons/png/key_icon.png"
-                      alt="key icon"
-                    />
-                    <div class="reward-name">Edenhorde #602</div>
-                  </div>
-                  <div class="quantity">1</div>
-                </div>
-
-                <div class="rewards-item__container legendary">
-                  <div class="icon-name">
-                    <img
-                      class="reward-icon"
-                      src="icons/png/key_icon.png"
-                      alt="key icon"
-                    />
-                    <div class="reward-name">Edenhorde #602</div>
-                  </div>
-                  <div class="quantity">1</div>
-                </div>
-
-                <div class="rewards-item__container divine">
-                  <div class="icon-name">
-                    <img
-                      class="reward-icon"
-                      src="icons/png/key_icon.png"
-                      alt="key icon"
-                    />
-                    <div class="reward-name">Edenhorde #602</div>
-                  </div>
-                  <div class="quantity">1</div>
-                </div>
+            <div class="rewards-item__container--inner">
+            ${
+              this.state.loading && !this.state.selectedChest
+                ? html`<div>Loading...</div>`
+                : sortRewards(this.state.selectedChest.rewardList)
+                    .map((reward: any) => {
+                      return html`
+                        <div
+                          class="rewards-item__container ${reward.itemRarity.toLowerCase()}"
+                        >
+                          <div class="icon-name">
+                            <img
+                              class="reward-icon"
+                              src="${urlFor(reward.rewardImage.asset._ref)
+                                .width(40)
+                                .height(40)
+                                .url()}"
+                              alt="key icon"
+                            />
+                            <div class="reward-name">${reward.rewardName}</div>
+                          </div>
+                          <div class="quantity">x${reward.itemInventory}</div>
+                        </div>
+                      `;
+                    })
+                    .join('')
+            }
+            </div>
               </div>
             </div>
           </div>
@@ -407,3 +419,91 @@ export class ChestInfoModal extends HTMLElement {
 }
 
 customElements.define('chest-info-modal', ChestInfoModal);
+
+// <div class="rewards-item__container--inner">
+// <div class="rewards-item__container common">
+//   <div class="icon-name">
+// <img
+//   class="reward-icon"
+//   src="icons/png/key_icon.png"
+//   alt="key icon"
+// />
+//     <div class="reward-name">Edenhorde #602</div>
+//   </div>
+//   <div class="quantity">1</div>
+// </div>
+
+// <div class="rewards-item__container uncommon">
+//   <div class="icon-name">
+//     <img
+//       class="reward-icon"
+//       src="icons/png/key_icon.png"
+//       alt="key icon"
+//     />
+//     <div class="reward-name">Edenhorde #602</div>
+//   </div>
+//   <div class="quantity">1</div>
+// </div>
+
+// <div class="rewards-item__container rare">
+//   <div class="icon-name">
+//     <img
+//       class="reward-icon"
+//       src="icons/png/key_icon.png"
+//       alt="key icon"
+//     />
+//     <div class="reward-name">Edenhorde #602</div>
+//   </div>
+//   <div class="quantity">1</div>
+// </div>
+
+// <div class="rewards-item__container legendary">
+//   <div class="icon-name">
+//     <img
+//       class="reward-icon"
+//       src="icons/png/key_icon.png"
+//       alt="key icon"
+//     />
+//     <div class="reward-name">Edenhorde #602</div>
+//   </div>
+//   <div class="quantity">1</div>
+// </div>
+
+// <div class="rewards-item__container divine">
+//   <div class="icon-name">
+//     <img
+//       class="reward-icon"
+//       src="icons/png/key_icon.png"
+//       alt="key icon"
+//     />
+//     <div class="reward-name">Edenhorde #602</div>
+//   </div>
+//   <div class="quantity">1</div>
+// </div>
+
+// ${
+//   this.state.loading
+//     ? html`<div>Loading...</div>`
+//     : this.state.selectedChest.rewardList.map((reward: any) => {
+//         return html`
+//           <div
+//             class="rewards-item__container ${reward.itemRarity.toLowerCase()}"
+//           >
+//             <div class="icon-name">
+//               <img
+//                 class="reward-icon"
+//                 src="${urlFor(
+//                   this.state.selectedChest.rewardImage.asset._ref,
+//                 )
+//                   .width(40)
+//                   .height(40)
+//                   .url()}"
+//                 alt="key icon"
+//               />
+//               <div class="reward-name">${reward.rewardName}</div>
+//             </div>
+//             <div class="quantity">${reward.quantity}</div>
+//           </div>
+//         `;
+//       })
+// }
