@@ -289,7 +289,7 @@ export class ChestInfoModal extends HTMLElement {
           align-items: center;
           justify-content: space-between;
           width: 100%;
-          padding: 7.5px 20px;
+          padding: 7.5px 15px;
           background: #f0f0f0;
           border: 0.5px solid #fff;
           cursor: pointer;
