@@ -120,6 +120,11 @@ export class ChestInfoModal extends HTMLElement {
     if (!this.shadowRoot) return;
     this.shadowRoot.innerHTML = html`
       <style>
+        {
+          @import url('https://fonts.googleapis.com/css2?family=Montserrat:ital,wght@0,100..900;1,100..900&display=swap');
+          @import url('https://fonts.googleapis.com/css2?family=Hind:wght@300;400;500;600;700&family=Montserrat:ital,wght@0,100..900;1,100..900&display=swap');
+        }
+        
         * {
           margin: 0;
           padding: 0;
@@ -130,6 +135,8 @@ export class ChestInfoModal extends HTMLElement {
           --rare: #8847ff;
           --legendary: #d32ee6;
           --divine: #f8ae39;
+          --font1: 'Montserrat', sans-serif;
+          --font2: 'Hind', sans-serif;
         }
 
         .info-modal {
