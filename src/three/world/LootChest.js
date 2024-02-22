@@ -1,10 +1,12 @@
 import * as THREE from 'three';
 import * as TWEEN from '@tweenjs/tween.js';
+import { EVENTS } from '../../constants/events';
 
 export default class LootChest {
   constructor() {
     this.experience = window.experience;
     this.debug = this.experience.debug;
+    this.sizes = this.experience.sizes;
     this.scene = this.experience.scene;
     this.camera = this.experience.camera;
     this.resources = this.experience.resources;
@@ -19,6 +21,7 @@ export default class LootChest {
     this.timerTwo = null;
     this.timerThree = null;
     this.timerFour = null;
+    this.points = [];
 
     this.animation = {};
     if (this.debug.active) {
@@ -45,6 +48,7 @@ export default class LootChest {
       if (this.model) {
         this.physics.boxBody.position.set(0, 3, 0);
         this.remove();
+        this.points = [new THREE.Vector3(0, 3, 0)];
       }
 
       const modelPosition = { x: 0, y: 3, z: 0 };
@@ -54,6 +58,11 @@ export default class LootChest {
       this.scene.add(this.model);
 
       this.model.traverse((child) => {
+        const target = new THREE.Vector3();
+        const { x, y, z } = child.getWorldPosition(target);
+        const chestPoint = new THREE.Vector3(x - 4, y + 3, z);
+        this.points.push(chestPoint);
+
         if (child instanceof THREE.Mesh) {
           child.castShadow = true;
           child.receiveShadow = true;
@@ -306,6 +315,14 @@ export default class LootChest {
 
     if (this.physics && this.physics.boxBody && this.isChestPhysicsSet) {
       this.model.position.copy(this.physics.boxBody.position);
+    }
+
+    if (this.points.length > 0) {
+      document.dispatchEvent(
+        new CustomEvent(EVENTS.CHEST_POINTS_UPDATED, {
+          detail: { points: this.points, cameraInstance: this.camera.instance },
+        }),
+      );
     }
   }
 }

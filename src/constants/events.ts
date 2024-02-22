@@ -32,4 +32,8 @@ export const EVENTS: Record<string, string> = {
 
   // Chest Events
   CHEST_SELECTED: 'chest-selected',
+  CHEST_POINTS_UPDATED: 'chest-points-updated',
+
+  // Chest Info Button Events
+  CHEST_INFO_BUTTON_CLICKED: 'chest-info-button-clicked',
 };

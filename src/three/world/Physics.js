@@ -19,6 +19,7 @@ export default class Physics {
     this.instance = new CANNON.World();
     this.instance.gravity.set(0, -9.82, 0);
     this.instance.solver.tolerance = 0.001;
+    this.boxBody = null;
 
     const defaultMaterial = new CANNON.Material('default');
     const defaultPlasticContactMaterial = new CANNON.ContactMaterial(

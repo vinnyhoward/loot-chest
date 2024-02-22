@@ -40,6 +40,7 @@ export class ChestInfoModal extends HTMLElement {
     this.attachListeners();
     this.attachEventListeners();
     this.updateDescription();
+    gsap.to(this, { duration: 0, opacity: 0, display: 'none' });
   }
 
   get selectedChest(): any {
@@ -49,6 +50,7 @@ export class ChestInfoModal extends HTMLElement {
   connectedCallback(): void {
     this.render();
     this.attachEventListeners();
+    gsap.to(this, { duration: 0, opacity: 0, display: 'none' });
   }
 
   private attachListeners(): void {
@@ -80,6 +82,11 @@ export class ChestInfoModal extends HTMLElement {
       this.attachListeners();
       this.updateDescription();
     });
+
+    document.addEventListener(EVENTS.CHEST_INFO_BUTTON_CLICKED, () => {
+      console.log('clicked  ');
+      this.show();
+    });
   }
 
   public show() {
@@ -88,7 +95,6 @@ export class ChestInfoModal extends HTMLElement {
   }
 
   public hide() {
-    console.log('hiding');
     if (!this.shadowRoot) return;
     gsap.to(this, { duration: 0.5, opacity: 0, display: 'none' });
   }
@@ -111,7 +117,6 @@ export class ChestInfoModal extends HTMLElement {
   }
 
   public render() {
-    console.log('state', this.state.selectedChest.rewardList);
     if (!this.shadowRoot) return;
     this.shadowRoot.innerHTML = html`
       <style>
@@ -132,12 +137,13 @@ export class ChestInfoModal extends HTMLElement {
           top: 50%;
           left: 50%;
           transform: translate(-50%, -50%);
+          z-index: 1000;
         }
 
         .info-modal__container {
           position: relative;
           background-color: #fff;
-          width: 350px;
+          width: 400px;
           max-height: 600px;
           border-radius: 24px;
           box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
@@ -419,91 +425,3 @@ export class ChestInfoModal extends HTMLElement {
 }
 
 customElements.define('chest-info-modal', ChestInfoModal);
-
-// <div class="rewards-item__container--inner">
-// <div class="rewards-item__container common">
-//   <div class="icon-name">
-// <img
-//   class="reward-icon"
-//   src="icons/png/key_icon.png"
-//   alt="key icon"
-// />
-//     <div class="reward-name">Edenhorde #602</div>
-//   </div>
-//   <div class="quantity">1</div>
-// </div>
-
-// <div class="rewards-item__container uncommon">
-//   <div class="icon-name">
-//     <img
-//       class="reward-icon"
-//       src="icons/png/key_icon.png"
-//       alt="key icon"
-//     />
-//     <div class="reward-name">Edenhorde #602</div>
-//   </div>
-//   <div class="quantity">1</div>
-// </div>
-
-// <div class="rewards-item__container rare">
-//   <div class="icon-name">
-//     <img
-//       class="reward-icon"
-//       src="icons/png/key_icon.png"
-//       alt="key icon"
-//     />
-//     <div class="reward-name">Edenhorde #602</div>
-//   </div>
-//   <div class="quantity">1</div>
-// </div>
-
-// <div class="rewards-item__container legendary">
-//   <div class="icon-name">
-//     <img
-//       class="reward-icon"
-//       src="icons/png/key_icon.png"
-//       alt="key icon"
-//     />
-//     <div class="reward-name">Edenhorde #602</div>
-//   </div>
-//   <div class="quantity">1</div>
-// </div>
-
-// <div class="rewards-item__container divine">
-//   <div class="icon-name">
-//     <img
-//       class="reward-icon"
-//       src="icons/png/key_icon.png"
-//       alt="key icon"
-//     />
-//     <div class="reward-name">Edenhorde #602</div>
-//   </div>
-//   <div class="quantity">1</div>
-// </div>
-
-// ${
-//   this.state.loading
-//     ? html`<div>Loading...</div>`
-//     : this.state.selectedChest.rewardList.map((reward: any) => {
-//         return html`
-//           <div
-//             class="rewards-item__container ${reward.itemRarity.toLowerCase()}"
-//           >
-//             <div class="icon-name">
-//               <img
-//                 class="reward-icon"
-//                 src="${urlFor(
-//                   this.state.selectedChest.rewardImage.asset._ref,
-//                 )
-//                   .width(40)
-//                   .height(40)
-//                   .url()}"
-//                 alt="key icon"
-//               />
-//               <div class="reward-name">${reward.rewardName}</div>
-//             </div>
-//             <div class="quantity">${reward.quantity}</div>
-//           </div>
-//         `;
-//       })
-// }

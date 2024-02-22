@@ -7,6 +7,7 @@ import './components/dropdown-menu/dropdown-menu';
 import './components/toast-notification/toast-notification';
 import './components/open-button/open-button';
 import './components/chest-info-modal/chest-info-modal';
+import './components/chest-info-button/chest-info-button';
 import { html } from './utils/html';
 import { EVENTS } from './constants/events';
 import { fetchAssets } from './services/chests';
@@ -89,6 +90,7 @@ export default class App extends HTMLElement {
           <dropdown-menu></dropdown-menu>
           <toast-notification></toast-notification>
           <open-button></open-button>
+          <chest-info-button></chest-info-button>
         </div>
         <chest-info-modal></chest-info-modal>
         <loading-bar></loading-bar>
