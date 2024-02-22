@@ -18,6 +18,7 @@ export class DropdownMenu extends HTMLElement {
   set chests(data) {
     this._chests = data;
     this.state.selectedChest = data.length > 0 ? data[0] : null;
+
     this.render();
     this.attachEventListeners();
   }
@@ -37,6 +38,7 @@ export class DropdownMenu extends HTMLElement {
     );
     if (!selectedChest) return;
     this.state.selectedChest = selectedChest;
+
     document.dispatchEvent(
       new CustomEvent(EVENTS.CHEST_SELECTED, {
         detail: { selectedChest },
