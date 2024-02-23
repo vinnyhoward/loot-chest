@@ -3,6 +3,9 @@ import { html } from '../../utils/html';
 import { urlFor } from '../../services/sanity';
 import { EVENTS } from '../../constants/events';
 import { mockRewardData } from '../../constants/mockData';
+import { camelToSentenceCase } from '../../utils/camelToSentenceCase';
+import { savePrize } from '../../services/prizes';
+import { PrizeFields } from '../../types';
 
 declare global {
   interface Window {
@@ -68,7 +71,43 @@ export class RewardModal extends HTMLElement {
 
     if (this.state.rewardState === RewardModalState.CLAIM) {
       this.state.rewardState = RewardModalState.SUCCESSFULLY_CLAIMED;
-      this.updateContent();
+      const target = event.target as HTMLFormElement;
+      const formData = new FormData(target);
+
+      const firstName: FormDataEntryValue | null = formData.get('firstName');
+      const lastName: FormDataEntryValue | null = formData.get('lastName');
+      const phoneNumber: FormDataEntryValue | null =
+        formData.get('phoneNumber');
+      const email: FormDataEntryValue | null = formData.get('email');
+      const address: FormDataEntryValue | null = formData.get('address');
+      const country: FormDataEntryValue | null = formData.get('country');
+      const state: FormDataEntryValue | null = formData.get('state');
+      const city: FormDataEntryValue | null = formData.get('city');
+      const zip: FormDataEntryValue | null = formData.get('zip');
+      const cryptoWalletAddress: FormDataEntryValue | null = formData.get(
+        'cryptoWalletAddress',
+      );
+
+      const formFields: PrizeFields = {
+        firstName: firstName as string,
+        lastName: lastName as string,
+        phoneNumber: phoneNumber as string,
+        email: email as string,
+        address: address as string,
+        country: country as string,
+        state: state as string,
+        city: city as string,
+        zip: zip as string,
+        cryptoWalletAddress: cryptoWalletAddress as string,
+      };
+      try {
+        const userFulfilledPrize = savePrize(formFields);
+        console.log('User fulfilled prize:', userFulfilledPrize);
+      } catch (error) {
+        this.state.rewardState = RewardModalState.FAILED_CLAIM;
+        this.updateContent();
+        console.error('Failed to claim prize:', error);
+      }
     }
   }
 
@@ -188,8 +227,11 @@ export class RewardModal extends HTMLElement {
 
       for (const field of this.state.reward.formFields) {
         const input = document.createElement('input');
-        input.setAttribute('placeholder', field);
+        input.setAttribute('placeholder', camelToSentenceCase(field));
         input.classList.add('input_field');
+        input.id = field;
+        input.type = 'text';
+        input.name = field;
         inputContainer.appendChild(input);
       }
     }
@@ -199,7 +241,6 @@ export class RewardModal extends HTMLElement {
     if (!this.shadowRoot) return;
     this.shadowRoot.innerHTML = html`
       <style>
-
         {
             @import url('https://fonts.googleapis.com/css2?family=Montserrat:ital,wght@0,100..900;1,100..900&display=swap');
             @import url('https://fonts.googleapis.com/css2?family=Hind:wght@300;400;500;600;700&family=Montserrat:ital,wght@0,100..900;1,100..900&display=swap');
@@ -221,11 +262,11 @@ export class RewardModal extends HTMLElement {
         }
 
         button {
-            outline: none;
-            border: none;
-            margin: 0;
-            padding: 0;
-            width: auto;
+          outline: none;
+          border: none;
+          margin: 0;
+          padding: 0;
+          width: auto;
         }
 
         .reward-modal {
@@ -287,16 +328,16 @@ export class RewardModal extends HTMLElement {
         }
 
         .reward-image {
-            width: 100%;
-            height: auto;
-            border-radius: 10px;
-            margin-bottom: 20px;
+          width: 100%;
+          height: auto;
+          border-radius: 10px;
+          margin-bottom: 20px;
         }
 
         .input__container {
-            display: flex;
-            flex-direction: column;
-            margin-bottom: 20px;
+          display: flex;
+          flex-direction: column;
+          margin-bottom: 20px;
         }
 
         .input_field {
@@ -315,6 +356,7 @@ export class RewardModal extends HTMLElement {
           color: #25314c;
           font-size: 14px;
           padding: 10px;
+          padding-left: 20px;
         }
 
         .input_field::placeholder {
@@ -329,6 +371,7 @@ export class RewardModal extends HTMLElement {
           outline: none;
         }
       </style>
+
       <div class="reward-modal">
         <div class="reward-modal__content">
           <img

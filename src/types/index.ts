@@ -38,3 +38,16 @@ export interface Keys {
   createdAt: Date;
   updatedAt: Date;
 }
+
+export interface PrizeFields {
+  firstName?: string;
+  lastName?: string;
+  phoneNumber?: string;
+  email?: string;
+  address?: string;
+  country?: string;
+  state?: string;
+  city?: string;
+  zip?: string;
+  cryptoWalletAddress?: string;
+}
