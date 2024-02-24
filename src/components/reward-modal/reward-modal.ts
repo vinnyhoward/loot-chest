@@ -24,6 +24,7 @@ export class RewardModal extends HTMLElement {
   private state: {
     reward: any;
     rewardState: RewardModalState;
+    formError: string;
   };
 
   constructor() {
@@ -32,6 +33,7 @@ export class RewardModal extends HTMLElement {
     this.state = {
       reward: mockRewardData[0],
       rewardState: RewardModalState.CLAIM,
+      formError: '',
     };
 
     this.onSubmit = this.onSubmit.bind(this);
@@ -54,7 +56,7 @@ export class RewardModal extends HTMLElement {
     this.render();
     this.updateContent();
     this.attachEventListeners();
-    gsap.to(this, { opacity: 0, display: 'none' });
+    // gsap.to(this, { opacity: 0, display: 'none' });
   }
 
   private attachEventListeners(): void {
@@ -62,8 +64,12 @@ export class RewardModal extends HTMLElement {
     form?.addEventListener('submit', this.onSubmit);
   }
 
-  private onSubmit(event: Event): void {
+  private async onSubmit(event: Event): Promise<void> {
     event.preventDefault();
+    const errorMessage = this.shadowRoot?.querySelector(
+      '.error__message',
+    ) as HTMLElement;
+    errorMessage.textContent = '';
 
     if (this.state.rewardState === RewardModalState.SHOW) {
       this.state.rewardState = RewardModalState.CLAIM;
@@ -90,6 +96,8 @@ export class RewardModal extends HTMLElement {
       );
 
       const formFields: PrizeFields = {
+        prizeLogId: 'clszs5ddj000m6mw2f3wcsao5',
+        sanityRewardId: 'd05933df3d49',
         firstName: firstName as string,
         lastName: lastName as string,
         phoneNumber: phoneNumber as string,
@@ -101,13 +109,17 @@ export class RewardModal extends HTMLElement {
         zip: zip as string,
         cryptoWalletAddress: cryptoWalletAddress as string,
       };
-      try {
-        const userFulfilledPrize = savePrize(formFields);
-        console.log('User fulfilled prize:', userFulfilledPrize);
-      } catch (error) {
+
+      const userFulfilledPrize = savePrize(formFields);
+      const responseData = await userFulfilledPrize;
+      console.log('User fulfilled prize:', responseData);
+      if (!responseData) {
         this.state.rewardState = RewardModalState.FAILED_CLAIM;
+        const errorMessage = this.shadowRoot?.querySelector(
+          '.error__message',
+        ) as HTMLElement;
+        errorMessage.textContent = 'Something went wrong while claiming prize!';
         this.updateContent();
-        console.error('Failed to claim prize:', error);
       }
     }
   }
@@ -212,7 +224,7 @@ export class RewardModal extends HTMLElement {
     const image = this.shadowRoot?.querySelector(
       '.reward-image',
     ) as HTMLImageElement;
-    if (this.state.rewardState === RewardModalState.CLAIM) {
+    if (this.state.rewardState !== RewardModalState.SHOW) {
       image.style.display = 'none';
     } else {
       image.style.display = 'block';
@@ -371,6 +383,15 @@ export class RewardModal extends HTMLElement {
         .input_field:focus {
           outline: none;
         }
+
+        .error__message {
+          color: red;
+          margin-bottom: 20px;
+          font-family: 'Hind', sans-serif;
+          font-weight: 400;
+          font-style: normal;
+          font-size: 14px;
+        }
       </style>
 
       <div class="reward-modal">
@@ -389,6 +410,7 @@ export class RewardModal extends HTMLElement {
           <form class="reward__form">
             <div class="input__container"></div>
 
+            <div class="error__message"></div>
             <button type="submit" class="claim__button">
               <div class="claim__text"></div>
             </button>

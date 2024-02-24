@@ -50,6 +50,8 @@ export interface PrizeFields {
   city?: string;
   zip?: string;
   cryptoWalletAddress?: string;
+  prizeLogId: string;
+  sanityRewardId: string;
 }
 
 export interface User {
