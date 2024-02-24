@@ -54,6 +54,7 @@ export class RewardModal extends HTMLElement {
     this.render();
     this.updateContent();
     this.attachEventListeners();
+    gsap.to(this, { opacity: 0, display: 'none' });
   }
 
   private attachEventListeners(): void {

@@ -95,6 +95,11 @@ export class OpenButton extends HTMLElement {
         this.attachEventListeners();
       }
     });
+
+    document.addEventListener(EVENTS.LOGIN_SUCCESS, () => {
+      this.state.userToken = localStorage.getItem('token');
+      this.awardAndFetchKeys();
+    });
   }
 
   showLoginMenu() {

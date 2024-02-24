@@ -331,6 +331,7 @@ export class LoginModal extends HTMLElement {
       this.setFormState(true);
       try {
         await loginUser(email, password);
+        document.dispatchEvent(new CustomEvent(EVENTS.LOGIN_SUCCESS));
         this.hide();
       } catch (error) {
         console.error('Failed to log in:', error);
@@ -343,6 +344,7 @@ export class LoginModal extends HTMLElement {
       this.setFormState(true);
       try {
         await signUpUser(username, email, password);
+        document.dispatchEvent(new CustomEvent(EVENTS.LOGIN_SUCCESS));
         this.hide();
       } catch (error) {
         console.error('Failed to sign up:', error);
