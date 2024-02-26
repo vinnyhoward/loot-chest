@@ -32,7 +32,7 @@ export class RewardModal extends HTMLElement {
     this.attachShadow({ mode: 'open' });
     this.state = {
       reward: mockRewardData[0],
-      rewardState: RewardModalState.CLAIM,
+      rewardState: RewardModalState.SHOW,
       formError: '',
     };
 
@@ -151,7 +151,7 @@ export class RewardModal extends HTMLElement {
 
     switch (this.state.rewardState) {
       case RewardModalState.SHOW:
-        rewardHeadline.textContent = '🎉 Congratulations! 🎉';
+        rewardHeadline.textContent = 'Congratulations';
         break;
       case RewardModalState.CLAIM:
         rewardHeadline.textContent = '🎉 Congratulations! 🎉';
@@ -254,10 +254,8 @@ export class RewardModal extends HTMLElement {
     if (!this.shadowRoot) return;
     this.shadowRoot.innerHTML = html`
       <style>
-        {
-            @import url('https://fonts.googleapis.com/css2?family=Montserrat:ital,wght@0,100..900;1,100..900&display=swap');
-            @import url('https://fonts.googleapis.com/css2?family=Hind:wght@300;400;500;600;700&family=Montserrat:ital,wght@0,100..900;1,100..900&display=swap');
-        }
+        @import url('https://fonts.googleapis.com/css2?family=Montserrat:ital,wght@0,100..900;1,100..900&display=swap');
+        @import url('https://fonts.googleapis.com/css2?family=Hind:wght@300;400;500;600;700&family=Montserrat:ital,wght@0,100..900;1,100..900&display=swap');
 
         * {
           margin: 0;
@@ -297,11 +295,32 @@ export class RewardModal extends HTMLElement {
         }
 
         .reward-modal__content {
+          position: relative;
           background-color: #fff;
-          padding: 20px;
-          border-radius: 10px;
+          padding: 10px;
+          border-radius: 24px;
           text-align: center;
-          width: 400px;
+          width: 350px;
+          /* min-height: 460px; */
+        }
+
+        .reward-modal__background {
+          position: absolute;
+          top: 0;
+          left: 0;
+          width: 100%;
+          height: 40%;
+          background-color: #8847ff;
+          border-top-left-radius: 24px;
+          border-top-right-radius: 24px;
+        }
+
+        .reward-modal__inner {
+          position: relative;
+          display: flex;
+          flex-direction: column;
+          justify-content: center;
+          align-items: center;
         }
 
         .claim__button {
@@ -310,7 +329,7 @@ export class RewardModal extends HTMLElement {
           padding: 10px 20px;
           color: #fff;
           cursor: pointer;
-          margin-top: 20px;
+          margin-top: 5px;
           display: flex;
           justify-content: center;
           align-items: center;
@@ -330,27 +349,27 @@ export class RewardModal extends HTMLElement {
           font-size: 1.5rem;
           font-weight: bold;
           text-transform: uppercase;
-          margin-bottom: 20px;
         }
 
         .caption-text {
           font-family: var(--font2);
           font-size: 1rem;
           font-weight: 500;
-          margin-bottom: 20px;
+          margin-bottom: 10px;
         }
 
         .reward-image {
-          width: 100%;
+          width: 250px;
+          height: 250px;
           height: auto;
-          border-radius: 10px;
+          border-radius: 16px;
           margin-bottom: 20px;
         }
 
         .input__container {
           display: flex;
           flex-direction: column;
-          margin-bottom: 20px;
+          /* margin-bottom: 20px; */
         }
 
         .input_field {
@@ -392,29 +411,58 @@ export class RewardModal extends HTMLElement {
           font-style: normal;
           font-size: 14px;
         }
+
+        .close-icon__container {
+          display: flex;
+          flex-direction: column;
+          align-items: flex-end;
+          justify-content: flex-end;
+          padding: 10px;
+        }
+
+        .close__icon {
+          width: 15px;
+          height: 15px;
+          z-index: 1000;
+          cursor: pointer;
+        }
+
+        .reward__form {
+          width: 100%;
+          padding: 0px 20px 20px 20px;
+        }
       </style>
 
       <div class="reward-modal">
         <div class="reward-modal__content">
-          <img
-            class="reward-image"
-            src="${urlFor(this.state.reward.rewardImage.asset._ref)
-              .width(500)
-              .height(500)
-              .url()}"
-            alt="Chest"
-          />
-          <h1 class="headline-text"></h1>
-          <p class="caption-text"></p>
+          <div class="close-icon__container">
+            <img
+              class="close__icon"
+              src="icons/svg/close_white.svg"
+              alt="close icon"
+            />
+          </div>
+          <div class="reward-modal__background"></div>
+          <div class="reward-modal__inner">
+            <img
+              class="reward-image"
+              src="${urlFor(this.state.reward.rewardImage.asset._ref)
+                .width(500)
+                .height(500)
+                .url()}"
+              alt="Chest"
+            />
+            <h1 class="headline-text"></h1>
+            <p class="caption-text"></p>
+            <form class="reward__form">
+              <div class="input__container"></div>
 
-          <form class="reward__form">
-            <div class="input__container"></div>
-
-            <div class="error__message"></div>
-            <button type="submit" class="claim__button">
-              <div class="claim__text"></div>
-            </button>
-          </form>
+              <div class="error__message"></div>
+              <button type="submit" class="claim__button">
+                <div class="claim__text"></div>
+              </button>
+            </form>
+          </div>
         </div>
       </div>
     `;
