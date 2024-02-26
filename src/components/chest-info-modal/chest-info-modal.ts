@@ -114,6 +114,14 @@ export class ChestInfoModal extends HTMLElement {
 
     const showMore = this.shadowRoot.querySelector('.show-more') as HTMLElement;
     showMore.innerText = this.state.showMore ? 'Show Less' : 'Show More';
+
+    const innerContainer = this.shadowRoot.querySelector(
+      '.rewards-item__container--inner',
+    ) as HTMLElement;
+    gsap.to(innerContainer, {
+      duration: 0.1,
+      maxHeight: this.state.showMore ? '100px' : '240px',
+    });
   }
 
   public render() {
@@ -130,11 +138,21 @@ export class ChestInfoModal extends HTMLElement {
           padding: 0;
           box-sizing: border-box;
 
-          --common: #5e98d9;
-          --uncommon: #4b69ff;
-          --rare: #8847ff;
-          --legendary: #d32ee6;
-          --divine: #f8ae39;
+          --main_color: #8847ff;
+          
+          --common: #588cbf;
+          --uncommon: #4664d6; 
+          --rare: #7a5bf0;
+          --legendary: #be47d0;
+          --divine: #db9f45; 
+
+
+          --bg-common: #5e98d9;
+          --bg-uncommon: #4b69ff;
+          --bg-rare: #8847ff;
+          --bg-legendary: #d32ee6;
+          --bg-divine: #f8ae39;
+
           --font1: 'Montserrat', sans-serif;
           --font2: 'Hind', sans-serif;
         }
@@ -150,7 +168,7 @@ export class ChestInfoModal extends HTMLElement {
         .info-modal__container {
           position: relative;
           background-color: #fff;
-          width: 400px;
+          width: 350px;
           max-height: 600px;
           border-radius: 24px;
           box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
@@ -216,7 +234,7 @@ export class ChestInfoModal extends HTMLElement {
         .chest__description {
           font-size: 0.9rem;
           color: #707c88;
-          font-family: 'Hind', sans-serif;
+          font-family: var(--font2);
           text-align: left;
           height: 50px;
           margin: 10px 0px 10px 0px;
@@ -226,18 +244,19 @@ export class ChestInfoModal extends HTMLElement {
           font-size: 0.8rem;
           font-weight: 500;
           color: #dedede;
-          font-family: 'Hind', sans-serif;
+          font-family: var(--font2);
           cursor: pointer;
         }
 
         .section-title {
           display: flex;
-          justify-content: space-around;
+          justify-content: space-between;
           font-size: 0.8rem;
           font-weight: 500;
           color: #dedede;
-          font-family: 'Hind', sans-serif;
-          margin: 7.5px 0;
+          font-family: var(--font2);
+          margin: 10px 0;
+          padding: 0 30px;
         }
 
         .rewards__container {
@@ -265,15 +284,15 @@ export class ChestInfoModal extends HTMLElement {
         }
 
         .rewards-item__container--inner::-webkit-scrollbar-track {
-          background: --var(--common);
+          background: var(--common);
         }
 
         .rewards-item__container--inner::-webkit-scrollbar-thumb {
-          background: --var(--uncommon);
+          background: var(--uncommon);
         }
 
         .rewards-item__container--inner::-webkit-scrollbar-thumb:hover {
-          background: --var(--uncommon);
+          background: var(--uncommon);
         }
 
         .icon-name {
@@ -290,12 +309,20 @@ export class ChestInfoModal extends HTMLElement {
         }
 
         .reward-name,
-        .quantity {
-          font-size: 1rem;
+        .reward {
+          font-size: 0.85rem;
           font-weight: 600;
           color: #fff;
-          font-family: 'Hind', sans-serif;
+          font-family: var(--font2);
         }
+
+        .reward {
+          font-size: 0.75rem;
+          padding: 7.5px 15px;
+          border-radius: 6px;
+          text-transform: uppercase;
+        } 
+        
 
         .rewards-item__container {
           display: flex;
@@ -304,51 +331,47 @@ export class ChestInfoModal extends HTMLElement {
           width: 100%;
           padding: 7.5px 15px;
           background: #f0f0f0;
-          border: 0.5px solid #fff;
           cursor: pointer;
         }
 
         .common {
           background-color: var(--common);
-          border: 2px solid #407BBD;
-          border-bottom: none;
         }
 
-        .common:first-child {
-          border-top: 2px solid #407BBD;
-          border-top-left-radius: 16px;
-          border-top-right-radius: 16px;
+        .bg-common {
+          background-color: var(--bg-common);
         }
-
 
         .uncommon {
           background-color: var(--uncommon);
-          border: 2px solid #2D4AD9;
-          border-bottom: none;
+        }
+
+        .bg-uncommon {
+          background-color: var(--bg-uncommon);
         }
 
         .rare {
           background-color: var(--rare);
-          border: 2px solid #6339B0;
-          border-bottom: none;
+        }
+
+        .bg-rare {
+          background-color: var(--bg-rare);
         }
 
         .legendary {
           background-color: var(--legendary);
-          border: 2px solid #9C22AB;
-          border-bottom: none;
+        }
+
+        .bg-legendary {
+          background-color: var(--bg-legendary);
         }
 
         .divine {
           background-color: var(--divine);
-          border: 2px solid #B37E2B;
-          border-bottom: none;
         }
 
-        .divine:last-child {
-          border-bottom: 2px solid #B37E2B;
-          border-bottom-left-radius: 16px;
-          border-bottom-right-radius: 16px;
+        .bg-divine {
+          background-color: var(--bg-divine);
         }
       </style>
       <div class="info-modal">
@@ -389,7 +412,7 @@ export class ChestInfoModal extends HTMLElement {
           <div class="line"></div>
           <div class="section-title">
             <p>Reward</p>
-            <p>Quantity</p>
+            <p>Rarity</p>
           </div>
 
           <div class="rewards__container">
@@ -402,7 +425,7 @@ export class ChestInfoModal extends HTMLElement {
                     .map((reward: any) => {
                       return html`
                         <div
-                          class="rewards-item__container ${reward.itemRarity.toLowerCase()}"
+                          class="rewards-item__container bg-${reward.itemRarity.toLowerCase()}"
                         >
                           <div class="icon-name">
                             <img
@@ -415,7 +438,11 @@ export class ChestInfoModal extends HTMLElement {
                             />
                             <div class="reward-name">${reward.rewardName}</div>
                           </div>
-                          <div class="quantity">x${reward.itemInventory}</div>
+                          <div
+                            class="reward ${reward.itemRarity.toLowerCase()}"
+                          >
+                            ${reward.itemRarity}
+                          </div>
                         </div>
                       `;
                     })

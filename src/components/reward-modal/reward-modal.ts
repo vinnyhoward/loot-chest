@@ -56,7 +56,7 @@ export class RewardModal extends HTMLElement {
     this.render();
     this.updateContent();
     this.attachEventListeners();
-    // gsap.to(this, { opacity: 0, display: 'none' });
+    gsap.to(this, { opacity: 0, display: 'none' });
   }
 
   private attachEventListeners(): void {
@@ -69,6 +69,7 @@ export class RewardModal extends HTMLElement {
     const errorMessage = this.shadowRoot?.querySelector(
       '.error__message',
     ) as HTMLElement;
+    errorMessage.style.display = 'block';
     errorMessage.textContent = '';
 
     if (this.state.rewardState === RewardModalState.SHOW) {
@@ -118,6 +119,7 @@ export class RewardModal extends HTMLElement {
         const errorMessage = this.shadowRoot?.querySelector(
           '.error__message',
         ) as HTMLElement;
+        errorMessage.style.display = 'block';
         errorMessage.textContent = 'Something went wrong while claiming prize!';
         this.updateContent();
       }
@@ -287,7 +289,7 @@ export class RewardModal extends HTMLElement {
           left: 0;
           width: 100%;
           height: 100%;
-          background-color: rgba(0, 0, 0, 0.5);
+          /* background-color: rgba(0, 0, 0, 0.5); */
           z-index: 100;
           justify-content: center;
           align-items: center;
@@ -301,6 +303,7 @@ export class RewardModal extends HTMLElement {
           border-radius: 24px;
           text-align: center;
           width: 350px;
+          padding: 20px;
           /* min-height: 460px; */
         }
 
@@ -326,10 +329,8 @@ export class RewardModal extends HTMLElement {
         .claim__button {
           background-color: var(--main_color);
           border-radius: 10px;
-          padding: 10px 20px;
           color: #fff;
           cursor: pointer;
-          margin-top: 5px;
           display: flex;
           justify-content: center;
           align-items: center;
@@ -410,6 +411,7 @@ export class RewardModal extends HTMLElement {
           font-weight: 400;
           font-style: normal;
           font-size: 14px;
+          display: none;
         }
 
         .close-icon__container {
@@ -417,7 +419,6 @@ export class RewardModal extends HTMLElement {
           flex-direction: column;
           align-items: flex-end;
           justify-content: flex-end;
-          padding: 10px;
         }
 
         .close__icon {
@@ -429,7 +430,6 @@ export class RewardModal extends HTMLElement {
 
         .reward__form {
           width: 100%;
-          padding: 0px 20px 20px 20px;
         }
       </style>
 
