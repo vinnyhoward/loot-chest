@@ -56,12 +56,15 @@ export class RewardModal extends HTMLElement {
     this.render();
     this.updateContent();
     this.attachEventListeners();
-    gsap.to(this, { opacity: 0, display: 'none' });
+    // gsap.to(this, { opacity: 0, display: 'none' });
   }
 
   private attachEventListeners(): void {
     const form = this.shadowRoot?.querySelector('.reward__form');
     form?.addEventListener('submit', this.onSubmit);
+
+    const closeButton = this.shadowRoot?.querySelector('.close__icon');
+    closeButton?.addEventListener('click', this.hide.bind(this));
   }
 
   private async onSubmit(event: Event): Promise<void> {
@@ -224,12 +227,31 @@ export class RewardModal extends HTMLElement {
     this.updateClaimButtonText();
 
     const image = this.shadowRoot?.querySelector(
-      '.reward-image',
+      '.hexagon-image',
     ) as HTMLImageElement;
+    const containerBackground = this.shadowRoot?.querySelector(
+      '.reward-modal__background',
+    ) as HTMLElement;
+    const claimButton = this.shadowRoot?.querySelector(
+      '.claim__button',
+    ) as HTMLButtonElement;
     if (this.state.rewardState !== RewardModalState.SHOW) {
       image.style.display = 'none';
     } else {
       image.style.display = 'block';
+      image.style.backgroundImage = `url(${urlFor(
+        this.state.reward.rewardImage.asset._ref,
+      )
+        .width(500)
+        .height(500)
+        .url()})`;
+
+      containerBackground.classList.add(
+        `gradient-${this.state.reward.itemRarity.toLowerCase()}`,
+      );
+      claimButton.classList.add(
+        `gradient-${this.state.reward.itemRarity.toLowerCase()}`,
+      );
     }
 
     if (
@@ -270,6 +292,14 @@ export class RewardModal extends HTMLElement {
           --rare: #8847ff;
           --legendary: #d32ee6;
           --divine: #f8ae39;
+
+          --gradient-main_color: linear-gradient(#8847ff, #9f6bff);
+          --gradient-common: linear-gradient(#5e98d9, #7eace0);
+          --gradient-uncommon: linear-gradient(#4b69ff, #6f87ff);
+          --gradient-rare: linear-gradient(#8847ff, #9f6bff);
+          --gradient-legendary: linear-gradient(#d32ee6, #db57eb);
+          --gradient-divine: linear-gradient(#f8ae39, #f9be60);
+
           --font1: 'Montserrat', sans-serif;
           --font2: 'Hind', sans-serif;
         }
@@ -289,7 +319,6 @@ export class RewardModal extends HTMLElement {
           left: 0;
           width: 100%;
           height: 100%;
-          /* background-color: rgba(0, 0, 0, 0.5); */
           z-index: 100;
           justify-content: center;
           align-items: center;
@@ -302,9 +331,9 @@ export class RewardModal extends HTMLElement {
           padding: 10px;
           border-radius: 24px;
           text-align: center;
-          width: 350px;
+          width: 375px;
           padding: 20px;
-          /* min-height: 460px; */
+          box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.25);
         }
 
         .reward-modal__background {
@@ -350,20 +379,13 @@ export class RewardModal extends HTMLElement {
           font-size: 1.5rem;
           font-weight: bold;
           text-transform: uppercase;
+          margin-bottom: 5px;
         }
 
         .caption-text {
           font-family: var(--font2);
           font-size: 1rem;
           font-weight: 500;
-          margin-bottom: 10px;
-        }
-
-        .reward-image {
-          width: 250px;
-          height: 250px;
-          height: auto;
-          border-radius: 16px;
           margin-bottom: 20px;
         }
 
@@ -431,6 +453,37 @@ export class RewardModal extends HTMLElement {
         .reward__form {
           width: 100%;
         }
+
+        .hexagon-image {
+          width: 220px;
+          height: 250px;
+          background-size: cover;
+          background-position: center;
+          -webkit-mask-image: url('mask/hexagon_mask.png');
+          mask-image: url('mask/hexagon_mask.png');
+          -webkit-mask-repeat: no-repeat;
+          mask-repeat: no-repeat;
+          -webkit-mask-size: 100% 100%;
+          mask-size: 100% 100%;
+          margin-bottom: 20px;
+          filter: drop-shadow(0px 0px 10px rgba(0, 0, 0, 0.5));
+        }
+
+        .gradient-common {
+          background: var(--gradient-common);
+        }
+        .gradient-uncommon {
+          background: var(--gradient-uncommon);
+        }
+        .gradient-rare {
+          background: var(--gradient-rare);
+        }
+        .gradient-legendary {
+          background: var(--gradient-legendary);
+        }
+        .gradient-divine {
+          background: var(--gradient-divine);
+        }
       </style>
 
       <div class="reward-modal">
@@ -444,14 +497,7 @@ export class RewardModal extends HTMLElement {
           </div>
           <div class="reward-modal__background"></div>
           <div class="reward-modal__inner">
-            <img
-              class="reward-image"
-              src="${urlFor(this.state.reward.rewardImage.asset._ref)
-                .width(500)
-                .height(500)
-                .url()}"
-              alt="Chest"
-            />
+            <div class="hexagon-image"></div>
             <h1 class="headline-text"></h1>
             <p class="caption-text"></p>
             <form class="reward__form">

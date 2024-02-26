@@ -168,7 +168,7 @@ export class ChestInfoModal extends HTMLElement {
         .info-modal__container {
           position: relative;
           background-color: #fff;
-          width: 350px;
+          width: 375px;
           max-height: 600px;
           border-radius: 24px;
           box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
