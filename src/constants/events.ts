@@ -36,4 +36,8 @@ export const EVENTS: Record<string, string> = {
 
   // Chest Info Button Events
   CHEST_INFO_BUTTON_CLICKED: 'chest-info-button-clicked',
+
+  // Reward Modal Events
+  SHOW_REWARD_MODAL: 'show-reward-modal',
+  HIDE_REWARD_MODAL: 'hide-reward-modal',
 };

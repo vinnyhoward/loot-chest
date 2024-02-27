@@ -84,7 +84,6 @@ export class ChestInfoModal extends HTMLElement {
     });
 
     document.addEventListener(EVENTS.CHEST_INFO_BUTTON_CLICKED, () => {
-      console.log('clicked  ');
       this.show();
     });
   }

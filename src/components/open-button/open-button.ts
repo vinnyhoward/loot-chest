@@ -4,12 +4,14 @@ import { Notification, NotificationType, Duration, Keys } from '../../types';
 import { EVENTS } from '../../constants/events';
 import { html } from '../../utils/html';
 import { awardKey, fetchUserKeys } from '../../services/keys';
+import { openChest } from '../../services/chests';
 
 export class OpenButton extends HTMLElement {
   private state: {
     isOpening: boolean;
     userKeys: Keys[];
     userToken: string | null;
+    selectedChest: any | null;
   };
 
   constructor() {
@@ -19,6 +21,7 @@ export class OpenButton extends HTMLElement {
       isOpening: false,
       userKeys: [],
       userToken: '',
+      selectedChest: null,
     };
   }
 
@@ -64,8 +67,12 @@ export class OpenButton extends HTMLElement {
 
   attachEventListeners(): void {
     if (!this.shadowRoot) return;
+    document.addEventListener(EVENTS.CHEST_SELECTED, (event: any) => {
+      this.state.selectedChest = event.detail.selectedChest;
+    });
+
     const openButton = this.shadowRoot.querySelector('.open__container');
-    openButton?.addEventListener('click', () => {
+    openButton?.addEventListener('click', async () => {
       gsap.to(openButton, {
         scale: 1.1,
         duration: 0.1,
@@ -76,23 +83,98 @@ export class OpenButton extends HTMLElement {
       if (!this.state.userToken) {
         this.showLoginMenu();
       } else {
-        const tempCallback = () => {
-          this.state.isOpening = false;
+        if (this.state.userKeys.length === 0) {
+          const detail: Notification = {
+            title: 'No keys',
+            message: 'You need keys to open chests',
+            id: uuidv4(),
+            type: NotificationType.ERROR,
+            duration: Duration.SHORT,
+          };
+
+          document.dispatchEvent(
+            new CustomEvent(EVENTS.TOAST_ERROR, {
+              bubbles: true,
+              composed: true,
+              detail,
+            }),
+          );
+          return;
+        }
+
+        if (!this.state.selectedChest._id) {
+          const detail: Notification = {
+            title: 'No chest selected',
+            message: 'You need to select a chest to open',
+            id: uuidv4(),
+            type: NotificationType.ERROR,
+            duration: Duration.SHORT,
+          };
+
+          document.dispatchEvent(
+            new CustomEvent(EVENTS.TOAST_SUCCESS, {
+              bubbles: true,
+              composed: true,
+              detail,
+            }),
+          );
+          return;
+        }
+        // const rewardItem = this.state.selectedChest.rewardList[0];
+        // this.showRewardModal(rewardItem);
+
+        const chestId = this.state.selectedChest._id;
+        const keyId = this.state.userKeys[0].id;
+        const openChestData = await openChest(chestId, keyId);
+        console.log('Open chest data', openChestData);
+
+        if (!openChestData) {
+          const detail: Notification = {
+            title: 'Something went wrong',
+            message: 'Please try again later',
+            id: uuidv4(),
+            type: NotificationType.ERROR,
+            duration: Duration.LONG,
+          };
+
+          document.dispatchEvent(
+            new CustomEvent(EVENTS.TOAST_SUCCESS, {
+              bubbles: true,
+              composed: true,
+              detail,
+            }),
+          );
+          return;
+        } else {
+          this.state.userKeys = openChestData.keys;
+          const tempCallback = () => {
+            if (openChestData.prizeFulfillment.sanityRewardId) {
+              const rewardItem = this.state.selectedChest.rewardList.find(
+                (item: any) =>
+                  item._key === openChestData.prizeFulfillment.sanityRewardId,
+              );
+              this.showRewardModal(rewardItem);
+            }
+
+            this.state.isOpening = false;
+            this.render();
+            this.attachEventListeners();
+          };
+
+          if (!this.state.isOpening) {
+            this.state.isOpening = true;
+            // @ts-ignore
+            window.experience.world.lootChest.startOpeningCutScene(
+              tempCallback,
+            );
+          } else {
+            this.state.isOpening = true;
+            // @ts-ignore
+            window.experience.world.lootChest.endOpeningCutScene(tempCallback);
+          }
           this.render();
           this.attachEventListeners();
-        };
-
-        if (!this.state.isOpening) {
-          this.state.isOpening = true;
-          // @ts-ignore
-          window.experience.world.lootChest.startOpeningCutScene(tempCallback);
-        } else {
-          this.state.isOpening = true;
-          // @ts-ignore
-          window.experience.world.lootChest.endOpeningCutScene(tempCallback);
         }
-        this.render();
-        this.attachEventListeners();
       }
     });
 
@@ -100,6 +182,17 @@ export class OpenButton extends HTMLElement {
       this.state.userToken = localStorage.getItem('token');
       this.awardAndFetchKeys();
     });
+  }
+
+  showRewardModal(reward: any) {
+    console.log('Reward:', reward);
+    document.dispatchEvent(
+      new CustomEvent(EVENTS.SHOW_REWARD_MODAL, {
+        bubbles: true,
+        composed: true,
+        detail: { reward },
+      }),
+    );
   }
 
   showLoginMenu() {

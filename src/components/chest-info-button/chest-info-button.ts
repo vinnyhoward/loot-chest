@@ -27,7 +27,6 @@ export class ChestInfoButton extends HTMLElement {
 
     const button = this.shadowRoot.querySelector('.chest-info') as HTMLElement;
     if (button) {
-      console.log('attaching button event listener');
       button.addEventListener('click', this.showChestInfo.bind(this));
     }
     const chestInfoButton = this.shadowRoot.querySelector(

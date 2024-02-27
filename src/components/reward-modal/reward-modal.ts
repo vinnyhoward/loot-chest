@@ -2,7 +2,6 @@ import gsap from 'gsap';
 import { html } from '../../utils/html';
 import { urlFor } from '../../services/sanity';
 import { EVENTS } from '../../constants/events';
-import { mockRewardData } from '../../constants/mockData';
 import { camelToSentenceCase } from '../../utils/camelToSentenceCase';
 import { savePrize } from '../../services/prizes';
 import { PrizeFields } from '../../types';
@@ -30,7 +29,7 @@ export class RewardModal extends HTMLElement {
     super();
     this.attachShadow({ mode: 'open' });
     this.state = {
-      reward: mockRewardData[0],
+      reward: null,
       rewardState: RewardModalState.SHOW,
       formError: '',
     };
@@ -55,10 +54,16 @@ export class RewardModal extends HTMLElement {
     this.render();
     this.updateContent();
     this.attachEventListeners();
-    // gsap.to(this, { opacity: 0, display: 'none' });
+    gsap.to(this, { opacity: 0, display: 'none' });
   }
 
   private attachEventListeners(): void {
+    document.addEventListener(EVENTS.SHOW_REWARD_MODAL, (event: any) => {
+      console.log('event detail reward', event.detail.reward);
+      this.reward = event.detail.reward;
+      this.show();
+    });
+
     const form = this.shadowRoot?.querySelector('.reward__form');
     form?.addEventListener('submit', this.onSubmit);
 
@@ -254,12 +259,16 @@ export class RewardModal extends HTMLElement {
     if (this.state.rewardState == RewardModalState.SUCCESSFULLY_CLAIMED) {
       headerImage.style.display = 'none';
       hexImage.style.display = 'block';
-      hexImage.style.backgroundImage = `url(${urlFor(
-        this.state.reward.rewardImage.asset._ref,
-      )
-        .width(500)
-        .height(500)
-        .url()})`;
+
+      if (this.state.reward) {
+        hexImage.style.backgroundImage = `url(${urlFor(
+          this.state.reward.rewardImage.asset._ref,
+        )
+          .width(500)
+          .height(500)
+          .url()})`;
+      }
+
       containerBackground.style.height = '100%';
       containerBackground.style.borderRadius = '24px';
     } else if (this.state.rewardState !== RewardModalState.SHOW) {
@@ -269,12 +278,16 @@ export class RewardModal extends HTMLElement {
       contentContainer.style.marginBottom = '40px';
     } else {
       hexImage.style.display = 'block';
-      hexImage.style.backgroundImage = `url(${urlFor(
-        this.state.reward.rewardImage.asset._ref,
-      )
-        .width(500)
-        .height(500)
-        .url()})`;
+
+      if (this.state.reward) {
+        hexImage.style.backgroundImage = `url(${urlFor(
+          this.state.reward.rewardImage.asset._ref,
+        )
+          .width(500)
+          .height(500)
+          .url()})`;
+      }
+
       headerImage.style.display = 'none';
       contentContainer.style.marginBottom = '0px';
       containerBackground.style.display = 'block';
@@ -283,15 +296,18 @@ export class RewardModal extends HTMLElement {
       containerBackground.style.borderTopRightRadius = '24px';
       containerBackground.style.borderBottomLeftRadius = '0px';
       containerBackground.style.borderBottomRightRadius = '0px';
-      containerBackground.classList.add(
-        `gradient-${this.state.reward.itemRarity.toLowerCase()}`,
-      );
-      claimButton.classList.add(
-        `gradient-${this.state.reward.itemRarity.toLowerCase()}`,
-      );
+      if (this.state.reward) {
+        containerBackground.classList.add(
+          `gradient-${this.state.reward.itemRarity.toLowerCase()}`,
+        );
+        claimButton.classList.add(
+          `gradient-${this.state.reward.itemRarity.toLowerCase()}`,
+        );
+      }
     }
 
     if (
+      this.state.reward &&
       this.state.reward.formFields &&
       this.state.rewardState === RewardModalState.CLAIM
     ) {
@@ -315,8 +331,10 @@ export class RewardModal extends HTMLElement {
     if (!this.shadowRoot) return;
     this.shadowRoot.innerHTML = html`
       <style>
-        @import url('https://fonts.googleapis.com/css2?family=Montserrat:ital,wght@0,100..900;1,100..900&display=swap');
-        @import url('https://fonts.googleapis.com/css2?family=Hind:wght@300;400;500;600;700&family=Montserrat:ital,wght@0,100..900;1,100..900&display=swap');
+        {
+          @import url('https://fonts.googleapis.com/css2?family=Montserrat:ital,wght@0,100..900;1,100..900&display=swap');
+          @import url('https://fonts.googleapis.com/css2?family=Hind:wght@300;400;500;600;700&family=Montserrat:ital,wght@0,100..900;1,100..900&display=swap');
+        }
 
         * {
           margin: 0;
@@ -370,6 +388,7 @@ export class RewardModal extends HTMLElement {
           border-radius: 24px;
           text-align: center;
           width: 375px;
+          max-height: 600px;
           padding: 20px;
           box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.25);
         }
@@ -562,14 +581,18 @@ export class RewardModal extends HTMLElement {
             <div class="hexagon-image"></div>
 
             <div class="content__container">
-              <img
-                class="reward__image"
-                src=${urlFor(this.state.reward.rewardImage.asset._ref)
-                  .width(500)
-                  .height(500)
-                  .url()}
-                alt="reward image"
-              />
+              ${this.state.reward
+                ? html`
+                    <img
+                      class="reward__image"
+                      src=${urlFor(this.state.reward.rewardImage.asset._ref)
+                        .width(500)
+                        .height(500)
+                        .url()}
+                      alt="reward image"
+                    />
+                  `
+                : html`<div class="reward__image"></div>`}
               <div class="text__container">
                 <h1 class="headline-text"></h1>
                 <p class="caption-text"></p>
