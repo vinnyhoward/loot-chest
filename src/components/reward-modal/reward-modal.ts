@@ -17,7 +17,6 @@ enum RewardModalState {
   SHOW,
   CLAIM,
   SUCCESSFULLY_CLAIMED,
-  FAILED_CLAIM,
 }
 
 export class RewardModal extends HTMLElement {
@@ -69,6 +68,10 @@ export class RewardModal extends HTMLElement {
 
   private async onSubmit(event: Event): Promise<void> {
     event.preventDefault();
+    if (this.state.rewardState === RewardModalState.SUCCESSFULLY_CLAIMED) {
+      return this.hide();
+    }
+
     const errorMessage = this.shadowRoot?.querySelector(
       '.error__message',
     ) as HTMLElement;
@@ -77,11 +80,10 @@ export class RewardModal extends HTMLElement {
 
     if (this.state.rewardState === RewardModalState.SHOW) {
       this.state.rewardState = RewardModalState.CLAIM;
-      this.updateContent();
+      return this.updateContent();
     }
 
     if (this.state.rewardState === RewardModalState.CLAIM) {
-      this.state.rewardState = RewardModalState.SUCCESSFULLY_CLAIMED;
       const target = event.target as HTMLFormElement;
       const formData = new FormData(target);
 
@@ -118,13 +120,13 @@ export class RewardModal extends HTMLElement {
       const responseData = await userFulfilledPrize;
       console.log('User fulfilled prize:', responseData);
       if (!responseData) {
-        this.state.rewardState = RewardModalState.FAILED_CLAIM;
         const errorMessage = this.shadowRoot?.querySelector(
           '.error__message',
         ) as HTMLElement;
         errorMessage.style.display = 'block';
         errorMessage.textContent = 'Something went wrong while claiming prize!';
-        this.updateContent();
+      } else {
+        this.state.rewardState = RewardModalState.SUCCESSFULLY_CLAIMED;
       }
     }
   }
@@ -157,16 +159,18 @@ export class RewardModal extends HTMLElement {
     switch (this.state.rewardState) {
       case RewardModalState.SHOW:
         rewardHeadline.textContent = 'Congratulations';
+        rewardHeadline.style.color = 'var(--font-color)';
         break;
       case RewardModalState.CLAIM:
-        rewardHeadline.textContent = '🎉 Congratulations! 🎉';
+        rewardHeadline.textContent = 'Fill out the form to claim your prize';
+        rewardHeadline.style.color = '#FFFFFF';
+        rewardHeadline.style.fontSize = '1.2rem';
+        rewardHeadline.style.textAlign = 'left';
+        rewardHeadline.style.textTransform = 'none';
         break;
       case RewardModalState.SUCCESSFULLY_CLAIMED:
-        rewardHeadline.textContent =
-          "🎉 You've successfully claimed your prize! 🎉";
-        break;
-      case RewardModalState.FAILED_CLAIM:
-        rewardHeadline.textContent = 'Something went wrong! 😢';
+        rewardHeadline.textContent = "You've successfully claimed your prize!";
+        rewardHeadline.style.color = '#FFFFFF';
         break;
       default:
         break;
@@ -181,17 +185,19 @@ export class RewardModal extends HTMLElement {
     switch (this.state.rewardState) {
       case RewardModalState.SHOW:
         rewardCaption.textContent = 'You have earned a reward!';
+        rewardCaption.style.color = 'var(--font-color)';
+        rewardCaption.style.display = 'block';
         break;
       case RewardModalState.CLAIM:
-        rewardCaption.textContent = 'You have earned a reward!';
+        rewardCaption.textContent = '';
+        rewardCaption.style.color = '#FFFFFF';
+        rewardCaption.style.display = 'none';
         break;
       case RewardModalState.SUCCESSFULLY_CLAIMED:
         rewardCaption.textContent =
           'You have successfully claimed your reward!';
-        break;
-      case RewardModalState.FAILED_CLAIM:
-        rewardCaption.textContent =
-          'Something went wrong while claiming your reward!';
+        rewardCaption.style.color = '#FFFFFF';
+        rewardCaption.style.display = 'block';
         break;
       default:
         break;
@@ -199,22 +205,25 @@ export class RewardModal extends HTMLElement {
   }
 
   private updateClaimButtonText(): void {
-    const claimButton = this.shadowRoot?.querySelector(
+    const claimButtonText = this.shadowRoot?.querySelector(
       '.claim__text',
     ) as HTMLElement;
+    const claimButton = this.shadowRoot?.querySelector(
+      '.claim__button',
+    ) as HTMLButtonElement;
 
     switch (this.state.rewardState) {
       case RewardModalState.SHOW:
-        claimButton.textContent = 'Claim your reward';
+        claimButtonText.textContent = 'Claim your reward';
+        claimButtonText.style.color = '#FFFFFF';
         break;
       case RewardModalState.CLAIM:
-        claimButton.textContent = 'Claim your reward';
+        claimButtonText.textContent = 'Claim your reward';
         break;
       case RewardModalState.SUCCESSFULLY_CLAIMED:
-        claimButton.textContent = 'Close';
-        break;
-      case RewardModalState.FAILED_CLAIM:
-        claimButton.textContent = 'Close';
+        claimButtonText.textContent = 'Close';
+        claimButtonText.style.color = 'var(--font-color)';
+        claimButton.style.backgroundColor = '#FFFFFF';
         break;
       default:
         break;
@@ -226,8 +235,11 @@ export class RewardModal extends HTMLElement {
     this.updateCaptionText();
     this.updateClaimButtonText();
 
-    const image = this.shadowRoot?.querySelector(
+    const hexImage = this.shadowRoot?.querySelector(
       '.hexagon-image',
+    ) as HTMLImageElement;
+    const headerImage = this.shadowRoot?.querySelector(
+      '.reward__image',
     ) as HTMLImageElement;
     const containerBackground = this.shadowRoot?.querySelector(
       '.reward-modal__background',
@@ -235,17 +247,42 @@ export class RewardModal extends HTMLElement {
     const claimButton = this.shadowRoot?.querySelector(
       '.claim__button',
     ) as HTMLButtonElement;
-    if (this.state.rewardState !== RewardModalState.SHOW) {
-      image.style.display = 'none';
-    } else {
-      image.style.display = 'block';
-      image.style.backgroundImage = `url(${urlFor(
+    const contentContainer = this.shadowRoot?.querySelector(
+      '.content__container',
+    ) as HTMLElement;
+
+    if (this.state.rewardState == RewardModalState.SUCCESSFULLY_CLAIMED) {
+      headerImage.style.display = 'none';
+      hexImage.style.display = 'block';
+      hexImage.style.backgroundImage = `url(${urlFor(
         this.state.reward.rewardImage.asset._ref,
       )
         .width(500)
         .height(500)
         .url()})`;
-
+      containerBackground.style.height = '100%';
+      containerBackground.style.borderRadius = '24px';
+    } else if (this.state.rewardState !== RewardModalState.SHOW) {
+      hexImage.style.display = 'none';
+      headerImage.style.display = 'block';
+      containerBackground.style.height = '135px';
+      contentContainer.style.marginBottom = '40px';
+    } else {
+      hexImage.style.display = 'block';
+      hexImage.style.backgroundImage = `url(${urlFor(
+        this.state.reward.rewardImage.asset._ref,
+      )
+        .width(500)
+        .height(500)
+        .url()})`;
+      headerImage.style.display = 'none';
+      contentContainer.style.marginBottom = '0px';
+      containerBackground.style.display = 'block';
+      containerBackground.style.height = '40%';
+      containerBackground.style.borderTopLeftRadius = '24px';
+      containerBackground.style.borderTopRightRadius = '24px';
+      containerBackground.style.borderBottomLeftRadius = '0px';
+      containerBackground.style.borderBottomRightRadius = '0px';
       containerBackground.classList.add(
         `gradient-${this.state.reward.itemRarity.toLowerCase()}`,
       );
@@ -286,14 +323,14 @@ export class RewardModal extends HTMLElement {
           padding: 0;
           box-sizing: border-box;
 
-          --main_color: #8847ff;
+          --main-color: #8847ff;
           --common: #5e98d9;
           --uncommon: #4b69ff;
           --rare: #8847ff;
           --legendary: #d32ee6;
           --divine: #f8ae39;
 
-          --gradient-main_color: linear-gradient(#8847ff, #9f6bff);
+          --gradient-main-color: linear-gradient(#8847ff, #9f6bff);
           --gradient-common: linear-gradient(#5e98d9, #7eace0);
           --gradient-uncommon: linear-gradient(#4b69ff, #6f87ff);
           --gradient-rare: linear-gradient(#8847ff, #9f6bff);
@@ -302,6 +339,7 @@ export class RewardModal extends HTMLElement {
 
           --font1: 'Montserrat', sans-serif;
           --font2: 'Hind', sans-serif;
+          --font-color: #25314c;
         }
 
         button {
@@ -356,7 +394,7 @@ export class RewardModal extends HTMLElement {
         }
 
         .claim__button {
-          background-color: var(--main_color);
+          background-color: var(--main-color);
           border-radius: 10px;
           color: #fff;
           cursor: pointer;
@@ -392,7 +430,6 @@ export class RewardModal extends HTMLElement {
         .input__container {
           display: flex;
           flex-direction: column;
-          /* margin-bottom: 20px; */
         }
 
         .input_field {
@@ -469,6 +506,31 @@ export class RewardModal extends HTMLElement {
           filter: drop-shadow(0px 0px 10px rgba(0, 0, 0, 0.5));
         }
 
+        .text__container {
+          display: flex;
+          flex-direction: column;
+          justify-content: center;
+          align-items: center;
+          width: 100%;
+        }
+
+        .content__container {
+          display: flex;
+          flex-direction: row;
+          justify-content: center;
+          align-items: center;
+          width: 100%;
+        }
+
+        .reward__image {
+          border-radius: 50%;
+          height: 85px;
+          width: 85px;
+          margin-right: 10px;
+          box-shadow: 0px 0px 5px rgba(0, 0, 0, 0.25);
+          display: none;
+        }
+
         .gradient-common {
           background: var(--gradient-common);
         }
@@ -498,8 +560,22 @@ export class RewardModal extends HTMLElement {
           <div class="reward-modal__background"></div>
           <div class="reward-modal__inner">
             <div class="hexagon-image"></div>
-            <h1 class="headline-text"></h1>
-            <p class="caption-text"></p>
+
+            <div class="content__container">
+              <img
+                class="reward__image"
+                src=${urlFor(this.state.reward.rewardImage.asset._ref)
+                  .width(500)
+                  .height(500)
+                  .url()}
+                alt="reward image"
+              />
+              <div class="text__container">
+                <h1 class="headline-text"></h1>
+                <p class="caption-text"></p>
+              </div>
+            </div>
+
             <form class="reward__form">
               <div class="input__container"></div>
 
