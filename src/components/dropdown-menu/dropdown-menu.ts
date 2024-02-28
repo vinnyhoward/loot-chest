@@ -13,6 +13,8 @@ export class DropdownMenu extends HTMLElement {
     this.state = {
       selectedChest: this._chests[0],
     };
+
+    this.selectItem = this.selectItem.bind(this);
   }
 
   set chests(data) {
@@ -37,6 +39,12 @@ export class DropdownMenu extends HTMLElement {
   connectedCallback(): void {
     this.render();
     this.attachEventListeners();
+  }
+
+  disconnectedCallback(): void {
+    this.removeEventListener(EVENTS.CHEST_SELECTED, () => {});
+    this.removeEventListener(EVENTS.HIDE_UI, () => {});
+    this.removeEventListener(EVENTS.SHOW_UI, () => {});
   }
 
   selectItem(selectedChestId: string | null): void {
@@ -117,6 +125,29 @@ export class DropdownMenu extends HTMLElement {
         const rotation = isOpening ? 180 : 0;
         gsap.to(arrow, { duration: 0.15, rotation, transformOrigin: 'center' });
       }
+    });
+
+    document.addEventListener(EVENTS.HIDE_UI, () => {
+      this.hide();
+    });
+    document.addEventListener(EVENTS.SHOW_UI, () => {
+      this.show();
+    });
+  }
+
+  public show(): void {
+    gsap.to(this, {
+      opacity: 1,
+      display: 'block',
+      duration: 0.5,
+    });
+  }
+
+  public hide(): void {
+    gsap.to(this, {
+      opacity: 0,
+      display: 'none',
+      duration: 0.5,
     });
   }
 

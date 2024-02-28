@@ -53,6 +53,11 @@ export class ChestInfoModal extends HTMLElement {
     gsap.to(this, { duration: 0, opacity: 0, display: 'none' });
   }
 
+  disconnectedCallback(): void {
+    this.removeEventListener(EVENTS.CHEST_SELECTED, () => {});
+    this.removeEventListener(EVENTS.CHEST_INFO_BUTTON_CLICKED, () => {});
+  }
+
   private attachListeners(): void {
     if (!this.shadowRoot) return;
 

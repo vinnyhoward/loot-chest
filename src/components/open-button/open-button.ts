@@ -124,6 +124,15 @@ export class OpenButton extends HTMLElement {
         }
 
         window.experience.world.lootChest.resetAnimations();
+        const keyIcon = this.shadowRoot?.querySelector(
+          '.key__icon',
+        ) as HTMLElement;
+        const keyText = this.shadowRoot?.querySelector(
+          '.key__text',
+        ) as HTMLElement;
+
+        gsap.to(keyIcon, { opacity: 0, display: 'none', duration: 0.5 });
+        gsap.to(keyText, { opacity: 0, display: 'none', duration: 0.5 });
 
         // const chestId = this.state.selectedChest._id;
         // const keyId = this.state.userKeys[0].id;
@@ -159,7 +168,7 @@ export class OpenButton extends HTMLElement {
           // }
 
           // Mock reward logic
-          if (true) {
+          if (false) {
             window.experience.world.lootChest.startSuccessAnimation();
             setTimeout(() => {
               const rewardItem = this.state.selectedChest.rewardList[0];
@@ -169,11 +178,17 @@ export class OpenButton extends HTMLElement {
             window.experience.world.lootChest.startFailureAnimation();
           }
 
+          document.dispatchEvent(new CustomEvent(EVENTS.SHOW_UI));
+
+          gsap.to(keyIcon, { opacity: 1, display: 'block', duration: 0.5 });
+          gsap.to(keyText, { opacity: 1, display: 'block', duration: 0.5 });
+
           this.state.isOpening = false;
           this.render();
           this.attachEventListeners();
         };
 
+        document.dispatchEvent(new CustomEvent(EVENTS.HIDE_UI));
         if (!this.state.isOpening) {
           this.state.isOpening = true;
           // @ts-ignore
@@ -264,6 +279,7 @@ export class OpenButton extends HTMLElement {
           font-family: 'Montserrat', sans-serif;
           margin-left: 50px;
           z-index: 1;
+          display: block;
         }
 
         .key__icon {
@@ -272,6 +288,7 @@ export class OpenButton extends HTMLElement {
           height: 55px;
           left: 93px;
           z-index: 0;
+          display: block;
         }
       </style>
       <div class="open__button">
@@ -279,8 +296,14 @@ export class OpenButton extends HTMLElement {
           <span class="open__text"
             >${this.state.isOpening ? 'Skip' : 'Open'}</span
           >
-          <img class="key__icon" src="icons/png/key_icon.png" alt="key" />
-          <span class="key__text">x${this.state.userKeys.length}</span>
+          ${this.state.isOpening
+            ? html``
+            : html`<img
+                  class="key__icon"
+                  src="icons/png/key_icon.png"
+                  alt="key"
+                />
+                <span class="key__text">x${this.state.userKeys.length}</span>`}
         </div>
       </div>
     `;

@@ -10,6 +10,22 @@ export class Loader extends HTMLElement {
     this.render();
   }
 
+  public show(): void {
+    gsap.to(this, {
+      opacity: 1,
+      display: 'block',
+      duration: 0.5,
+    });
+  }
+
+  public hide(): void {
+    gsap.to(this, {
+      opacity: 0,
+      display: 'none',
+      duration: 0.5,
+    });
+  }
+
   render() {
     if (!this.shadowRoot) return;
     this.shadowRoot.innerHTML = html`

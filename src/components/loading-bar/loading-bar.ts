@@ -91,6 +91,22 @@ export default class LoadingBar extends HTMLElement {
     }
   }
 
+  public show(): void {
+    gsap.to(this, {
+      opacity: 1,
+      display: 'block',
+      duration: 0.5,
+    });
+  }
+
+  public hide(): void {
+    gsap.to(this, {
+      opacity: 0,
+      display: 'none',
+      duration: 0.5,
+    });
+  }
+
   private render(): void {
     if (!this.shadowRoot) return;
     this.shadowRoot.innerHTML = html`

@@ -1,4 +1,8 @@
 export const EVENTS: Record<string, string> = {
+  // General UI Events
+  HIDE_UI: 'hide-ui',
+  SHOW_UI: 'show-ui',
+
   // Menu Events
   SHOW_MENU: 'show-menu',
   HIDE_MENU: 'hide-menu',
@@ -39,5 +43,6 @@ export const EVENTS: Record<string, string> = {
 
   // Reward Modal Events
   SHOW_REWARD_MODAL: 'show-reward-modal',
+  SHOW_FAILURE_MODAL: 'show-failure-modal',
   HIDE_REWARD_MODAL: 'hide-reward-modal',
 };

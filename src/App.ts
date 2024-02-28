@@ -53,6 +53,24 @@ export default class App extends HTMLElement {
         });
       }
     });
+
+    document.addEventListener(EVENTS.HIDE_MENU, () => {
+      const app = this.shadowRoot.querySelector('.app');
+      if (app) {
+        gsap.to(app, {
+          delay: 3.5,
+          duration: 0.5,
+          opacity: 0,
+          display: 'none',
+          ease: 'power1.out',
+        });
+      }
+    });
+  }
+
+  disconnectedCallback() {
+    document.removeEventListener(EVENTS.SHOW_MENU, () => {});
+    document.removeEventListener(EVENTS.HIDE_MENU, () => {});
   }
 
   render() {

@@ -22,6 +22,14 @@ export class ChestInfoButton extends HTMLElement {
     this.attachEventListeners();
   }
 
+  disconnectedCallback(): void {
+    this.removeEventListener('click', this.showChestInfo);
+    this.removeEventListener(EVENTS.CHEST_POINTS_UPDATED, () => {});
+    this.removeEventListener(EVENTS.CHEST_SELECTED, () => {});
+    this.removeEventListener(EVENTS.HIDE_UI, () => {});
+    this.removeEventListener(EVENTS.SHOW_UI, () => {});
+  }
+
   attachEventListeners(): void {
     if (!this.shadowRoot) return;
 
@@ -56,6 +64,14 @@ export class ChestInfoButton extends HTMLElement {
       setTimeout(() => {
         this.show();
       }, 700);
+    });
+
+    document.addEventListener(EVENTS.HIDE_UI, () => {
+      this.hide();
+    });
+
+    document.addEventListener(EVENTS.SHOW_UI, () => {
+      this.show();
     });
   }
 
