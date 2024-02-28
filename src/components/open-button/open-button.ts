@@ -23,6 +23,8 @@ export class OpenButton extends HTMLElement {
       userToken: '',
       selectedChest: null,
     };
+
+    this.showRewardModal = this.showRewardModal.bind(this);
   }
 
   connectedCallback(): void {
@@ -83,24 +85,24 @@ export class OpenButton extends HTMLElement {
       if (!this.state.userToken) {
         this.showLoginMenu();
       } else {
-        if (this.state.userKeys.length === 0) {
-          const detail: Notification = {
-            title: 'No keys',
-            message: 'You need keys to open chests',
-            id: uuidv4(),
-            type: NotificationType.ERROR,
-            duration: Duration.SHORT,
-          };
+        // if (this.state.userKeys.length === 0) {
+        //   const detail: Notification = {
+        //     title: 'No keys',
+        //     message: 'You need keys to open chests',
+        //     id: uuidv4(),
+        //     type: NotificationType.ERROR,
+        //     duration: Duration.SHORT,
+        //   };
 
-          document.dispatchEvent(
-            new CustomEvent(EVENTS.TOAST_ERROR, {
-              bubbles: true,
-              composed: true,
-              detail,
-            }),
-          );
-          return;
-        }
+        //   document.dispatchEvent(
+        //     new CustomEvent(EVENTS.TOAST_ERROR, {
+        //       bubbles: true,
+        //       composed: true,
+        //       detail,
+        //     }),
+        //   );
+        //   return;
+        // }
 
         if (!this.state.selectedChest._id) {
           const detail: Notification = {
@@ -120,62 +122,71 @@ export class OpenButton extends HTMLElement {
           );
           return;
         }
-        // const rewardItem = this.state.selectedChest.rewardList[0];
-        // this.showRewardModal(rewardItem);
 
-        const chestId = this.state.selectedChest._id;
-        const keyId = this.state.userKeys[0].id;
-        const openChestData = await openChest(chestId, keyId);
-        console.log('Open chest data', openChestData);
+        window.experience.world.lootChest.resetAnimations();
 
-        if (!openChestData) {
-          const detail: Notification = {
-            title: 'Something went wrong',
-            message: 'Please try again later',
-            id: uuidv4(),
-            type: NotificationType.ERROR,
-            duration: Duration.LONG,
-          };
+        // const chestId = this.state.selectedChest._id;
+        // const keyId = this.state.userKeys[0].id;
+        // const openChestData = await openChest(chestId, keyId);
+        // console.log('Open chest data', openChestData);
 
-          document.dispatchEvent(
-            new CustomEvent(EVENTS.TOAST_SUCCESS, {
-              bubbles: true,
-              composed: true,
-              detail,
-            }),
-          );
-          return;
-        } else {
-          this.state.userKeys = openChestData.keys;
-          const tempCallback = () => {
-            if (openChestData.prizeFulfillment.sanityRewardId) {
-              const rewardItem = this.state.selectedChest.rewardList.find(
-                (item: any) =>
-                  item._key === openChestData.prizeFulfillment.sanityRewardId,
-              );
+        // if (!openChestData) {
+        //   const detail: Notification = {
+        //     title: 'Something went wrong',
+        //     message: 'Please try again later',
+        //     id: uuidv4(),
+        //     type: NotificationType.ERROR,
+        //     duration: Duration.LONG,
+        //   };
+
+        //   document.dispatchEvent(
+        //     new CustomEvent(EVENTS.TOAST_SUCCESS, {
+        //       bubbles: true,
+        //       composed: true,
+        //       detail,
+        //     }),
+        //   );
+        //   return;
+        // } else {
+        // this.state.userKeys = openChestData.keys;
+        const tempCallback = () => {
+          // if (openChestData.prizeFulfillment.sanityRewardId) {
+          //   const rewardItem = this.state.selectedChest.rewardList.find(
+          //     (item: any) =>
+          //       item._key === openChestData.prizeFulfillment.sanityRewardId,
+          //   );
+          //   this.showRewardModal(rewardItem);
+          // }
+
+          // Mock reward logic
+          if (true) {
+            window.experience.world.lootChest.startSuccessAnimation();
+            setTimeout(() => {
+              const rewardItem = this.state.selectedChest.rewardList[0];
               this.showRewardModal(rewardItem);
-            }
-
-            this.state.isOpening = false;
-            this.render();
-            this.attachEventListeners();
-          };
-
-          if (!this.state.isOpening) {
-            this.state.isOpening = true;
-            // @ts-ignore
-            window.experience.world.lootChest.startOpeningCutScene(
-              tempCallback,
-            );
+            }, 2000);
           } else {
-            this.state.isOpening = true;
-            // @ts-ignore
-            window.experience.world.lootChest.endOpeningCutScene(tempCallback);
+            window.experience.world.lootChest.startFailureAnimation();
           }
+
+          this.state.isOpening = false;
           this.render();
           this.attachEventListeners();
+        };
+
+        if (!this.state.isOpening) {
+          this.state.isOpening = true;
+          // @ts-ignore
+          window.experience.world.lootChest.startOpeningCutScene(tempCallback);
+        } else {
+          this.state.isOpening = true;
+          // @ts-ignore
+          window.experience.world.lootChest.endOpeningCutScene(tempCallback);
         }
+        this.render();
+        this.attachEventListeners();
       }
+      // }
     });
 
     document.addEventListener(EVENTS.LOGIN_SUCCESS, () => {

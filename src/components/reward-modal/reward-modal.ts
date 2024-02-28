@@ -391,7 +391,13 @@ export class RewardModal extends HTMLElement {
           max-height: 600px;
           padding: 20px;
           box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.25);
+          overflow-y: auto;
         }
+
+        .reward-modal__content::-webkit-scrollbar {
+          display: none;
+        }
+
 
         .reward-modal__background {
           position: absolute;

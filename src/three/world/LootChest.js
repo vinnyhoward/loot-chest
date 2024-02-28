@@ -32,6 +32,8 @@ export default class LootChest {
     this.setAnimation = this.setAnimation.bind(this);
     this.setLootChest = this.setLootChest.bind(this);
     this.getLootChest = this.getLootChest.bind(this);
+    this.startSuccessAnimation = this.startSuccessAnimation.bind(this);
+    this.startFailureAnimation = this.startFailureAnimation.bind(this);
   }
 
   setLootChest(assetName) {
@@ -159,6 +161,22 @@ export default class LootChest {
     setTimeout(() => {
       this.setLootChest(chestFileName);
     }, 650);
+  }
+
+  startSuccessAnimation(callback) {
+    console.log('callback:', callback);
+    const animationTime = 10000;
+    this.setNewAnimation('success');
+    setTimeout(() => {
+      console.log('running callback');
+      return callback();
+    }, animationTime);
+    console.log('animation time:', this.animation.actions.success);
+  }
+
+  startFailureAnimation() {
+    this.animation.actions.failure.reset();
+    this.animation.actions.failure.play();
   }
 
   startOpeningCutScene(tempCallback) {
