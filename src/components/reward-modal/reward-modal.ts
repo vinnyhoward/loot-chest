@@ -81,7 +81,9 @@ export class RewardModal extends HTMLElement {
   private async onSubmit(event: Event): Promise<void> {
     event.preventDefault();
     if (this.state.rewardState === RewardModalState.SUCCESSFULLY_CLAIMED) {
-      return this.hide();
+      this.hide();
+      this.state.rewardState = RewardModalState.SHOW;
+      return;
     }
 
     const errorMessage = this.shadowRoot?.querySelector(
@@ -295,7 +297,6 @@ export class RewardModal extends HTMLElement {
     const hexImage = this.shadowRoot?.querySelector(
       '.hexagon-image',
     ) as HTMLImageElement;
-    console.log('update content state:', this.state);
     const headerImage = this.shadowRoot?.querySelector(
       '.reward__image',
     ) as HTMLImageElement;
@@ -341,6 +342,9 @@ export class RewardModal extends HTMLElement {
       hexImage.style.display = 'none';
       headerImage.style.display = 'block';
       containerBackground.style.height = '135px';
+      containerBackground.classList.add(
+        `gradient-${this.state.reward.itemRarity.toLowerCase()}`,
+      );
       contentContainer.style.marginBottom = '40px';
     } else {
       hexImage.style.display = 'block';
@@ -397,10 +401,15 @@ export class RewardModal extends HTMLElement {
         input.name = field;
         inputContainer.appendChild(input);
       }
+
+      inputContainer.style.height = '350px';
+      inputContainer.style.overflowY = 'overlay';
     } else {
       const inputContainer = this.shadowRoot?.querySelector(
         '.input__container',
       ) as HTMLElement;
+      inputContainer.style.height = '100%';
+      inputContainer.style.overflowY = 'none';
       inputContainer.innerHTML = '';
     }
   }
@@ -534,6 +543,10 @@ export class RewardModal extends HTMLElement {
         .input__container {
           display: flex;
           flex-direction: column;
+        }
+
+        .input__container::-webkit-scrollbar {
+          display: none;
         }
 
         .input_field {

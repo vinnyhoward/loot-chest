@@ -1,6 +1,5 @@
 import * as THREE from 'three';
 import * as TWEEN from '@tweenjs/tween.js';
-import gsap from 'gsap';
 import { EVENTS } from '../../constants/events';
 
 export default class LootChest {
@@ -176,94 +175,132 @@ export default class LootChest {
     this.music.setLootChestOpeningTheme(false);
     this.music.removeLootChestTheme();
     this.camera.controls.enabled = false;
-
-    // GSAP timeline
-    const tl = gsap.timeline({
-      onComplete: () => {
-        this.camera.controls.enabled = true;
-        this.music.removeLootChestOpeningTheme(false);
-        this.music.setLootChestTheme(true);
-        tempCallback(); // Final callback
-      },
-    });
-
-    // Initial zoom and pan
-    tl.to(this.camera.instance.position, {
-      x: '-=5.35',
+    const firstTweenDuration = 2000;
+    const firstCoords = {
+      x: -4,
       y: 3,
-      z: '-=5.25',
-      duration: 2,
-      ease: 'power1.in',
-      onUpdate: () => this.camera.instance.lookAt(this.model.position),
-    });
-
-    tl.to(
-      this.camera.instance.position,
-      {
-        onStart: () => {
-          this.camera.instance.position.set(3.65, 3, 2.25);
+      z: 2.5,
+    };
+    new TWEEN.Tween(firstCoords)
+      .to(
+        {
+          x: firstCoords.x - 0.35,
+          y: firstCoords.y,
+          z: firstCoords.z - 0.25,
         },
-        x: 3.65,
+        firstTweenDuration,
+      )
+      .easing(TWEEN.Easing.Quadratic.In)
+      .onUpdate(() => {
+        this.camera.instance.position.set(
+          firstCoords.x,
+          firstCoords.y,
+          firstCoords.z,
+        );
+        this.camera.instance.lookAt(this.model.position);
+      })
+      .start();
+
+    this.timerOne = setTimeout(() => {
+      const secondTweenDuration = 2000;
+      const secondCoords = {
+        x: 4,
         y: 3,
-        z: 2.25 + 0.5,
-        duration: 2,
-        ease: 'none',
-        onUpdate: () => this.camera.instance.lookAt(this.model.position),
-      },
-      '+=2',
-    );
+        z: 2.5,
+      };
+      new TWEEN.Tween(secondCoords)
+        .to(
+          {
+            x: secondCoords.x - 0.25,
+            y: secondCoords.y,
+            z: secondCoords.z - 0.45,
+          },
+          secondTweenDuration,
+        )
+        .easing(TWEEN.Easing.Quadratic.In)
+        .onUpdate(() => {
+          this.camera.instance.position.set(
+            secondCoords.x,
+            secondCoords.y,
+            secondCoords.z,
+          );
+          this.camera.instance.lookAt(this.model.position);
+        })
+        .start();
+    }, 2000);
 
-    tl.to(
-      this.camera.instance.position,
-      {
-        onStart: () => {
-          this.camera.instance.position.set(0, 3.5, 3.25);
-        },
-        x: 0 + 0.5, // Slight movement in X for panning
-        y: 3.5,
-        z: 3.25,
-        duration: 2,
-        ease: 'none',
-        onUpdate: () => this.camera.instance.lookAt(this.model.position),
-      },
-      '+=2',
-    );
-
-    // Third cut with panning
-    tl.to(
-      this.camera.instance.position,
-      {
-        onStart: () => {
-          this.camera.instance.position.set(0, 5.5, 5.75);
-        },
+    this.timerTwo = setTimeout(() => {
+      const tweenDuration = 3800;
+      const thirdCoords = {
         x: 0,
-        y: 2.5 + 0.5, // Slight movement in Y for panning
-        z: 5.75,
-        duration: 2,
-        ease: 'none',
-        onUpdate: () => this.camera.instance.lookAt(this.model.position),
-      },
-      '+=2',
-    );
+        y: 3.5,
+        z: 5,
+      };
+      new TWEEN.Tween(thirdCoords)
+        .to(
+          { x: thirdCoords.x, y: thirdCoords.y, z: thirdCoords.z - 1.75 },
+          tweenDuration,
+        )
+        .easing(TWEEN.Easing.Quadratic.In)
+        .onUpdate(() => {
+          this.camera.instance.position.set(
+            thirdCoords.x,
+            thirdCoords.y,
+            thirdCoords.z,
+          );
+          this.camera.instance.lookAt(this.model.position);
+        })
+        .start();
+    }, 4000);
+
+    this.timerThree = setTimeout(() => {
+      const tweenDuration = 1000;
+      const thirdCoords = {
+        x: this.camera.instance.position.x,
+        y: this.camera.instance.position.y,
+        z: this.camera.instance.position.z,
+      };
+      new TWEEN.Tween(thirdCoords)
+        .to(
+          { x: thirdCoords.x, y: thirdCoords.y - 1, z: thirdCoords.z + 2.5 },
+          tweenDuration,
+        )
+        .easing(TWEEN.Easing.Quadratic.In)
+        .onUpdate(() => {
+          this.camera.instance.position.set(
+            thirdCoords.x,
+            thirdCoords.y,
+            thirdCoords.z,
+          );
+          this.camera.instance.lookAt(this.model.position);
+        })
+        .start();
+
+      this.camera.controls.enabled = true;
+      this.music.removeLootChestOpeningTheme(false);
+    }, 10000);
+
+    this.timerFour = setTimeout(() => {
+      tempCallback();
+      this.music.setLootChestTheme(true);
+    }, 12000);
   }
 
   endOpeningCutScene(tempCallback) {
-    // Kill all GSAP animations
-    gsap.killTweensOf(this.camera.instance.position);
-
-    // If you have animations on other properties or objects, kill them too
-    // e.g., gsap.killTweensOf([this.camera.instance.rotation, anotherObject.position]);
-
-    // Reset the camera to the desired position and orientation
+    TWEEN.removeAll();
     this.camera.controls.enabled = true;
     this.camera.instance.position.set(0, 3, 5);
     this.camera.instance.lookAt(this.model.position);
-    this.camera.controls.update(); // This might be redundant if controls.enabled automatically updates the camera
+    this.camera.controls.update();
 
-    // Handle music and callbacks as before
+    clearTimeout(this.timerOne);
+    clearTimeout(this.timerTwo);
+    clearTimeout(this.timerThree);
+    clearTimeout(this.timerFour);
+
     this.music.removeLootChestOpeningTheme(false);
     this.music.setLootChestTheme(true);
-    tempCallback(); // Execute any final actions now that the cutscene is skipped
+    tempCallback();
   }
 
   remove() {

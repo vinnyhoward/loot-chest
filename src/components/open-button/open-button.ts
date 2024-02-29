@@ -13,6 +13,7 @@ export class OpenButton extends HTMLElement {
     userKeys: Keys[];
     userToken: string | null;
     selectedChest: any | null;
+    openedChestData: any | null;
   };
 
   constructor() {
@@ -23,6 +24,7 @@ export class OpenButton extends HTMLElement {
       userKeys: [],
       userToken: '',
       selectedChest: null,
+      openedChestData: null,
     };
 
     this.showRewardModal = this.showRewardModal.bind(this);
@@ -74,133 +76,138 @@ export class OpenButton extends HTMLElement {
     });
 
     const openButton = this.shadowRoot.querySelector('.open__container');
-    openButton?.addEventListener('click', async () => {
-      gsap.to(openButton, {
-        scale: 1.1,
-        duration: 0.1,
-        yoyo: true,
-        repeat: 1,
-      });
-
-      if (!this.state.userToken) {
-        this.showLoginMenu();
-      } else {
-        if (this.state.userKeys.length === 0) {
-          const detail: Notification = {
-            title: 'No keys',
-            message: 'You need keys to open chests',
-            id: uuidv4(),
-            type: NotificationType.ERROR,
-            duration: Duration.SHORT,
-          };
-
-          document.dispatchEvent(
-            new CustomEvent(EVENTS.TOAST_ERROR, {
-              bubbles: true,
-              composed: true,
-              detail,
-            }),
-          );
-          return;
-        }
-
-        if (!this.state.selectedChest._id) {
-          const detail: Notification = {
-            title: 'No chest selected',
-            message: 'You need to select a chest to open',
-            id: uuidv4(),
-            type: NotificationType.ERROR,
-            duration: Duration.SHORT,
-          };
-
-          document.dispatchEvent(
-            new CustomEvent(EVENTS.TOAST_SUCCESS, {
-              bubbles: true,
-              composed: true,
-              detail,
-            }),
-          );
-          return;
-        }
-
-        window.experience.world.lootChest.resetAnimations();
-
-        const chestId = this.state.selectedChest._id;
-        const keyId = this.state.userKeys[0].id;
-        const openChestData = await openChest(chestId, keyId);
-        console.log('open chest data', openChestData);
-        if (!openChestData) {
-          const detail: Notification = {
-            title: 'Something went wrong',
-            message: 'Please try again later',
-            id: uuidv4(),
-            type: NotificationType.ERROR,
-            duration: Duration.LONG,
-          };
-
-          document.dispatchEvent(
-            new CustomEvent(EVENTS.TOAST_SUCCESS, {
-              bubbles: true,
-              composed: true,
-              detail,
-            }),
-          );
-          return;
-        } else {
-          this.state.userKeys = openChestData.keys;
-          const tempCallback = () => {
-            const prizeLogId = openChestData.prizeFulfillment.prizeLogId;
-            if (prizeLogId) {
-              const rewardItem = this.state.selectedChest.rewardList.find(
-                (item: any) =>
-                  item._key === openChestData.prizeFulfillment.sanityRewardId,
-              );
-              console.log('args: ', rewardItem, prizeLogId);
-              window.experience.world.lootChest.startSuccessAnimation();
-              setTimeout(() => {
-                this.showRewardModal(rewardItem, prizeLogId);
-              }, 2000);
-            } else {
-              window.experience.world.lootChest.startFailureAnimation();
-              setTimeout(() => {
-                const randomIndex = Math.floor(
-                  Math.random() * errorMessages.length,
-                );
-                const { title, description } = errorMessages[randomIndex];
-                this.showErrorModal(title, description);
-              }, 2000);
-            }
-
-            document.dispatchEvent(new CustomEvent(EVENTS.SHOW_UI));
-
-            this.state.isOpening = false;
-            this.render();
-            this.attachEventListeners();
-          };
-
-          document.dispatchEvent(new CustomEvent(EVENTS.HIDE_UI));
-          if (!this.state.isOpening) {
-            this.state.isOpening = true;
-            // @ts-ignore
-            window.experience.world.lootChest.startOpeningCutScene(
-              tempCallback,
-            );
-          } else {
-            this.state.isOpening = true;
-            // @ts-ignore
-            window.experience.world.lootChest.endOpeningCutScene(tempCallback);
-          }
-          this.render();
-          this.attachEventListeners();
-        }
-      }
-    });
+    openButton?.addEventListener('click', this.handleOpen.bind(this));
 
     document.addEventListener(EVENTS.LOGIN_SUCCESS, () => {
       this.state.userToken = localStorage.getItem('token');
-      console.log('fetching keys');
       this.awardAndFetchKeys();
     });
+  }
+
+  async handleOpen(): Promise<void> {
+    if (!this.shadowRoot) return;
+    const openButton = this.shadowRoot.querySelector('.open__container');
+    gsap.to(openButton, {
+      scale: 1.1,
+      duration: 0.1,
+      yoyo: true,
+      repeat: 1,
+    });
+
+    if (!this.state.userToken) {
+      return this.showLoginMenu();
+    }
+
+    if (this.state.userKeys.length === 0) {
+      const detail: Notification = {
+        title: 'No keys',
+        message: 'You need keys to open chests',
+        id: uuidv4(),
+        type: NotificationType.ERROR,
+        duration: Duration.SHORT,
+      };
+
+      document.dispatchEvent(
+        new CustomEvent(EVENTS.TOAST_ERROR, {
+          bubbles: true,
+          composed: true,
+          detail,
+        }),
+      );
+      return;
+    }
+
+    if (!this.state.selectedChest._id) {
+      const detail: Notification = {
+        title: 'No chest selected',
+        message: 'You need to select a chest to open',
+        id: uuidv4(),
+        type: NotificationType.ERROR,
+        duration: Duration.SHORT,
+      };
+
+      document.dispatchEvent(
+        new CustomEvent(EVENTS.TOAST_SUCCESS, {
+          bubbles: true,
+          composed: true,
+          detail,
+        }),
+      );
+      return;
+    }
+
+    window.experience.world.lootChest.resetAnimations();
+
+    const chestId = this.state.selectedChest._id;
+    const keyId = this.state.userKeys[0].id;
+
+    console.log('opened chest data: ', this.state.openedChestData);
+    if (!this.state.openedChestData) {
+      this.state.openedChestData = await openChest(chestId, keyId);
+    }
+
+    if (!this.state.openedChestData) {
+      const detail: Notification = {
+        title: 'Something went wrong',
+        message: 'Please try again later',
+        id: uuidv4(),
+        type: NotificationType.ERROR,
+        duration: Duration.LONG,
+      };
+
+      document.dispatchEvent(
+        new CustomEvent(EVENTS.TOAST_SUCCESS, {
+          bubbles: true,
+          composed: true,
+          detail,
+        }),
+      );
+      return;
+    }
+
+    this.state.userKeys = this.state.openedChestData.keys;
+    const tempCallback = () => {
+      const prizeLogId = this.state.openedChestData.prizeFulfillment.prizeLogId;
+      if (prizeLogId) {
+        const rewardItem = this.state.selectedChest.rewardList.find(
+          (item: any) =>
+            item._key ===
+            this.state.openedChestData.prizeFulfillment.sanityRewardId,
+        );
+        console.log('args: ', rewardItem, prizeLogId);
+        window.experience.world.lootChest.startSuccessAnimation();
+        setTimeout(() => {
+          this.showRewardModal(rewardItem, prizeLogId);
+        }, 2000);
+      } else {
+        window.experience.world.lootChest.startFailureAnimation();
+        setTimeout(() => {
+          const randomIndex = Math.floor(Math.random() * errorMessages.length);
+          const { title, description } = errorMessages[randomIndex];
+          this.showErrorModal(title, description);
+        }, 2000);
+      }
+
+      document.dispatchEvent(new CustomEvent(EVENTS.SHOW_UI));
+
+      this.state.isOpening = false;
+      this.state.openedChestData = null;
+      this.render();
+      this.attachEventListeners();
+    };
+
+    document.dispatchEvent(new CustomEvent(EVENTS.HIDE_UI));
+    if (!this.state.isOpening) {
+      this.state.isOpening = true;
+      // @ts-ignore
+      window.experience.world.lootChest.startOpeningCutScene(tempCallback);
+    } else {
+      this.state.isOpening = true;
+      // @ts-ignore
+      window.experience.world.lootChest.endOpeningCutScene(tempCallback);
+    }
+    this.render();
+    this.attachEventListeners();
   }
 
   showRewardModal(reward: any, prizeLogId: string) {

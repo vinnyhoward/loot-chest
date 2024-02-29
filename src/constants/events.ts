@@ -48,4 +48,8 @@ export const EVENTS: Record<string, string> = {
   // Failure Modal Events
   SHOW_FAILURE_MODAL: 'show-failure-modal',
   HIDE_FAILURE_MODAL: 'hide-failure-modal',
+
+  // Claim Reward Events
+  CLAIMING_REWARD: 'claiming-reward',
+  CLAIMED_REWARD: 'claimed-reward',
 };
