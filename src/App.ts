@@ -9,6 +9,7 @@ import './components/open-button/open-button';
 import './components/chest-info-modal/chest-info-modal';
 import './components/chest-info-button/chest-info-button';
 import './components/reward-modal/reward-modal';
+import './components/failure-modal/failure-modal';
 import { html } from './utils/html';
 import { EVENTS } from './constants/events';
 import { fetchAssets } from './services/chests';
@@ -111,6 +112,7 @@ export default class App extends HTMLElement {
           <open-button></open-button>
           <chest-info-button></chest-info-button>
           <reward-modal></reward-modal>
+          <failure-modal></failure-modal>
         </div>
         <chest-info-modal></chest-info-modal>
         <loading-bar></loading-bar>

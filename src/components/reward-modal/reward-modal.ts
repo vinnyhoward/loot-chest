@@ -1,4 +1,5 @@
 import gsap from 'gsap';
+import '../loader/loader';
 import { html } from '../../utils/html';
 import { urlFor } from '../../services/sanity';
 import { EVENTS } from '../../constants/events';
@@ -23,6 +24,8 @@ export class RewardModal extends HTMLElement {
     reward: any;
     rewardState: RewardModalState;
     formError: string;
+    prizeLogId: string;
+    loading: boolean;
   };
 
   constructor() {
@@ -32,6 +35,8 @@ export class RewardModal extends HTMLElement {
       reward: null,
       rewardState: RewardModalState.SHOW,
       formError: '',
+      prizeLogId: '',
+      loading: false,
     };
 
     this.onSubmit = this.onSubmit.bind(this);
@@ -60,8 +65,10 @@ export class RewardModal extends HTMLElement {
   private attachEventListeners(): void {
     document.addEventListener(EVENTS.SHOW_REWARD_MODAL, (event: any) => {
       console.log('event detail reward', event.detail.reward);
-      this.reward = event.detail.reward;
+      this.state.reward = event.detail.reward;
+      this.state.prizeLogId = event.detail.prizeLogId;
       this.show();
+      this.updateContent();
     });
 
     const form = this.shadowRoot?.querySelector('.reward__form');
@@ -89,6 +96,8 @@ export class RewardModal extends HTMLElement {
     }
 
     if (this.state.rewardState === RewardModalState.CLAIM) {
+      this.state.loading = true;
+      this.addLoading();
       const target = event.target as HTMLFormElement;
       const formData = new FormData(target);
 
@@ -105,10 +114,10 @@ export class RewardModal extends HTMLElement {
       const cryptoWalletAddress: FormDataEntryValue | null = formData.get(
         'cryptoWalletAddress',
       );
-
+      console.log('state', state);
       const formFields: PrizeFields = {
-        prizeLogId: 'clszs5ddj000m6mw2f3wcsao5',
-        sanityRewardId: 'd05933df3d49',
+        prizeLogId: this.state.prizeLogId,
+        sanityRewardId: this.state.reward._key,
         firstName: firstName as string,
         lastName: lastName as string,
         phoneNumber: phoneNumber as string,
@@ -120,7 +129,8 @@ export class RewardModal extends HTMLElement {
         zip: zip as string,
         cryptoWalletAddress: cryptoWalletAddress as string,
       };
-
+      console.log('form fields:', formFields);
+      console.log('loading:', this.state.loading);
       const userFulfilledPrize = savePrize(formFields);
       const responseData = await userFulfilledPrize;
       console.log('User fulfilled prize:', responseData);
@@ -133,6 +143,47 @@ export class RewardModal extends HTMLElement {
       } else {
         this.state.rewardState = RewardModalState.SUCCESSFULLY_CLAIMED;
       }
+      this.state.loading = true;
+
+      this.removeLoading();
+      this.updateContent();
+    }
+  }
+
+  private addLoading(): void {
+    const claimButton = this.shadowRoot?.querySelector(
+      '.claim__button',
+    ) as HTMLButtonElement;
+    if (claimButton) {
+      claimButton.disabled = true;
+      claimButton.style.alignItems = 'baseline';
+      claimButton.innerHTML = '';
+
+      const loader = document.createElement('loader-component');
+      claimButton.appendChild(loader);
+    }
+  }
+
+  removeLoading(): void {
+    const claimButton = this.shadowRoot?.querySelector(
+      '.claim__button',
+    ) as HTMLButtonElement;
+
+    if (claimButton) {
+      claimButton.disabled = false;
+      claimButton.style.alignItems = 'center';
+      const loader = claimButton.querySelector('loader-component');
+
+      if (loader) {
+        claimButton.removeChild(loader);
+      }
+
+      const claimTextDiv = document.createElement('div');
+      claimTextDiv.textContent = 'Close';
+      claimTextDiv.className = 'claim__text';
+      claimButton.appendChild(claimTextDiv);
+
+      this.attachEventListeners();
     }
   }
 
@@ -176,6 +227,7 @@ export class RewardModal extends HTMLElement {
       case RewardModalState.SUCCESSFULLY_CLAIMED:
         rewardHeadline.textContent = "You've successfully claimed your prize!";
         rewardHeadline.style.color = '#FFFFFF';
+        rewardHeadline.style.textAlign = 'center';
         break;
       default:
         break;
@@ -209,7 +261,7 @@ export class RewardModal extends HTMLElement {
     }
   }
 
-  private updateClaimButtonText(): void {
+  private updateClaimButton(): void {
     const claimButtonText = this.shadowRoot?.querySelector(
       '.claim__text',
     ) as HTMLElement;
@@ -238,20 +290,18 @@ export class RewardModal extends HTMLElement {
   private updateContent(): void {
     this.updateHeadlineText();
     this.updateCaptionText();
-    this.updateClaimButtonText();
+    this.updateClaimButton();
 
     const hexImage = this.shadowRoot?.querySelector(
       '.hexagon-image',
     ) as HTMLImageElement;
+    console.log('update content state:', this.state);
     const headerImage = this.shadowRoot?.querySelector(
       '.reward__image',
     ) as HTMLImageElement;
     const containerBackground = this.shadowRoot?.querySelector(
       '.reward-modal__background',
     ) as HTMLElement;
-    const claimButton = this.shadowRoot?.querySelector(
-      '.claim__button',
-    ) as HTMLButtonElement;
     const contentContainer = this.shadowRoot?.querySelector(
       '.content__container',
     ) as HTMLElement;
@@ -267,10 +317,18 @@ export class RewardModal extends HTMLElement {
           .width(500)
           .height(500)
           .url()})`;
+
+        headerImage.style.backgroundImage = `url(${urlFor(
+          this.state.reward.rewardImage.asset._ref,
+        )
+          .width(500)
+          .height(500)
+          .url()})`;
       }
 
       containerBackground.style.height = '100%';
       containerBackground.style.borderRadius = '24px';
+      contentContainer.style.marginBottom = '0px';
     } else if (this.state.rewardState !== RewardModalState.SHOW) {
       hexImage.style.display = 'none';
       headerImage.style.display = 'block';
@@ -300,9 +358,6 @@ export class RewardModal extends HTMLElement {
         containerBackground.classList.add(
           `gradient-${this.state.reward.itemRarity.toLowerCase()}`,
         );
-        claimButton.classList.add(
-          `gradient-${this.state.reward.itemRarity.toLowerCase()}`,
-        );
       }
     }
 
@@ -315,6 +370,13 @@ export class RewardModal extends HTMLElement {
         '.input__container',
       ) as HTMLElement;
 
+      headerImage.style.backgroundImage = `url(${urlFor(
+        this.state.reward.rewardImage.asset._ref,
+      )
+        .width(500)
+        .height(500)
+        .url()})`;
+
       for (const field of this.state.reward.formFields) {
         const input = document.createElement('input');
         input.setAttribute('placeholder', camelToSentenceCase(field));
@@ -324,6 +386,11 @@ export class RewardModal extends HTMLElement {
         input.name = field;
         inputContainer.appendChild(input);
       }
+    } else {
+      const inputContainer = this.shadowRoot?.querySelector(
+        '.input__container',
+      ) as HTMLElement;
+      inputContainer.innerHTML = '';
     }
   }
 
@@ -442,7 +509,8 @@ export class RewardModal extends HTMLElement {
           font-size: 1.5rem;
           font-weight: bold;
           text-transform: uppercase;
-          margin-bottom: 5px;
+          margin-bottom: 10px;
+          text-align: center;
         }
 
         .caption-text {
@@ -550,10 +618,11 @@ export class RewardModal extends HTMLElement {
         .reward__image {
           border-radius: 50%;
           height: 85px;
-          width: 85px;
+          width: 125px;
           margin-right: 10px;
           box-shadow: 0px 0px 5px rgba(0, 0, 0, 0.25);
           display: none;
+          background-size: cover;
         }
 
         .gradient-common {
@@ -587,18 +656,7 @@ export class RewardModal extends HTMLElement {
             <div class="hexagon-image"></div>
 
             <div class="content__container">
-              ${this.state.reward
-                ? html`
-                    <img
-                      class="reward__image"
-                      src=${urlFor(this.state.reward.rewardImage.asset._ref)
-                        .width(500)
-                        .height(500)
-                        .url()}
-                      alt="reward image"
-                    />
-                  `
-                : html`<div class="reward__image"></div>`}
+              <div class="reward__image"></div>
               <div class="text__container">
                 <h1 class="headline-text"></h1>
                 <p class="caption-text"></p>

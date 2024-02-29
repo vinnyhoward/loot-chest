@@ -43,6 +43,9 @@ export const EVENTS: Record<string, string> = {
 
   // Reward Modal Events
   SHOW_REWARD_MODAL: 'show-reward-modal',
-  SHOW_FAILURE_MODAL: 'show-failure-modal',
   HIDE_REWARD_MODAL: 'hide-reward-modal',
+
+  // Failure Modal Events
+  SHOW_FAILURE_MODAL: 'show-failure-modal',
+  HIDE_FAILURE_MODAL: 'hide-failure-modal',
 };
