@@ -305,6 +305,9 @@ export class RewardModal extends HTMLElement {
     const contentContainer = this.shadowRoot?.querySelector(
       '.content__container',
     ) as HTMLElement;
+    const claimButton = this.shadowRoot?.querySelector(
+      '.claim__button',
+    ) as HTMLButtonElement;
 
     if (this.state.rewardState == RewardModalState.SUCCESSFULLY_CLAIMED) {
       headerImage.style.display = 'none';
@@ -324,6 +327,11 @@ export class RewardModal extends HTMLElement {
           .width(500)
           .height(500)
           .url()})`;
+
+        claimButton.classList.remove(
+          `gradient-${this.state.reward.itemRarity.toLowerCase()}`,
+        );
+        claimButton.style.backgroundColor = '#FFFFFF';
       }
 
       containerBackground.style.height = '100%';
@@ -356,6 +364,9 @@ export class RewardModal extends HTMLElement {
       containerBackground.style.borderBottomRightRadius = '0px';
       if (this.state.reward) {
         containerBackground.classList.add(
+          `gradient-${this.state.reward.itemRarity.toLowerCase()}`,
+        );
+        claimButton.classList.add(
           `gradient-${this.state.reward.itemRarity.toLowerCase()}`,
         );
       }

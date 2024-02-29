@@ -39,7 +39,6 @@ export class OpenButton extends HTMLElement {
 
   async awardAndFetchKeys(): Promise<void> {
     const userIsAwarded = await awardKey();
-
     if (userIsAwarded) {
       const detail: Notification = {
         // TODO: Make dynamic based on key amount and just 3
@@ -199,6 +198,7 @@ export class OpenButton extends HTMLElement {
 
     document.addEventListener(EVENTS.LOGIN_SUCCESS, () => {
       this.state.userToken = localStorage.getItem('token');
+      console.log('fetching keys');
       this.awardAndFetchKeys();
     });
   }
