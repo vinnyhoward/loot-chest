@@ -6,6 +6,17 @@ import { EVENTS } from '../../constants/events';
 import { camelToSentenceCase } from '../../utils/camelToSentenceCase';
 import { savePrize } from '../../services/prizes';
 import { PrizeFields } from '../../types';
+import {
+  validateAddress,
+  validateCity,
+  validateCountryOrState,
+  validateEmail,
+  validateEthereumWalletAddress,
+  validateName,
+  validatePhoneNumber,
+  validateZip,
+} from '../../utils/fieldValidationHelpers';
+import { camelToSnakeCase } from '../../utils/camelToSnakeCase';
 
 declare global {
   interface Window {
@@ -62,7 +73,7 @@ export class RewardModal extends HTMLElement {
     gsap.to(this, { opacity: 0, display: 'none' });
   }
 
-  private attachEventListeners(): void {
+  private attachEventListeners() {
     document.addEventListener(EVENTS.SHOW_REWARD_MODAL, (event: any) => {
       console.log('event detail reward', event.detail.reward);
       this.state.reward = event.detail.reward;
@@ -78,6 +89,26 @@ export class RewardModal extends HTMLElement {
     closeButton?.addEventListener('click', this.hide.bind(this));
   }
 
+  private resetFieldErrors(): void {
+    const errorFields = this.shadowRoot?.querySelectorAll(
+      '.error__field',
+    ) as NodeListOf<HTMLElement>;
+    const inputs = this.shadowRoot?.querySelectorAll(
+      '.input_field',
+    ) as NodeListOf<HTMLElement>;
+
+    errorFields?.forEach((field) => {
+      field.textContent = '';
+      field.style.display = 'none';
+    });
+
+    inputs?.forEach((input) => {
+      input.style.backgroundColor = '#fbfbfb';
+      input.style.border = '1px solid #e9e9e9';
+      input.style.color = '#25314c';
+    });
+  }
+
   private async onSubmit(event: Event): Promise<void> {
     event.preventDefault();
     if (this.state.rewardState === RewardModalState.SUCCESSFULLY_CLAIMED) {
@@ -91,6 +122,7 @@ export class RewardModal extends HTMLElement {
     ) as HTMLElement;
     errorMessage.style.display = 'block';
     errorMessage.textContent = '';
+    this.resetFieldErrors();
 
     if (this.state.rewardState === RewardModalState.SHOW) {
       this.state.rewardState = RewardModalState.CLAIM;
@@ -103,39 +135,128 @@ export class RewardModal extends HTMLElement {
       const target = event.target as HTMLFormElement;
       const formData = new FormData(target);
 
-      const firstName: FormDataEntryValue | null = formData.get('firstName');
-      const lastName: FormDataEntryValue | null = formData.get('lastName');
-      const phoneNumber: FormDataEntryValue | null =
-        formData.get('phoneNumber');
-      const email: FormDataEntryValue | null = formData.get('email');
-      const address: FormDataEntryValue | null = formData.get('address');
-      const country: FormDataEntryValue | null = formData.get('country');
-      const state: FormDataEntryValue | null = formData.get('state');
-      const city: FormDataEntryValue | null = formData.get('city');
-      const zip: FormDataEntryValue | null = formData.get('zip');
-      const cryptoWalletAddress: FormDataEntryValue | null = formData.get(
-        'cryptoWalletAddress',
-      );
-      console.log('state', state);
-      const formFields: PrizeFields = {
-        prizeLogId: this.state.prizeLogId,
-        sanityRewardId: this.state.reward._key,
-        firstName: firstName as string,
-        lastName: lastName as string,
-        phoneNumber: phoneNumber as string,
-        email: email as string,
-        address: address as string,
-        country: country as string,
-        state: state as string,
-        city: city as string,
-        zip: zip as string,
-        cryptoWalletAddress: cryptoWalletAddress as string,
+      const fields = this.state.reward.formFields.map((field: string) => {
+        return {
+          [field]: formData.get(field) as string,
+        };
+      });
+
+      const errors: string[] = [];
+
+      for (const field of fields) {
+        const fieldName = Object.keys(field)[0];
+        const fieldValue = Object.values(field)[0];
+
+        if (fieldName === 'firstName') {
+          if (!validateName(fieldValue)) {
+            errors.push('firstName');
+          }
+        } else if (fieldName === 'lastName') {
+          if (!validateName(fieldValue)) {
+            errors.push('lastName');
+          }
+        } else if (fieldName === 'email') {
+          if (!validateEmail(fieldValue)) {
+            errors.push('email');
+          }
+        } else if (fieldName === 'phoneNumber') {
+          if (!validatePhoneNumber(fieldValue)) {
+            errors.push('phoneNumber');
+          }
+        } else if (fieldName === 'address') {
+          if (!validateAddress(fieldValue)) {
+            errors.push('address');
+          }
+        } else if (fieldName === 'city') {
+          if (!validateCity(fieldValue)) {
+            errors.push('city');
+          }
+        } else if (fieldName === 'zip') {
+          if (!validateZip(fieldValue)) {
+            errors.push('zip');
+          }
+        } else if (fieldName === 'country') {
+          if (!validateCountryOrState(fieldValue)) {
+            errors.push('country');
+          }
+        } else if (fieldName === 'state') {
+          if (!validateCountryOrState(fieldValue)) {
+            errors.push('state');
+          }
+        } else if (fieldName === 'cryptoWalletAddress') {
+          if (!validateEthereumWalletAddress(fieldValue)) {
+            errors.push('cryptoWalletAddress');
+          }
+        }
+      }
+
+      if (errors.length > 0) {
+        this.state.loading = false;
+        this.removeLoading();
+        errors.forEach((error) => {
+          const className = camelToSnakeCase(error);
+          const errorField = this.shadowRoot?.querySelector(
+            `.${className}__input`,
+          ) as HTMLInputElement;
+          const errorDiv = this.shadowRoot?.querySelector(
+            `.${className}__error`,
+          ) as HTMLElement;
+
+          errorDiv.style.display = 'block';
+          errorField.style.border = '1px solid red';
+          errorField.style.backgroundColor = '#f9e3e3';
+          errorField.style.color = 'red';
+          errorField.style.marginBottom = '0px';
+
+          switch (error) {
+            case 'firstName':
+              errorDiv.innerText = 'Please enter a valid first name.';
+              break;
+            case 'lastName':
+              errorDiv.innerText = 'Please enter a valid last name.';
+              break;
+            case 'email':
+              errorDiv.innerText = 'Please enter a valid email address.';
+              break;
+            case 'phoneNumber':
+              errorDiv.innerText = 'Please enter a valid phone number.';
+              break;
+            case 'address':
+              errorDiv.innerText = 'Please enter a valid address.';
+              break;
+            case 'city':
+              errorDiv.innerText = 'Please enter a valid city.';
+              break;
+            case 'zip':
+              errorDiv.innerText = 'Please enter a valid zip code.';
+              break;
+            case 'country':
+              errorDiv.innerText = 'Please select a valid country.';
+              break;
+            case 'state':
+              errorDiv.innerText = 'Please select a valid state.';
+              break;
+            case 'cryptoWalletAddress':
+              errorDiv.innerText =
+                'Please enter a valid Ethereum wallet address.';
+              break;
+            default:
+              errorDiv.innerText = 'Invalid input detected.';
+          }
+        });
+
+        return;
+      }
+
+      const prizeFulfillmentData: PrizeFields = {
+        prizeLogId: this.state.prizeLogId as string,
+        sanityRewardId: this.state.reward._key as string,
+        ...fields,
       };
-      console.log('form fields:', formFields);
-      console.log('loading:', this.state.loading);
-      const userFulfilledPrize = savePrize(formFields);
+
+      const userFulfilledPrize = savePrize(prizeFulfillmentData);
       const responseData = await userFulfilledPrize;
-      console.log('User fulfilled prize:', responseData);
+
       if (!responseData) {
         const errorMessage = this.shadowRoot?.querySelector(
           '.error__message',
@@ -181,10 +302,10 @@ export class RewardModal extends HTMLElement {
       }
 
       const claimTextDiv = document.createElement('div');
-      claimTextDiv.textContent = 'Close';
       claimTextDiv.className = 'claim__text';
       claimButton.appendChild(claimTextDiv);
 
+      this.updateClaimButton();
       this.attachEventListeners();
     }
   }
@@ -393,16 +514,32 @@ export class RewardModal extends HTMLElement {
         .url()})`;
 
       for (const field of this.state.reward.formFields) {
+        const className = camelToSnakeCase(field);
         const input = document.createElement('input');
+
+        const div = document.createElement('div');
+        div.classList.add('error__field');
+        div.classList.add(`${className}__error`);
+
+        input.classList.add(`${className}__input`);
         input.setAttribute('placeholder', camelToSentenceCase(field));
         input.classList.add('input_field');
         input.id = field;
         input.type = 'text';
         input.name = field;
+
+        input.addEventListener('focus', () => {
+          div.innerText = '';
+          input.style.border = '1px solid #e9e9e9';
+          input.style.backgroundColor = '#fbfbfb';
+          input.style.color = '#25314c';
+        });
+
         inputContainer.appendChild(input);
+        inputContainer.appendChild(div);
       }
 
-      inputContainer.style.height = '350px';
+      inputContainer.style.maxHeight = '350px';
       inputContainer.style.overflowY = 'overlay';
     } else {
       const inputContainer = this.shadowRoot?.querySelector(
@@ -578,6 +715,17 @@ export class RewardModal extends HTMLElement {
 
         .input_field:focus {
           outline: none;
+        }
+
+        .error__field {
+          color: red;
+          margin: 5px 0px;
+          font-family: 'Hind', sans-serif;
+          font-weight: 400;
+          font-style: normal;
+          text-align: left;
+          font-size: 14px;
+          display: none;
         }
 
         .error__message {

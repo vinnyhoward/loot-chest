@@ -171,7 +171,7 @@ export default class LootChest {
     this.setNewAnimation('failure');
   }
 
-  startOpeningCutScene(tempCallback) {
+  startOpeningCutScene(callback) {
     this.music.setLootChestOpeningTheme(false);
     this.music.removeLootChestTheme();
     this.camera.controls.enabled = false;
@@ -281,12 +281,12 @@ export default class LootChest {
     }, 10000);
 
     this.timerFour = setTimeout(() => {
-      tempCallback();
+      callback();
       this.music.setLootChestTheme(true);
     }, 12000);
   }
 
-  endOpeningCutScene(tempCallback) {
+  endOpeningCutScene(callback) {
     TWEEN.removeAll();
     this.camera.controls.enabled = true;
     this.camera.instance.position.set(0, 3, 5);
@@ -300,7 +300,7 @@ export default class LootChest {
 
     this.music.removeLootChestOpeningTheme(false);
     this.music.setLootChestTheme(true);
-    tempCallback();
+    callback();
   }
 
   remove() {

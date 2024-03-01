@@ -166,8 +166,9 @@ export class OpenButton extends HTMLElement {
     }
 
     this.state.userKeys = this.state.openedChestData.keys;
-    const tempCallback = () => {
-      const prizeLogId = this.state.openedChestData.prizeFulfillment.prizeLogId;
+    const callback = () => {
+      const prizeLogId =
+        this.state.openedChestData?.prizeFulfillment?.prizeLogId;
       if (prizeLogId) {
         const rewardItem = this.state.selectedChest.rewardList.find(
           (item: any) =>
@@ -200,11 +201,11 @@ export class OpenButton extends HTMLElement {
     if (!this.state.isOpening) {
       this.state.isOpening = true;
       // @ts-ignore
-      window.experience.world.lootChest.startOpeningCutScene(tempCallback);
+      window.experience.world.lootChest.startOpeningCutScene(callback);
     } else {
       this.state.isOpening = true;
       // @ts-ignore
-      window.experience.world.lootChest.endOpeningCutScene(tempCallback);
+      window.experience.world.lootChest.endOpeningCutScene(callback);
     }
     this.render();
     this.attachEventListeners();
