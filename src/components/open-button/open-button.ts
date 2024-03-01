@@ -141,7 +141,6 @@ export class OpenButton extends HTMLElement {
     const chestId = this.state.selectedChest._id;
     const keyId = this.state.userKeys[0].id;
 
-    console.log('opened chest data: ', this.state.openedChestData);
     if (!this.state.openedChestData) {
       this.state.openedChestData = await openChest(chestId, keyId);
     }
@@ -175,7 +174,6 @@ export class OpenButton extends HTMLElement {
             item._key ===
             this.state.openedChestData.prizeFulfillment.sanityRewardId,
         );
-        console.log('args: ', rewardItem, prizeLogId);
         window.experience.world.lootChest.startSuccessAnimation();
         setTimeout(() => {
           this.showRewardModal(rewardItem, prizeLogId);
@@ -212,10 +210,6 @@ export class OpenButton extends HTMLElement {
   }
 
   showRewardModal(reward: any, prizeLogId: string) {
-    console.log('show reward modal', {
-      reward,
-      prizeLogId,
-    });
     document.dispatchEvent(
       new CustomEvent(EVENTS.SHOW_REWARD_MODAL, {
         bubbles: true,

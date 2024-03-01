@@ -75,7 +75,6 @@ export class RewardModal extends HTMLElement {
 
   private attachEventListeners() {
     document.addEventListener(EVENTS.SHOW_REWARD_MODAL, (event: any) => {
-      console.log('event detail reward', event.detail.reward);
       this.state.reward = event.detail.reward;
       this.state.prizeLogId = event.detail.prizeLogId;
       this.show();
