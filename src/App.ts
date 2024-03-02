@@ -10,6 +10,7 @@ import './components/chest-info-modal/chest-info-modal';
 import './components/chest-info-button/chest-info-button';
 import './components/reward-modal/reward-modal';
 import './components/failure-modal/failure-modal';
+import './components/roulette/roulette';
 import { html } from './utils/html';
 import { EVENTS } from './constants/events';
 import { fetchAssets } from './services/chests';

@@ -112,8 +112,28 @@ export default class LoadingBar extends HTMLElement {
     this.shadowRoot.innerHTML = html`
       <style>
         .loading-bar-container {
-          --bar-color: #d52c3a;
-          --body-color: #222;
+          --main-color: #8847ff;
+          --main-color-gradient: linear-gradient(
+            120deg,
+            #8847ff 0%,
+            #a06cff 100%
+          );
+
+          --common: #588cbf;
+          --uncommon: #4664d6;
+          --rare: #7a5bf0;
+          --legendary: #be47d0;
+          --divine: #db9f45;
+
+          --bg-common: #5e98d9;
+          --bg-uncommon: #4b69ff;
+          --bg-rare: #8847ff;
+          --bg-legendary: #d32ee6;
+          --bg-divine: #f8ae39;
+
+          --font1: 'Montserrat', sans-serif;
+          --font2: 'Hind', sans-serif;
+
           --text-color: white;
           --bar-wrap-back-color: rgba(166, 166, 166, 0.2);
 
@@ -130,7 +150,7 @@ export default class LoadingBar extends HTMLElement {
         }
 
         .loading-bar-container .loading-bar {
-          background: linear-gradient(90deg, #d52c3a 0%, #ff2839 100%);
+          background: var(--main-color-gradient);
           border-radius: 100px;
           height: 12px;
           transition: width 0.15s ease-out;

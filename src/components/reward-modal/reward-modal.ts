@@ -144,7 +144,7 @@ export class RewardModal extends HTMLElement {
 
       for (const field of fields) {
         const fieldName = Object.keys(field)[0];
-        const fieldValue = Object.values(field)[0];
+        const fieldValue = Object.values(field)[0] as string;
 
         if (fieldName === 'firstName') {
           if (!validateName(fieldValue)) {
