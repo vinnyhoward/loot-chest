@@ -12,9 +12,16 @@ import './components/reward-modal/reward-modal';
 import './components/failure-modal/failure-modal';
 import './components/roulette/roulette';
 import './components/hamburger-icon/hamburger-icon';
+import './components/side-menu/side-menu';
 import { html } from './utils/html';
 import { EVENTS } from './constants/events';
 import { fetchAssets } from './services/chests';
+
+declare global {
+  interface Window {
+    experience: any;
+  }
+}
 
 export default class App extends HTMLElement {
   constructor() {
@@ -44,8 +51,8 @@ export default class App extends HTMLElement {
         console.error('Failed to fetch assets:', error);
       });
 
-    document.addEventListener(EVENTS.SHOW_MENU, () => {
-      const app = this.shadowRoot.querySelector('.app');
+    document.addEventListener(EVENTS.FIRST_SHOW_MENU, () => {
+      const app = this.shadowRoot.querySelector('.menu');
       if (app) {
         gsap.to(app, {
           delay: 3.5,
@@ -57,11 +64,24 @@ export default class App extends HTMLElement {
       }
     });
 
-    document.addEventListener(EVENTS.HIDE_MENU, () => {
-      const app = this.shadowRoot.querySelector('.app');
+    document.addEventListener(EVENTS.SHOW_MENU, () => {
+      const app = this.shadowRoot.querySelector('.menu');
       if (app) {
         gsap.to(app, {
-          delay: 3.5,
+          delay: 0.15,
+          duration: 0.5,
+          opacity: 1,
+          display: 'block',
+          ease: 'power1.out',
+        });
+      }
+    });
+
+    document.addEventListener(EVENTS.HIDE_MENU, () => {
+      const app = this.shadowRoot.querySelector('.menu');
+      if (app) {
+        gsap.to(app, {
+          delay: 0.15,
           duration: 0.5,
           opacity: 0,
           display: 'none',
@@ -72,7 +92,7 @@ export default class App extends HTMLElement {
   }
 
   disconnectedCallback() {
-    document.removeEventListener(EVENTS.SHOW_MENU, () => {});
+    document.removeEventListener(EVENTS.FIRST_SHOW_MENU, () => {});
     document.removeEventListener(EVENTS.HIDE_MENU, () => {});
   }
 
@@ -101,13 +121,13 @@ export default class App extends HTMLElement {
           z-index: -1;
         }
 
-        .app {
+        .menu {
           display: none;
           opacity: 0;
         }
       </style>
       <div>
-        <div class="app">
+        <div class="menu">
           <login-modal></login-modal>
           <hamburger-icon></hamburger-icon>
           <dropdown-menu></dropdown-menu>
@@ -116,10 +136,13 @@ export default class App extends HTMLElement {
           <chest-info-button></chest-info-button>
           <reward-modal></reward-modal>
           <failure-modal></failure-modal>
+          <chest-info-modal></chest-info-modal>
         </div>
-        <chest-info-modal></chest-info-modal>
-        <loading-bar></loading-bar>
-        <canvas class="webgl"></canvas>
+        <div class="experience">
+          <side-menu></side-menu>
+          <loading-bar></loading-bar>
+          <canvas class="webgl"></canvas>
+        </div>
       </div>
     `;
   }

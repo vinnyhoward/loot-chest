@@ -14,7 +14,45 @@ export class HamburgerIcon extends HTMLElement {
     this.attachEventListeners();
   }
 
-  attachEventListeners() {}
+  attachEventListeners() {
+    if (!this.shadowRoot) return;
+
+    this.shadowRoot
+      .querySelector('.hamburger')
+      ?.addEventListener('click', () => {
+        document.dispatchEvent(new CustomEvent(EVENTS.SHOW_SIDE_MENU));
+      });
+
+    document.addEventListener(EVENTS.HIDE_SIDE_MENU, () => {
+      this.hide();
+    });
+
+    document.addEventListener(EVENTS.SHOW_SIDE_MENU, () => {
+      this.show();
+    });
+  }
+
+  disconnectedCallback(): void {
+    this.detachEventListeners();
+  }
+
+  private detachEventListeners(): void {
+    if (!this.shadowRoot) return;
+
+    this.shadowRoot
+      ?.querySelector('.hamburger')
+      ?.removeEventListener('click', () => {
+        document.dispatchEvent(new CustomEvent(EVENTS.SHOW_SIDE_MENU));
+      });
+
+    document.removeEventListener(EVENTS.HIDE_SIDE_MENU, () => {
+      this.hide();
+    });
+
+    document.removeEventListener(EVENTS.SHOW_SIDE_MENU, () => {
+      this.show();
+    });
+  }
 
   public show(): void {
     if (!this.shadowRoot) return;

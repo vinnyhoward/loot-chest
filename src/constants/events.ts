@@ -11,6 +11,10 @@ export const EVENTS: Record<string, string> = {
   SHOW_LOGIN_MENU: 'show-login-menu',
   HIDE_LOGIN_MENU: 'hide-login-menu',
 
+  // Side Menu Events
+  SHOW_SIDE_MENU: 'show-side-menu',
+  HIDE_SIDE_MENU: 'hide-side-menu',
+
   // Loading Events
   SHOW_LOADING: 'show-loading',
   HIDE_LOADING: 'hide-loading',

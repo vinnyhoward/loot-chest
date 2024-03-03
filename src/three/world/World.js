@@ -30,7 +30,7 @@ export default class World {
           this.lootChest.setLootChest(chestAssets[0].name);
         }, 3000);
 
-        document.dispatchEvent(new CustomEvent(EVENTS.SHOW_MENU));
+        document.dispatchEvent(new CustomEvent(EVENTS.FIRST_SHOW_MENU));
       }
     });
   }
