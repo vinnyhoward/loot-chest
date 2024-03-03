@@ -25,6 +25,7 @@ export class Roulette extends HTMLElement {
       this.render();
       console.log('selected chest: ', this.state.selectedChest);
       this.updateRoulette();
+      this.horizontalScrolling();
     });
   }
 
@@ -33,19 +34,59 @@ export class Roulette extends HTMLElement {
     const container = this.shadowRoot.querySelector('.roulette__container');
     if (!container) return;
 
-    // Clear existing content
     container.innerHTML = '';
 
-    // Append two sets of rewards for the loop effect
     const rewards = [
       ...this.state.selectedChest.rewardList,
       ...this.state.selectedChest.rewardList,
     ];
     rewards.forEach((reward: any) => {
-      const rewardElement = document.createElement('div');
-      rewardElement.classList.add('roulette__reward-image');
-      rewardElement.style.backgroundImage = `url(${urlFor(reward.rewardImage.asset._ref).width(500).height(500).url()})`;
-      container.appendChild(rewardElement);
+      const rewardImageEl = document.createElement('div');
+      rewardImageEl.classList.add('reward__image');
+      rewardImageEl.style.backgroundImage = `url(${urlFor(reward.rewardImage.asset._ref).width(500).height(500).url()})`;
+
+      const rewardTextContainer = document.createElement('div');
+      rewardTextContainer.classList.add('text__container');
+
+      const rewardText = document.createElement('p');
+      rewardText.classList.add('reward__text');
+
+      rewardText.innerHTML = reward.rewardName;
+      rewardTextContainer.appendChild(rewardText);
+
+      const rewardContainer = document.createElement('div');
+      rewardContainer.classList.add('reward__container');
+      rewardContainer.classList.add(`bg-${reward.itemRarity.toLowerCase()}`);
+      rewardContainer.appendChild(rewardImageEl);
+      rewardContainer.appendChild(rewardTextContainer);
+
+      container.appendChild(rewardContainer);
+    });
+  }
+
+  public horizontalScrolling(): void {
+    if (!this.shadowRoot) return;
+    const container = this.shadowRoot.querySelector(
+      '.roulette__container',
+    ) as HTMLElement;
+    if (!container) return;
+
+    // Ensure the container is full of duplicated rewards for a seamless loop
+    // Note: You might already be doing this in updateRoulette, just ensure there's enough content to scroll through
+
+    // Calculate the width to scroll before resetting (width of a single set of rewards)
+    const scrollWidth = container.scrollWidth / 2; // Assuming you've duplicated the rewards exactly once
+
+    // Use GSAP to animate the scroll
+    gsap.to(container, {
+      x: () => `-${scrollWidth}px`, // Move to the end of the first set of rewards
+      ease: 'linear', // Use a linear ease for consistent speed
+      duration: 10, // Duration before the loop resets
+      repeat: -1, // Infinite repeats
+      onRepeat: () => {
+        // Instantly reset the position to the start without the user noticing
+        gsap.set(container, { x: 0 });
+      },
     });
   }
 
@@ -75,6 +116,32 @@ export class Roulette extends HTMLElement {
     if (!this.shadowRoot) return;
     this.shadowRoot.innerHTML = html`
       <style>
+        @import url('https://fonts.googleapis.com/css2?family=Montserrat:ital,wght@0,100..900;1,100..900&display=swap');
+        @import url('https://fonts.googleapis.com/css2?family=Hind:wght@300;400;500;600;700&family=Montserrat:ital,wght@0,100..900;1,100..900&display=swap');
+
+        * {
+          margin: 0;
+          padding: 0;
+          box-sizing: border-box;
+
+          --main_color: #8847ff;
+
+          --common: #588cbf;
+          --uncommon: #4664d6;
+          --rare: #7a5bf0;
+          --legendary: #be47d0;
+          --divine: #db9f45;
+
+          --bg-common: #5e98d9;
+          --bg-uncommon: #4b69ff;
+          --bg-rare: #8847ff;
+          --bg-legendary: #d32ee6;
+          --bg-divine: #f8ae39;
+
+          --font1: 'Montserrat', sans-serif;
+          --font2: 'Hind', sans-serif;
+        }
+
         .roulette {
           position: fixed;
           bottom: 160px;
@@ -91,12 +158,56 @@ export class Roulette extends HTMLElement {
           width: 100%;
         }
 
-        .roulette__reward-image {
+        .reward__container {
           width: 180px;
           height: 180px;
+          margin: 0 10px;
+          display: flex;
+          flex-direction: column;
+          background-color: #fff;
+          border-radius: 16px;
+          box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+        }
+
+        .reward__image {
+          width: 180px;
+          height: 140px;
           background-size: cover;
           background-position: center;
-          border-radius: 16px;
+          border-top-left-radius: 16px;
+          border-top-right-radius: 16px;
+        }
+
+        .text__container {
+          text-align: center;
+          padding: 10px;
+        }
+
+        .reward__text {
+          font-family: var(--font1);
+          font-size: 16px;
+          font-weight: 900;
+          color: #fff;
+        }
+
+        .bg-common {
+          background-color: var(--bg-common);
+        }
+
+        .bg-uncommon {
+          background-color: var(--bg-uncommon);
+        }
+
+        .bg-rare {
+          background-color: var(--bg-rare);
+        }
+
+        .bg-legendary {
+          background-color: var(--bg-legendary);
+        }
+
+        .bg-divine {
+          background-color: var(--bg-divine);
         }
       </style>
       <div class="roulette">

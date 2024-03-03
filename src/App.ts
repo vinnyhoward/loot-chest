@@ -11,6 +11,7 @@ import './components/chest-info-button/chest-info-button';
 import './components/reward-modal/reward-modal';
 import './components/failure-modal/failure-modal';
 import './components/roulette/roulette';
+import './components/hamburger-icon/hamburger-icon';
 import { html } from './utils/html';
 import { EVENTS } from './constants/events';
 import { fetchAssets } from './services/chests';
@@ -108,6 +109,7 @@ export default class App extends HTMLElement {
       <div>
         <div class="app">
           <login-modal></login-modal>
+          <hamburger-icon></hamburger-icon>
           <dropdown-menu></dropdown-menu>
           <toast-notification></toast-notification>
           <open-button></open-button>
