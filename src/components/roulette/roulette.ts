@@ -23,7 +23,6 @@ export class Roulette extends HTMLElement {
       this.state.selectedChest = event.detail.selectedChest;
       this.attachEventListeners();
       this.render();
-      console.log('selected chest: ', this.state.selectedChest);
       this.updateRoulette();
       this.horizontalScrolling();
     });

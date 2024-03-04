@@ -3,6 +3,7 @@ import { EVENTS } from '../../constants/events';
 import { html } from '../../utils/html';
 import { fetchAllPrizes } from '../../services/prizes';
 import { urlFor } from '../../services/sanity';
+import { timeAgo } from '../../utils/timeAgo';
 
 enum SelectedSection {
   WINS = 'WINS',
@@ -16,6 +17,10 @@ type Rewards = {
   createdAt: string;
   updatedAt: string;
   itemWon: string;
+  rewardImageRef: string;
+  user: {
+    username: string;
+  };
 };
 
 export class SideMenu extends HTMLElement {
@@ -25,6 +30,7 @@ export class SideMenu extends HTMLElement {
     page: number;
     limit: number;
     skip: number;
+    loading: boolean;
   };
   constructor() {
     super();
@@ -35,6 +41,7 @@ export class SideMenu extends HTMLElement {
       page: 1,
       limit: 20,
       skip: 0,
+      loading: false,
     };
   }
 
@@ -70,12 +77,12 @@ export class SideMenu extends HTMLElement {
       });
 
     document.addEventListener(EVENTS.SHOW_SIDE_MENU, () => {
+      this.getPrizes();
       this.show();
     });
 
     this.recentWinsSelected();
     this.myProfileSelected();
-    this.getPrizes();
   }
 
   recentWinsSelected(): void {
@@ -184,8 +191,11 @@ export class SideMenu extends HTMLElement {
   }
 
   async getPrizes(): Promise<void> {
+    this.state.rewards = [];
+    this.state.loading = true;
     const prizes = await fetchAllPrizes(1, 20);
     if (prizes) {
+      this.state.loading = false;
       this.state.rewards = prizes;
       this.renderRewards();
     }
@@ -196,14 +206,25 @@ export class SideMenu extends HTMLElement {
     const rewardsContainer = this.shadowRoot.querySelector(
       '.rewards-data__container',
     );
+    console.log('rendering:', this.state.rewards);
     if (!rewardsContainer) return;
-    this.state.rewards.forEach((reward: Rewards) => {
+
+    rewardsContainer.innerHTML = '';
+
+    this.state.rewards.map((reward: Rewards) => {
       const rewardElement = document.createElement('div');
       rewardElement.classList.add('rewards-data');
       rewardElement.innerHTML = html`
-        <h3 class="header">${reward.itemWon}</h3>
-        <h3 class="header">Username</h3>
-        <h3 class="header">${reward.wonAt}</h3>
+        <div class="reward-name-image">
+          <img
+            class="reward__icon"
+            src="${urlFor(reward.rewardImageRef).width(40).height(40).url()}"
+            alt="reward image"
+          />
+          <span class="reward__name">${reward.itemWon}</span>
+        </div>
+        <div class="username">${reward.user.username}</div>
+        <div class="won-date">${timeAgo(reward.wonAt)}</div>
       `;
       rewardsContainer.appendChild(rewardElement);
     });
@@ -390,12 +411,11 @@ export class SideMenu extends HTMLElement {
           display: grid;
           grid-template-columns: 50% 35% 15%;
           padding: 10px 20px;
+          border-bottom: 1px solid #f0f0f0;
         }
 
         .rewards-data__container {
           display: grid;
-          /* grid-template-columns: 50% 35% 15%; */
-          height: 100%;
           overflow-y: auto;
         }
 
@@ -411,6 +431,43 @@ export class SideMenu extends HTMLElement {
           height: 100%;
           display: flex;
           flex-direction: column;
+        }
+
+        .reward-name-image {
+          display: flex;
+          align-items: center;
+        }
+
+        .reward__icon {
+          width: 35px;
+          height: 35px;
+          margin-right: 10px;
+          border-radius: 50%;
+        }
+
+        .reward__name {
+          font-family: var(--font1);
+          font-size: 0.9rem;
+          font-weight: 900;
+          color: #25314c;
+        }
+
+        .username {
+          font-family: var(--font1);
+          font-size: 0.9rem;
+          font-weight: 900;
+          color: #25314c;
+          display: flex;
+          align-items: center;
+        }
+
+        .won-date {
+          font-family: var(--font2);
+          font-size: 0.9rem;
+          font-weight: 500;
+          color: #c9ced8;
+          display: flex;
+          align-items: center;
         }
       </style>
 

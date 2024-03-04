@@ -85,7 +85,13 @@ export class RewardModal extends HTMLElement {
     form?.addEventListener('submit', this.onSubmit);
 
     const closeButton = this.shadowRoot?.querySelector('.close__icon');
-    closeButton?.addEventListener('click', this.hide.bind(this));
+    closeButton?.addEventListener('click', () => {
+      this.hide();
+      const form = this.shadowRoot?.querySelector(
+        '.reward__form',
+      ) as HTMLFormElement;
+      form?.reset();
+    });
   }
 
   private resetFieldErrors(): void {

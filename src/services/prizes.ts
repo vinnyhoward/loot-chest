@@ -34,8 +34,6 @@ export const savePrize = async (body: PrizeFields) => {
 };
 
 export const fetchAllPrizes = async (page: number, limit: number) => {
-  console.log('page', page);
-  console.log('limit', limit);
   const stringifiedUser: string | null = localStorage.getItem('user_auth');
   const token = localStorage.getItem('token');
 
