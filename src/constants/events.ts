@@ -4,6 +4,7 @@ export const EVENTS: Record<string, string> = {
   SHOW_UI: 'show-ui',
 
   // Menu Events
+  FIRST_SHOW_MENU: 'show-menu',
   SHOW_MENU: 'show-menu',
   HIDE_MENU: 'hide-menu',
 

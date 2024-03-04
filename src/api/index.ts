@@ -20,6 +20,8 @@ export const getUserChestInteractionsUrl = () =>
 // prizes
 export const getUserPrizesWonUrl = () => `${BASE_URL}/prizes/me`;
 export const getUserPrizesWonByIdUrl = () => `${BASE_URL}/prizes/me`;
+export const getAllPrizesUrl = (page: string, limit: string) =>
+  `${BASE_URL}/prizes/all?page=${page}&limit=${limit}`;
 
 // fulfillment
 export const savePrizeFulfillmentUrl = () => `${BASE_URL}/prizes/fulfillment`;
