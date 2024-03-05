@@ -11,6 +11,11 @@ enum SelectedSection {
   NONE = 'NONE',
 }
 
+enum ProfileSection {
+  PAST_REWARDS = 'PAST_REWARDS',
+  UNCLAIMED_REWARDS = 'UNCLAIMED_REWARDS',
+}
+
 type Rewards = {
   id: string;
   wonAt: string;
@@ -27,6 +32,7 @@ export class SideMenu extends HTMLElement {
   private state: {
     rewards: Rewards[];
     selectedSection: SelectedSection;
+    profileSection: ProfileSection;
     page: number;
     limit: number;
     skip: number;
@@ -37,6 +43,7 @@ export class SideMenu extends HTMLElement {
     this.attachShadow({ mode: 'open' });
     this.state = {
       selectedSection: SelectedSection.WINS,
+      profileSection: ProfileSection.PAST_REWARDS,
       rewards: [],
       page: 1,
       limit: 20,
@@ -49,6 +56,7 @@ export class SideMenu extends HTMLElement {
     this.render();
     this.attachEventListeners();
     this.getPrizes();
+    this.renderProfile();
     // this.hide();
   }
 
@@ -79,10 +87,24 @@ export class SideMenu extends HTMLElement {
     document.addEventListener(EVENTS.SHOW_SIDE_MENU, () => {
       this.getPrizes();
       this.show();
+      this.renderProfile();
     });
 
     this.recentWinsSelected();
     this.myProfileSelected();
+    this.loginButtonListener();
+  }
+
+  loginButtonListener(): void {
+    if (!this.shadowRoot) return;
+    const loginButton = this.shadowRoot?.querySelector(
+      '.login-btn',
+    ) as HTMLElement;
+    console.log('login button', loginButton);
+    loginButton?.addEventListener('click', () => {
+      document.dispatchEvent(new CustomEvent(EVENTS.SHOW_LOGIN_MENU));
+      this.hide();
+    });
   }
 
   recentWinsSelected(): void {
@@ -101,12 +123,16 @@ export class SideMenu extends HTMLElement {
     const profileElement = this.shadowRoot?.querySelector(
       '.profile',
     ) as HTMLElement;
+    const profileContainer = this.shadowRoot?.querySelector(
+      '.profile__container',
+    ) as HTMLElement;
 
     recentWinsElement?.addEventListener('click', () => {
       if (this.state.selectedSection !== SelectedSection.WINS) {
         this.state.selectedSection = SelectedSection.WINS;
         profileElement.style.borderTop = `1px solid #f0f0f0`;
         rewardsContainer.style.display = 'block';
+        profileContainer.style.display = 'none';
         if (profileArrow) {
           const rotation = -90;
           gsap.to(profileArrow, {
@@ -153,10 +179,15 @@ export class SideMenu extends HTMLElement {
     const profileElement = this.shadowRoot?.querySelector(
       '.profile',
     ) as HTMLElement;
+    const profileContainer = this.shadowRoot?.querySelector(
+      '.profile__container',
+    ) as HTMLElement;
 
     profileElement?.addEventListener('click', () => {
       if (this.state.selectedSection !== SelectedSection.PROFILE) {
         this.state.selectedSection = SelectedSection.PROFILE;
+        this.loginButtonListener();
+        profileContainer.style.display = 'flex';
         rewardsContainer.style.display = 'none';
         if (winsArrow) {
           const rotation = -90;
@@ -178,6 +209,7 @@ export class SideMenu extends HTMLElement {
       } else {
         this.state.selectedSection = SelectedSection.NONE;
         profileElement.style.borderTop = `0px solid #f0f0f0`;
+        profileContainer.style.display = 'none';
         if (profileArrow) {
           const rotation = -90;
           gsap.to(profileArrow, {
@@ -206,7 +238,7 @@ export class SideMenu extends HTMLElement {
     const rewardsContainer = this.shadowRoot.querySelector(
       '.rewards-data__container',
     );
-    console.log('rendering:', this.state.rewards);
+
     if (!rewardsContainer) return;
 
     rewardsContainer.innerHTML = '';
@@ -228,6 +260,55 @@ export class SideMenu extends HTMLElement {
       `;
       rewardsContainer.appendChild(rewardElement);
     });
+  }
+
+  renderProfile(): void {
+    if (!this.shadowRoot) return;
+    const profileContainer = this.shadowRoot.querySelector(
+      '.profile__container',
+    );
+
+    if (!profileContainer) return;
+    const user = JSON.parse(localStorage.getItem('user_auth') || '{}');
+
+    if (Object.keys(user).length === 0) {
+      profileContainer.innerHTML = html`
+        <div class="profile-sections__header">
+          <h3 class="header">My Past Rewards</h3>
+        </div>
+        <div class="profile__info">
+          <button class="login-btn">Login</button>
+        </div>
+      `;
+    } else {
+      profileContainer.innerHTML = html`
+        <div class="profile-sections__header">
+          <h3 class="header">My Past Rewards</h3>
+        </div>
+        <div class="profile__info">
+          <div class="profile-image__container">
+            <img
+              class="profile-image"
+              src="https://i.pravatar.cc/150?img=68"
+              alt="profile image"
+            />
+            <h3 class="username">${user.username}</h3>
+          </div>
+          <svg
+            width="25"
+            height="25"
+            viewBox="0 0 25 25"
+            fill="none"
+            xmlns="http://www.w3.org/2000/svg"
+          >
+            <path
+              d="M18 5H6C4 5 3 6 3 8V17C3 19 4 20 6 20H18C20 20 21 19 21 17V8C21 6 20 5 18 5ZM17.9409 9.606L13.0291 13.178C12.7211 13.402 12.36 13.514 12 13.514C11.64 13.514 11.2779 13.402 10.9709 13.179L6.05908 9.606C5.72408 9.363 5.65004 8.893 5.89404 8.558C6.13704 8.224 6.60389 8.14801 6.94189 8.39301L11.854 11.965C11.942 12.028 12.059 12.029 12.147 11.965L17.0591 8.39301C17.3961 8.14801 17.8639 8.224 18.1069 8.558C18.3509 8.894 18.2759 9.363 17.9409 9.606Z"
+              fill="#25314C"
+            />
+          </svg>
+        </div>
+      `;
+    }
   }
 
   detachEventListeners(): void {
@@ -280,195 +361,275 @@ export class SideMenu extends HTMLElement {
   public render() {
     if (!this.shadowRoot) return;
     this.shadowRoot.innerHTML = html` <style>
-        @import url('https://fonts.googleapis.com/css2?family=Hind:wght@300;400;500;600;700;800;900&family=Montserrat:ital,wght@0,100..900;1,100..900&display=swap');
-
-        * {
-          margin: 0;
-          padding: 0;
-          box-sizing: border-box;
-
-          --main_color: #8847ff;
-          --secondary_color: #fff;
-
-          --common: #588cbf;
-          --uncommon: #4664d6;
-          --rare: #7a5bf0;
-          --legendary: #be47d0;
-          --divine: #db9f45;
-
-          --bg-common: #5e98d9;
-          --bg-uncommon: #4b69ff;
-          --bg-rare: #8847ff;
-          --bg-legendary: #d32ee6;
-          --bg-divine: #f8ae39;
-
-          --font1: 'Montserrat', sans-serif;
-          --font2: 'Hind', sans-serif;
+        {
+          @import url('https://fonts.googleapis.com/css2?family=Hind:wght@300;400;500;600;700;800;900&family=Montserrat:ital,wght@0,100..900;1,100..900&display=swap');
         }
+          * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
 
-        .side-menu__parent {
-          position: fixed;
-          top: 0;
-          left: 0;
+            --main_color: #8847ff;
+            --secondary_color: #fff;
+
+            --common: #588cbf;
+            --uncommon: #4664d6;
+            --rare: #7a5bf0;
+            --legendary: #be47d0;
+            --divine: #db9f45;
+
+            --bg-common: #5e98d9;
+            --bg-uncommon: #4b69ff;
+            --bg-rare: #8847ff;
+            --bg-legendary: #d32ee6;
+            --bg-divine: #f8ae39;
+
+            --font1: 'Montserrat', sans-serif;
+            --font2: 'Hind', sans-serif;
+          }
+
+          button {
           width: 100%;
-          height: 100%;
-          background-color: rgba(0, 0, 0, 0.1);
-          z-index: 1;
-          display: flex;
-          justify-content: flex-end;
-          align-items: center;
-          z-index: 998;
-        }
-
-        .side-menu {
-          position: fixed;
-          top: 0;
-          left: 0;
-          width: 400px;
-          height: 100%;
-          background-color: var(--secondary_color);
-          z-index: 999;
-          box-shadow: 0 0 5px rgba(0, 0, 0, 0.1);
-        }
-
-        .side-menu__container {
-          display: flex;
-          flex-direction: column;
-          justify-content: space-between;
-          height: 100%;
-        }
-
-        .logo__image {
-          width: 262px;
-          height: 78px;
-        }
-
-        .logo__container {
-          display: flex;
-          justify-content: center;
-          align-items: center;
-          padding: 0px 10px 10px 10px;
-        }
-
-        .close__container {
-          display: flex;
-          justify-content: flex-end;
-          padding: 20px 20px 0 0;
-        }
-
-        .close__button {
+          height: 50px;
+          border: none;
+          border-radius: 8px;
+          background-color: #974af4;
+          color: white;
+          font-family: 'Hind', sans-serif;
+          font-weight: 600;
+          font-style: normal;
+          font-size: 14px;
           cursor: pointer;
-          margin: 0;
-        }
-
-        .section-btn__container {
-          cursor: pointer;
-          display: flex;
-          align-items: center;
-          justify-content: space-between;
-          padding: 20px 20px 20px 20px;
-          border-bottom: 1px solid #f0f0f0;
-          border-top: 1px solid #f0f0f0;
-        }
-
-        .reward__icon {
-          width: 25px;
-          height: 25px;
-          margin-right: 10px;
-        }
-
-        .section-btn__text {
-          font-family: var(--font1);
-          font-size: 1rem;
-          font-weight: 900;
-          color: #25314c;
           text-transform: uppercase;
         }
 
-        .reward-text-icon__container {
-          display: flex;
-          align-items: center;
-        }
+          .side-menu__parent {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.1);
+            z-index: 1;
+            display: flex;
+            justify-content: flex-end;
+            align-items: center;
+            z-index: 998;
+          }
 
-        .recent-wins__container {
-          height: 300px;
-        }
+          .side-menu {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 400px;
+            height: 100%;
+            background-color: var(--secondary_color);
+            z-index: 999;
+            box-shadow: 0 0 5px rgba(0, 0, 0, 0.1);
+          }
 
-        .tabs {
-          height: 100%;
-          display: flex;
-          flex-direction: column;
-        }
+          .side-menu__container {
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            height: 100%;
+          }
 
-        .rewards__header {
-          display: grid;
-          grid-template-columns: 50% 35% 15%;
-          padding: 10px 20px;
-          border-bottom: 1px solid #f0f0f0;
-        }
+          .logo__image {
+            width: 262px;
+            height: 78px;
+          }
 
-        .rewards-data {
-          display: grid;
-          grid-template-columns: 50% 35% 15%;
-          padding: 10px 20px;
-          border-bottom: 1px solid #f0f0f0;
-        }
+          .logo__container {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 0px 10px 10px 10px;
+          }
 
-        .rewards-data__container {
-          display: grid;
-          overflow-y: auto;
-        }
+          .close__container {
+            display: flex;
+            justify-content: flex-end;
+            padding: 20px 20px 0 0;
+          }
 
-        .header {
-          font-family: var(--font2);
-          font-size: 0.9rem;
-          font-weight: 500;
-          color: #c9ced8;
-        }
+          .close__button {
+            cursor: pointer;
+            margin: 0;
+          }
 
-        .rewards__container {
-          overflow-y: auto;
-          height: 100%;
-          display: flex;
-          flex-direction: column;
-        }
+          .section-btn__container {
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 20px 20px 20px 20px;
+            border-bottom: 1px solid #f0f0f0;
+            border-top: 1px solid #f0f0f0;
+          }
 
-        .reward-name-image {
-          display: flex;
-          align-items: center;
-        }
+          .reward__icon {
+            width: 25px;
+            height: 25px;
+            margin-right: 10px;
+          }
 
-        .reward__icon {
-          width: 35px;
-          height: 35px;
-          margin-right: 10px;
-          border-radius: 50%;
-        }
+          .section-btn__text {
+            font-family: var(--font1);
+            font-size: 1rem;
+            font-weight: 900;
+            color: #25314c;
+            text-transform: uppercase;
+          }
 
-        .reward__name {
-          font-family: var(--font1);
-          font-size: 0.9rem;
-          font-weight: 900;
-          color: #25314c;
-        }
+          .reward-text-icon__container {
+            display: flex;
+            align-items: center;
+          }
 
-        .username {
-          font-family: var(--font1);
-          font-size: 0.9rem;
-          font-weight: 900;
-          color: #25314c;
-          display: flex;
-          align-items: center;
-        }
+          .recent-wins__container {
+            height: 300px;
+          }
 
-        .won-date {
-          font-family: var(--font2);
-          font-size: 0.9rem;
-          font-weight: 500;
-          color: #c9ced8;
-          display: flex;
-          align-items: center;
-        }
+          .tabs {
+            height: 100%;
+            display: flex;
+            flex-direction: column;
+          }
+
+          .rewards__header {
+            display: grid;
+            grid-template-columns: 50% 35% 15%;
+            padding: 10px 20px;
+            border-bottom: 1px solid #f0f0f0;
+          }
+
+          .rewards-data {
+            display: grid;
+            grid-template-columns: 50% 35% 15%;
+            padding: 10px 20px;
+            border-bottom: 1px solid #f0f0f0;
+          }
+
+          .rewards-data__container {
+            height: 500px;
+          }
+
+          .rewards-data__container::-webkit-scrollbar {
+            display: none;
+          }
+
+          .rewards-data__container::-webkit-scrollbar-track {
+            background: var(--common);
+          }
+
+          .rewards-data__container::-webkit-scrollbar-thumb {
+            background: var(--uncommon);
+          }
+
+          .rewards-data__container::-webkit-scrollbar-thumb:hover {
+            background: var(--uncommon);
+          }
+
+          .header {
+            font-family: var(--font2);
+            font-size: 0.9rem;
+            font-weight: 500;
+            color: #c9ced8;
+          }
+
+          .rewards__container {
+            overflow-y: auto;
+            height: 100%;
+            display: flex;
+            flex-direction: column;
+          }
+
+          .reward-name-image {
+            display: flex;
+            align-items: center;
+          }
+
+          .reward__icon {
+            width: 25px;
+            height: 25px;
+            margin-right: 10px;
+            border-radius: 50%;
+          }
+
+          .reward__name {
+            font-family: var(--font1);
+            font-size: 0.9rem;
+            font-weight: 900;
+            color: #25314c;
+          }
+
+          .username {
+            font-family: var(--font1);
+            font-size: 0.9rem;
+            font-weight: 900;
+            color: #25314c;
+            display: flex;
+            align-items: center;
+          }
+
+          .won-date {
+            font-family: var(--font2);
+            font-size: 0.9rem;
+            font-weight: 500;
+            color: #c9ced8;
+            display: flex;
+            align-items: center;
+          }
+
+          .profile__container {
+            display: none;
+            flex-direction: column;
+            height: 100%;
+            justify-content: space-between;
+          }
+
+          .profile-image{
+            width: 45px;
+            height: 45px;
+            border-radius: 8px;
+            background-size: cover;
+            margin-right: 10px;
+          }
+
+          .profile__info {
+            display: flex;
+            flex-direction: row;
+            justify-content: space-between;
+            align-items: center;
+            padding: 20px;
+            border-top: 1px solid #f0f0f0;
+            border-bottom: 1px solid #f0f0f0;
+          }
+
+          .profile-image__container {
+            display: flex;
+            flex-direction: row;
+            align-items: center;
+          }
+
+          .profile-sections__header {
+            display: flex;
+            flex-direction: row;
+            justify-content: center;
+            align-items: center;
+            padding: 10px 20px;
+            border-bottom: 1px solid #f0f0f0;
+            text-align: center;
+          }
+
+          .inactive-section-title {
+            font-family: var(--font1);
+            font-size: 0.9rem;
+            font-weight: 900;
+            color: #c9ced8;
+            cursor: pointer;
+          }
       </style>
 
       <div class="side-menu__parent">
@@ -538,7 +699,7 @@ export class SideMenu extends HTMLElement {
                     src="icons/svg/profile.svg"
                     alt="reward icon"
                   />
-                  <span class="section-btn__text">My Profile</span>
+                  <span class="section-btn__text">Profile</span>
                 </div>
 
                 <svg
@@ -555,6 +716,8 @@ export class SideMenu extends HTMLElement {
                   />
                 </svg>
               </div>
+
+              <div class="profile__container"></div>
             </div>
           </div>
         </div>

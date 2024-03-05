@@ -155,7 +155,7 @@ export class LoginModal extends HTMLElement {
     const password: FormDataEntryValue | null = formData.get('password');
     const confirmedPassword: FormDataEntryValue | null =
       formData.get('confirm_password');
-    const username: FormDataEntryValue | null = formData.get('email');
+    const username: FormDataEntryValue | null = formData.get('username');
 
     const isPasswordInvalid = !validatePassword(password as string);
     const isEmailInvalid = !validateEmail(email as string);
@@ -343,6 +343,7 @@ export class LoginModal extends HTMLElement {
     if (this.authState === AuthState.SIGNUP && email && password && username) {
       this.setFormState(true);
       try {
+        console.log('Signing up:', username, email, password);
         await signUpUser(username, email, password);
         document.dispatchEvent(new CustomEvent(EVENTS.LOGIN_SUCCESS));
         this.hide();

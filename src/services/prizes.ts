@@ -34,13 +34,6 @@ export const savePrize = async (body: PrizeFields) => {
 };
 
 export const fetchAllPrizes = async (page: number, limit: number) => {
-  const stringifiedUser: string | null = localStorage.getItem('user_auth');
-  const token = localStorage.getItem('token');
-
-  if (!stringifiedUser || !token) {
-    throw new Error('User not found');
-  }
-
   try {
     const response = await fetch(
       getAllPrizesUrl(page.toString(), limit.toString()),
@@ -48,7 +41,6 @@ export const fetchAllPrizes = async (page: number, limit: number) => {
         method: 'GET',
         headers: {
           'Content-Type': 'application/json',
-          authorization: `Bearer ${token}`,
         },
       },
     );
