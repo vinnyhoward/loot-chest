@@ -22,6 +22,7 @@ export const getUserPrizesWonUrl = () => `${BASE_URL}/prizes/me`;
 export const getUserPrizesWonByIdUrl = () => `${BASE_URL}/prizes/me`;
 export const getAllPrizesUrl = (page: string, limit: string) =>
   `${BASE_URL}/prizes/all?page=${page}&limit=${limit}`;
+export const getUserPrizesUrl = () => `${BASE_URL}/prizes/me`;
 
 // fulfillment
 export const savePrizeFulfillmentUrl = () => `${BASE_URL}/prizes/fulfillment`;

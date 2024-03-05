@@ -1,7 +1,7 @@
 import gsap from 'gsap';
 import { EVENTS } from '../../constants/events';
 import { html } from '../../utils/html';
-import { fetchAllPrizes } from '../../services/prizes';
+import { fetchAllPrizes, fetchUserPrizes } from '../../services/prizes';
 import { urlFor } from '../../services/sanity';
 import { timeAgo } from '../../utils/timeAgo';
 
@@ -30,7 +30,8 @@ type Rewards = {
 
 export class SideMenu extends HTMLElement {
   private state: {
-    rewards: Rewards[];
+    allRewards: Rewards[];
+    usersRewards: Rewards[];
     selectedSection: SelectedSection;
     profileSection: ProfileSection;
     page: number;
@@ -44,7 +45,8 @@ export class SideMenu extends HTMLElement {
     this.state = {
       selectedSection: SelectedSection.WINS,
       profileSection: ProfileSection.PAST_REWARDS,
-      rewards: [],
+      allRewards: [],
+      usersRewards: [],
       page: 1,
       limit: 20,
       skip: 0,
@@ -55,7 +57,7 @@ export class SideMenu extends HTMLElement {
   connectedCallback(): void {
     this.render();
     this.attachEventListeners();
-    this.getPrizes();
+    this.getAllPrizes();
     this.renderProfile();
     // this.hide();
   }
@@ -85,9 +87,10 @@ export class SideMenu extends HTMLElement {
       });
 
     document.addEventListener(EVENTS.SHOW_SIDE_MENU, () => {
-      this.getPrizes();
-      this.show();
+      this.getAllPrizes();
+      this.fetchUserPrizes();
       this.renderProfile();
+      this.show();
     });
 
     this.recentWinsSelected();
@@ -104,6 +107,18 @@ export class SideMenu extends HTMLElement {
     loginButton?.addEventListener('click', () => {
       document.dispatchEvent(new CustomEvent(EVENTS.SHOW_LOGIN_MENU));
       this.hide();
+    });
+
+    const logoutButton = this.shadowRoot?.querySelector(
+      '.logout-btn',
+    ) as HTMLElement;
+
+    logoutButton?.addEventListener('click', () => {
+      localStorage.removeItem('user_auth');
+      localStorage.removeItem('token');
+      this.renderProfile();
+      this.fetchUserPrizes();
+      this.attachEventListeners();
     });
   }
 
@@ -186,6 +201,7 @@ export class SideMenu extends HTMLElement {
     profileElement?.addEventListener('click', () => {
       if (this.state.selectedSection !== SelectedSection.PROFILE) {
         this.state.selectedSection = SelectedSection.PROFILE;
+        this.fetchUserPrizes();
         this.loginButtonListener();
         profileContainer.style.display = 'flex';
         rewardsContainer.style.display = 'none';
@@ -222,18 +238,30 @@ export class SideMenu extends HTMLElement {
     });
   }
 
-  async getPrizes(): Promise<void> {
-    this.state.rewards = [];
+  async getAllPrizes(): Promise<void> {
+    this.state.allRewards = [];
     this.state.loading = true;
     const prizes = await fetchAllPrizes(1, 20);
     if (prizes) {
       this.state.loading = false;
-      this.state.rewards = prizes;
-      this.renderRewards();
+      this.state.allRewards = prizes;
+      this.renderAllRewards();
     }
   }
 
-  renderRewards(): void {
+  async fetchUserPrizes(): Promise<void> {
+    this.state.usersRewards = [];
+    this.state.loading = true;
+    const prizes = await fetchUserPrizes();
+    console.log('prizes', prizes);
+    if (prizes) {
+      this.state.loading = false;
+      this.state.usersRewards = prizes;
+      this.renderUsersRewards();
+    }
+  }
+
+  renderAllRewards(): void {
     if (!this.shadowRoot) return;
     const rewardsContainer = this.shadowRoot.querySelector(
       '.rewards-data__container',
@@ -243,7 +271,7 @@ export class SideMenu extends HTMLElement {
 
     rewardsContainer.innerHTML = '';
 
-    this.state.rewards.map((reward: Rewards) => {
+    this.state.allRewards.map((reward: Rewards) => {
       const rewardElement = document.createElement('div');
       rewardElement.classList.add('rewards-data');
       rewardElement.innerHTML = html`
@@ -259,6 +287,34 @@ export class SideMenu extends HTMLElement {
         <div class="won-date">${timeAgo(reward.wonAt)}</div>
       `;
       rewardsContainer.appendChild(rewardElement);
+    });
+  }
+
+  renderUsersRewards(): void {
+    if (!this.shadowRoot) return;
+    const usersRewardsContainer = this.shadowRoot.querySelector(
+      '.users-rewards__container',
+    );
+
+    if (!usersRewardsContainer) return;
+
+    usersRewardsContainer.innerHTML = '';
+
+    this.state.usersRewards.map((reward: any) => {
+      const rewardElement = document.createElement('div');
+      rewardElement.classList.add('users-rewards__data');
+      rewardElement.innerHTML = html`
+        <div class="reward-name-image">
+          <img
+            class="reward__icon"
+            src="${urlFor(reward.rewardImageRef).width(40).height(40).url()}"
+            alt="reward image"
+          />
+          <span class="reward__name">${reward.itemWon}</span>
+        </div>
+        <div class="won-date">${timeAgo(reward.wonAt)}</div>
+      `;
+      usersRewardsContainer.appendChild(rewardElement);
     });
   }
 
@@ -282,30 +338,39 @@ export class SideMenu extends HTMLElement {
       `;
     } else {
       profileContainer.innerHTML = html`
-        <div class="profile-sections__header">
-          <h3 class="header">My Past Rewards</h3>
-        </div>
-        <div class="profile__info">
-          <div class="profile-image__container">
-            <img
-              class="profile-image"
-              src="https://i.pravatar.cc/150?img=68"
-              alt="profile image"
-            />
-            <h3 class="username">${user.username}</h3>
+        <div class="users-rewards-list">
+          <div class="profile-sections__header">
+            <h3 class="header">My Past Rewards</h3>
           </div>
-          <svg
-            width="25"
-            height="25"
-            viewBox="0 0 25 25"
-            fill="none"
-            xmlns="http://www.w3.org/2000/svg"
-          >
-            <path
-              d="M18 5H6C4 5 3 6 3 8V17C3 19 4 20 6 20H18C20 20 21 19 21 17V8C21 6 20 5 18 5ZM17.9409 9.606L13.0291 13.178C12.7211 13.402 12.36 13.514 12 13.514C11.64 13.514 11.2779 13.402 10.9709 13.179L6.05908 9.606C5.72408 9.363 5.65004 8.893 5.89404 8.558C6.13704 8.224 6.60389 8.14801 6.94189 8.39301L11.854 11.965C11.942 12.028 12.059 12.029 12.147 11.965L17.0591 8.39301C17.3961 8.14801 17.8639 8.224 18.1069 8.558C18.3509 8.894 18.2759 9.363 17.9409 9.606Z"
-              fill="#25314C"
-            />
-          </svg>
+          <div class="users-rewards__container"></div>
+        </div>
+
+        <div class="users-interaction">
+          <div class="logout-btn__container">
+            <button class="logout-btn">Logout</button>
+          </div>
+          <div class="profile__info">
+            <div class="profile-image__container">
+              <img
+                class="profile-image"
+                src="https://i.pravatar.cc/150?img=68"
+                alt="profile image"
+              />
+              <h3 class="username">${user.username}</h3>
+            </div>
+            <svg
+              width="25"
+              height="25"
+              viewBox="0 0 25 25"
+              fill="none"
+              xmlns="http://www.w3.org/2000/svg"
+            >
+              <path
+                d="M18 5H6C4 5 3 6 3 8V17C3 19 4 20 6 20H18C20 20 21 19 21 17V8C21 6 20 5 18 5ZM17.9409 9.606L13.0291 13.178C12.7211 13.402 12.36 13.514 12 13.514C11.64 13.514 11.2779 13.402 10.9709 13.179L6.05908 9.606C5.72408 9.363 5.65004 8.893 5.89404 8.558C6.13704 8.224 6.60389 8.14801 6.94189 8.39301L11.854 11.965C11.942 12.028 12.059 12.029 12.147 11.965L17.0591 8.39301C17.3961 8.14801 17.8639 8.224 18.1069 8.558C18.3509 8.894 18.2759 9.363 17.9409 9.606Z"
+                fill="#25314C"
+              />
+            </svg>
+          </div>
         </div>
       `;
     }
@@ -468,12 +533,6 @@ export class SideMenu extends HTMLElement {
             border-top: 1px solid #f0f0f0;
           }
 
-          .reward__icon {
-            width: 25px;
-            height: 25px;
-            margin-right: 10px;
-          }
-
           .section-btn__text {
             font-family: var(--font1);
             font-size: 1rem;
@@ -551,8 +610,8 @@ export class SideMenu extends HTMLElement {
           }
 
           .reward__icon {
-            width: 25px;
-            height: 25px;
+            width: 40px;
+            height: 40px;
             margin-right: 10px;
             border-radius: 50%;
           }
@@ -629,6 +688,35 @@ export class SideMenu extends HTMLElement {
             font-weight: 900;
             color: #c9ced8;
             cursor: pointer;
+          }
+
+          .users-rewards__data {
+            display: flex;
+            justify-content: space-between;
+            padding: 10px 20px;
+            border-bottom: 1px solid #f0f0f0;
+          }
+
+          .logout-btn__container {
+            margin: 20px;
+          }
+
+          .users-rewards__container {
+
+            display: flex;
+            flex-direction: column;
+          }
+
+          .users-rewards-list {
+            display: flex;
+            flex-direction: column;
+            overflow-y: auto;
+          }
+
+          .users-interaction {
+            display: flex;
+            flex-direction: column;
+            height: 90%;
           }
       </style>
 
