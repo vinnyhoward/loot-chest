@@ -642,6 +642,7 @@ export class SideMenu extends HTMLElement {
           }
 
           .profile__container {
+            position: relative;
             display: none;
             flex-direction: column;
             height: 100%;
@@ -710,13 +711,17 @@ export class SideMenu extends HTMLElement {
           .users-rewards-list {
             display: flex;
             flex-direction: column;
-            overflow-y: auto;
+            overflow-y: scroll;
+            max-height: 500px;
           }
 
           .users-interaction {
+            position: fixed;
+            bottom: 0;
             display: flex;
             flex-direction: column;
-            height: 90%;
+            width: 400px;
+            background-color: #fff;
           }
       </style>
 
