@@ -72,7 +72,9 @@ export class LoginModal extends HTMLElement {
   }
 
   private attachEventListeners(): void {
-    const form = this.shadowRoot?.querySelector('.modal__login-form');
+    const form = this.shadowRoot?.querySelector(
+      '.modal__login-form',
+    ) as HTMLFormElement;
     form?.addEventListener('submit', this.onSubmit);
 
     const signUpButton = this.shadowRoot?.querySelector(
@@ -95,6 +97,7 @@ export class LoginModal extends HTMLElement {
     ) as HTMLElement;
 
     close?.addEventListener('click', () => {
+      form?.reset();
       this.hide();
     });
 
@@ -332,6 +335,7 @@ export class LoginModal extends HTMLElement {
       try {
         await loginUser(email, password);
         document.dispatchEvent(new CustomEvent(EVENTS.LOGIN_SUCCESS));
+        target.reset();
         this.hide();
       } catch (error) {
         console.error('Failed to log in:', error);
@@ -345,6 +349,7 @@ export class LoginModal extends HTMLElement {
       try {
         console.log('Signing up:', username, email, password);
         await signUpUser(username, email, password);
+        target.reset();
         document.dispatchEvent(new CustomEvent(EVENTS.LOGIN_SUCCESS));
         this.hide();
       } catch (error) {

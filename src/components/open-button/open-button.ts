@@ -82,6 +82,13 @@ export class OpenButton extends HTMLElement {
       this.state.userToken = localStorage.getItem('token');
       this.awardAndFetchKeys();
     });
+
+    document.addEventListener(EVENTS.LOGOUT, () => {
+      this.state.userToken = null;
+      this.state.userKeys = [];
+      this.render();
+      this.attachEventListeners();
+    });
   }
 
   async handleOpen(): Promise<void> {

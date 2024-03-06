@@ -112,7 +112,7 @@ export class DropdownMenu extends HTMLElement {
       ) as HTMLElement;
       const selectedDropdownEl = this.shadowRoot?.querySelector(
         '.dropdown__selected-chest',
-      );
+      ) as HTMLElement;
       const dropdownChestIconEl = this.shadowRoot?.querySelector(
         '.dropdown__chest-icon',
       ) as HTMLImageElement;
@@ -160,7 +160,50 @@ export class DropdownMenu extends HTMLElement {
           });
         }
       } else {
-        // dropdownContainerEl.style.width = '320px';
+        const isOpening = list.style.display === 'none' || !list.style.display;
+
+        dropdownContainerEl.style.width = isOpening ? '320px' : '70px';
+        dropdownContainerEl.style.height = isOpening ? 'auto' : '70px';
+        selectedDropdownEl.style.justifyContent = isOpening
+          ? 'space-between'
+          : 'center';
+        dropdownChestIconEl.style.marginRight = isOpening ? '5px' : '0px';
+        chestNameEl.style.display = isOpening ? 'block' : 'none';
+        arrow.style.display = isOpening ? 'block' : 'none';
+
+        list.style.display = 'block';
+        list.style.opacity = '0';
+        list.style.transform = 'translateY(-20px)';
+
+        const targetHeight = isOpening ? `${list.scrollHeight}px` : '0px';
+
+        gsap.to(list, {
+          duration: 0.15,
+          opacity: isOpening ? 1 : 0,
+          translateY: isOpening ? '0px' : '-20px',
+          onComplete: () => {
+            if (!isOpening) {
+              list.style.display = 'none';
+            }
+          },
+        });
+
+        gsap.to(list, {
+          duration: 0.15,
+          height: targetHeight,
+          onComplete: () => {
+            if (isOpening) {
+              list.style.height = 'auto';
+            }
+          },
+        });
+
+        const rotation = isOpening ? 180 : 0;
+        gsap.to(arrow, {
+          duration: 0.15,
+          rotation,
+          transformOrigin: 'center',
+        });
       }
     });
   }

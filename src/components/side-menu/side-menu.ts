@@ -90,6 +90,7 @@ export class SideMenu extends HTMLElement {
       this.getAllPrizes();
       this.fetchUserPrizes();
       this.renderProfile();
+      this.loginButtonListener();
       this.show();
     });
 
@@ -103,7 +104,6 @@ export class SideMenu extends HTMLElement {
     const loginButton = this.shadowRoot?.querySelector(
       '.login-btn',
     ) as HTMLElement;
-    console.log('login button', loginButton);
     loginButton?.addEventListener('click', () => {
       document.dispatchEvent(new CustomEvent(EVENTS.SHOW_LOGIN_MENU));
       this.hide();
@@ -114,8 +114,15 @@ export class SideMenu extends HTMLElement {
     ) as HTMLElement;
 
     logoutButton?.addEventListener('click', () => {
+      document.dispatchEvent(new CustomEvent(EVENTS.LOGOUT));
       localStorage.removeItem('user_auth');
       localStorage.removeItem('token');
+      this.renderProfile();
+      this.fetchUserPrizes();
+      this.attachEventListeners();
+    });
+
+    document.addEventListener(EVENTS.LOGIN_SUCCESS, () => {
       this.renderProfile();
       this.fetchUserPrizes();
       this.attachEventListeners();
@@ -254,10 +261,13 @@ export class SideMenu extends HTMLElement {
   }
 
   async fetchUserPrizes(): Promise<void> {
+    const user = JSON.parse(localStorage.getItem('user_auth') || '{}');
+    if (Object.keys(user).length === 0) return;
+
     this.state.usersRewards = [];
     this.state.loading = true;
     const prizes = await fetchUserPrizes();
-    console.log('prizes', prizes);
+
     if (prizes) {
       this.state.loading = false;
       this.state.usersRewards = prizes;
@@ -576,14 +586,14 @@ export class SideMenu extends HTMLElement {
 
         .rewards__header {
           display: grid;
-          grid-template-columns: 50% 35% 15%;
+          grid-template-columns: 55% 40% 5%;
           padding: 10px 20px;
           border-bottom: 1px solid #f0f0f0;
         }
 
         .rewards-data {
           display: grid;
-          grid-template-columns: 50% 35% 15%;
+          grid-template-columns: 55% 40% 5%;
           padding: 10px 20px;
           border-bottom: 1px solid #f0f0f0;
         }
