@@ -621,6 +621,10 @@ export class RewardModal extends HTMLElement {
           padding: 20px;
           box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.25);
           overflow-y: auto;
+
+          @media (max-width: 375px) {
+            width: 100%;
+          }
         }
 
         .reward-modal__content::-webkit-scrollbar {

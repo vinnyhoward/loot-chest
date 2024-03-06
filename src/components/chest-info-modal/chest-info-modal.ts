@@ -189,6 +189,12 @@ export class ChestInfoModal extends HTMLElement {
           top: 5%;
           left: 60%;
           transform: translate(-50%, -50%);
+
+          @media (max-width: 575px) {
+            width: 200px;
+            height: 200px;
+            top: 10%;
+          }
         }
 
         .chest__placeholder {
