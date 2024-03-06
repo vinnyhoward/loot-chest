@@ -146,6 +146,7 @@ export class SideMenu extends HTMLElement {
       if (this.state.selectedSection !== SelectedSection.WINS) {
         this.state.selectedSection = SelectedSection.WINS;
         profileElement.style.borderTop = `1px solid #f0f0f0`;
+        profileElement.style.position = 'fixed';
         rewardsContainer.style.display = 'block';
         profileContainer.style.display = 'none';
         if (profileArrow) {
@@ -168,6 +169,7 @@ export class SideMenu extends HTMLElement {
       } else {
         this.state.selectedSection = SelectedSection.NONE;
         profileElement.style.borderTop = `0px solid #f0f0f0`;
+        profileElement.style.position = 'relative';
         rewardsContainer.style.display = 'none';
         if (winsArrow) {
           const rotation = -90;
@@ -203,6 +205,7 @@ export class SideMenu extends HTMLElement {
         this.state.selectedSection = SelectedSection.PROFILE;
         this.fetchUserPrizes();
         this.loginButtonListener();
+        profileElement.style.position = 'relative';
         profileContainer.style.display = 'flex';
         rewardsContainer.style.display = 'none';
         if (winsArrow) {
@@ -224,6 +227,7 @@ export class SideMenu extends HTMLElement {
         }
       } else {
         this.state.selectedSection = SelectedSection.NONE;
+        profileElement.style.position = 'relative';
         profileElement.style.borderTop = `0px solid #f0f0f0`;
         profileContainer.style.display = 'none';
         if (profileArrow) {
@@ -500,6 +504,10 @@ export class SideMenu extends HTMLElement {
           background-color: var(--secondary_color);
           z-index: 999;
           box-shadow: 0 0 5px rgba(0, 0, 0, 0.1);
+
+          @media (max-width: 400px) {
+            width: 100%;
+          }
         }
 
         .side-menu__container {
@@ -560,6 +568,7 @@ export class SideMenu extends HTMLElement {
         }
 
         .tabs {
+          position: relative;
           height: 100%;
           display: flex;
           flex-direction: column;
@@ -730,6 +739,17 @@ export class SideMenu extends HTMLElement {
           flex-direction: column;
           width: 400px;
           background-color: #fff;
+
+          @media (max-width: 400px) {
+            width: 100%;
+          }
+        }
+
+        .profile {
+          background: white;
+          position: fixed;
+          bottom: 0;
+          width: 100%;
         }
       </style>
 

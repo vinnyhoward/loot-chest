@@ -4,7 +4,9 @@ import { urlFor } from '../../services/sanity';
 import { EVENTS } from '../../constants/events';
 
 export class DropdownMenu extends HTMLElement {
-  private state: { selectedChest: any };
+  private state: {
+    selectedChest: any;
+  };
   private _chests: any[] = [];
 
   constructor() {
@@ -83,7 +85,21 @@ export class DropdownMenu extends HTMLElement {
       });
     });
 
+    this.dropdownToggle();
+
+    document.addEventListener(EVENTS.HIDE_UI, () => {
+      this.hide();
+    });
+    document.addEventListener(EVENTS.SHOW_UI, () => {
+      this.show();
+    });
+  }
+
+  dropdownToggle(): void {
+    if (!this.shadowRoot) return;
+
     const dropdown = this.shadowRoot.querySelector('.dropdown');
+
     dropdown?.addEventListener('click', () => {
       const list = this.shadowRoot?.querySelector(
         '.dropdown__list',
@@ -91,47 +107,61 @@ export class DropdownMenu extends HTMLElement {
       const arrow = this.shadowRoot?.querySelector(
         '#dropdownArrow',
       ) as SVGSVGElement;
+      const dropdownContainerEl = this.shadowRoot?.querySelector(
+        '.dropdown__container',
+      ) as HTMLElement;
+      const selectedDropdownEl = this.shadowRoot?.querySelector(
+        '.dropdown__selected-chest',
+      );
+      const dropdownChestIconEl = this.shadowRoot?.querySelector(
+        '.dropdown__chest-icon',
+      ) as HTMLImageElement;
+      const chestNameEl = this.shadowRoot?.querySelector(
+        '.chest-name',
+      ) as HTMLElement;
+      console.log('dropdown clicked...', window.innerWidth);
+      if (window.innerWidth >= 575) {
+        if (list && arrow) {
+          const isOpening =
+            list.style.display === 'none' || !list.style.display;
 
-      if (list && arrow) {
-        const isOpening = list.style.display === 'none' || !list.style.display;
+          list.style.display = 'block';
+          list.style.opacity = '0';
+          list.style.transform = 'translateY(-20px)';
 
-        list.style.display = 'block';
-        list.style.opacity = '0';
-        list.style.transform = 'translateY(-20px)';
+          const targetHeight = isOpening ? `${list.scrollHeight}px` : '0px';
 
-        const targetHeight = isOpening ? `${list.scrollHeight}px` : '0px';
+          gsap.to(list, {
+            duration: 0.15,
+            opacity: isOpening ? 1 : 0,
+            translateY: isOpening ? '0px' : '-20px',
+            onComplete: () => {
+              if (!isOpening) {
+                list.style.display = 'none';
+              }
+            },
+          });
 
-        gsap.to(list, {
-          duration: 0.15,
-          opacity: isOpening ? 1 : 0,
-          translateY: isOpening ? '0px' : '-20px',
-          onComplete: () => {
-            if (!isOpening) {
-              list.style.display = 'none';
-            }
-          },
-        });
+          gsap.to(list, {
+            duration: 0.15,
+            height: targetHeight,
+            onComplete: () => {
+              if (isOpening) {
+                list.style.height = 'auto';
+              }
+            },
+          });
 
-        gsap.to(list, {
-          duration: 0.15,
-          height: targetHeight,
-          onComplete: () => {
-            if (isOpening) {
-              list.style.height = 'auto';
-            }
-          },
-        });
-
-        const rotation = isOpening ? 180 : 0;
-        gsap.to(arrow, { duration: 0.15, rotation, transformOrigin: 'center' });
+          const rotation = isOpening ? 180 : 0;
+          gsap.to(arrow, {
+            duration: 0.15,
+            rotation,
+            transformOrigin: 'center',
+          });
+        }
+      } else {
+        // dropdownContainerEl.style.width = '320px';
       }
-    });
-
-    document.addEventListener(EVENTS.HIDE_UI, () => {
-      this.hide();
-    });
-    document.addEventListener(EVENTS.SHOW_UI, () => {
-      this.show();
     });
   }
 
@@ -162,6 +192,38 @@ export class DropdownMenu extends HTMLElement {
       <style>
         {
           @import url('https://fonts.googleapis.com/css2?family=Montserrat:ital,wght@0,100..900;1,100..900&display=swap');
+          @import url('https://fonts.googleapis.com/css2?family=Hind:wght@300;400;500;600;700&family=Montserrat:ital,wght@0,100..900;1,100..900&display=swap');
+        }
+
+        * {
+          margin: 0;
+          padding: 0;
+          box-sizing: border-box;
+
+          --main-color: #8847ff;
+          --main-color-gradient: linear-gradient(
+            120deg,
+            #8847ff 0%,
+            #a06cff 100%
+          );
+
+          --common: #588cbf;
+          --uncommon: #4664d6;
+          --rare: #7a5bf0;
+          --legendary: #be47d0;
+          --divine: #db9f45;
+
+          --bg-common: #5e98d9;
+          --bg-uncommon: #4b69ff;
+          --bg-rare: #8847ff;
+          --bg-legendary: #d32ee6;
+          --bg-divine: #f8ae39;
+
+          --font1: 'Montserrat', sans-serif;
+          --font2: 'Hind', sans-serif;
+
+          --primary-text-color: white;
+          --secondary-text-color: #25314c;
         }
 
         .dropdown__container {
@@ -172,6 +234,13 @@ export class DropdownMenu extends HTMLElement {
           width: 320px;
           height: 50px;
           opacity: 1;
+
+          @media (max-width: 575px) {
+            width: 70px;
+            height: 70px;
+            top: 25px;
+            right: 25px;
+          }
         }
 
         .dropdown {
@@ -224,6 +293,10 @@ export class DropdownMenu extends HTMLElement {
           justify-content: space-between;
           align-items: center;
           width: 100%;
+
+          @media (max-width: 575px) {
+            justify-content: center;
+          }
         }
 
         .dropdown__chest-info {
@@ -235,10 +308,14 @@ export class DropdownMenu extends HTMLElement {
 
         .dropdown__chest-icon {
           margin-right: 5px;
+
+          @media (max-width: 575px) {
+            margin-right: 0px;
+          }
         }
 
         span {
-          font-family: 'Montserrat', sans-serif;
+          font-family: var(--font1);
           font-weight: 700;
           font-size: 0.9rem;
           text-transform: uppercase;
@@ -248,6 +325,18 @@ export class DropdownMenu extends HTMLElement {
         .dead {
           width: 25px;
           height: 25px;
+        }
+
+        .chest-name {
+          @media (max-width: 575px) {
+            display: none;
+          }
+        }
+
+        .arrow__container {
+          @media (max-width: 575px) {
+            display: none;
+          }
         }
       </style>
       <div class="dropdown__container">
@@ -263,22 +352,26 @@ export class DropdownMenu extends HTMLElement {
                       .url()}"
                     alt="${this.state.selectedChest.chestName}"
                   />
-                  <span>${this.state.selectedChest.chestName}</span>
+                  <span class="chest-name"
+                    >${this.state.selectedChest.chestName}</span
+                  >
                 </div>
 
-                <svg
-                  id="dropdownArrow"
-                  width="24"
-                  height="24"
-                  viewBox="0 0 24 24"
-                  fill="none"
-                  xmlns="http://www.w3.org/2000/svg"
-                >
-                  <path
-                    d="M12 17C11.744 17 11.488 16.9021 11.293 16.7071L4.29301 9.70707C3.90201 9.31607 3.90201 8.68401 4.29301 8.29301C4.68401 7.90201 5.31607 7.90201 5.70707 8.29301L12 14.586L18.293 8.29301C18.684 7.90201 19.3161 7.90201 19.7071 8.29301C20.0981 8.68401 20.0981 9.31607 19.7071 9.70707L12.7071 16.7071C12.5121 16.9021 12.256 17 12 17Z"
-                    fill="#25314C"
-                  />
-                </svg>
+                <div class="arrow__container">
+                  <svg
+                    id="dropdownArrow"
+                    width="24"
+                    height="24"
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    xmlns="http://www.w3.org/2000/svg"
+                  >
+                    <path
+                      d="M12 17C11.744 17 11.488 16.9021 11.293 16.7071L4.29301 9.70707C3.90201 9.31607 3.90201 8.68401 4.29301 8.29301C4.68401 7.90201 5.31607 7.90201 5.70707 8.29301L12 14.586L18.293 8.29301C18.684 7.90201 19.3161 7.90201 19.7071 8.29301C20.0981 8.68401 20.0981 9.31607 19.7071 9.70707L12.7071 16.7071C12.5121 16.9021 12.256 17 12 17Z"
+                      fill="#25314C"
+                    />
+                  </svg>
+                </div>
               </div>`
             : html`<div>Loading...</div>`}
 
