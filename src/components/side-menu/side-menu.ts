@@ -59,7 +59,7 @@ export class SideMenu extends HTMLElement {
     this.attachEventListeners();
     this.getAllPrizes();
     this.renderProfile();
-    // this.hide();
+    this.hide();
   }
 
   disconnectedCallback(): void {
@@ -427,33 +427,42 @@ export class SideMenu extends HTMLElement {
     if (!this.shadowRoot) return;
     this.shadowRoot.innerHTML = html` <style>
         {
-          @import url('https://fonts.googleapis.com/css2?family=Hind:wght@300;400;500;600;700;800;900&family=Montserrat:ital,wght@0,100..900;1,100..900&display=swap');
+        @import url('https://fonts.googleapis.com/css2?family=Hind:wght@300;400;500;600;700;800;900&family=Montserrat:ital,wght@0,100..900;1,100..900&display=swap');
         }
-          * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
 
-            --main_color: #8847ff;
-            --secondary_color: #fff;
+        * {
+          margin: 0;
+          padding: 0;
+          box-sizing: border-box;
 
-            --common: #588cbf;
-            --uncommon: #4664d6;
-            --rare: #7a5bf0;
-            --legendary: #be47d0;
-            --divine: #db9f45;
+          --main-color: #8847ff;
+          --main-color-gradient: linear-gradient(
+            120deg,
+            #8847ff 0%,
+            #a06cff 100%
+          );
+          --secondary_color: #fff;
 
-            --bg-common: #5e98d9;
-            --bg-uncommon: #4b69ff;
-            --bg-rare: #8847ff;
-            --bg-legendary: #d32ee6;
-            --bg-divine: #f8ae39;
+          --common: #588cbf;
+          --uncommon: #4664d6;
+          --rare: #7a5bf0;
+          --legendary: #be47d0;
+          --divine: #db9f45;
 
-            --font1: 'Montserrat', sans-serif;
-            --font2: 'Hind', sans-serif;
-          }
+          --bg-common: #5e98d9;
+          --bg-uncommon: #4b69ff;
+          --bg-rare: #8847ff;
+          --bg-legendary: #d32ee6;
+          --bg-divine: #f8ae39;
 
-          button {
+          --font1: 'Montserrat', sans-serif;
+          --font2: 'Hind', sans-serif;
+
+          --primary-text-color: white;
+          --secondary-text-color: #25314c;
+        }
+
+        button {
           width: 100%;
           height: 50px;
           border: none;
@@ -468,261 +477,260 @@ export class SideMenu extends HTMLElement {
           text-transform: uppercase;
         }
 
-          .side-menu__parent {
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background-color: rgba(0, 0, 0, 0.1);
-            z-index: 1;
-            display: flex;
-            justify-content: flex-end;
-            align-items: center;
-            z-index: 998;
-          }
+        .side-menu__parent {
+          position: fixed;
+          top: 0;
+          left: 0;
+          width: 100%;
+          height: 100%;
+          background-color: rgba(0, 0, 0, 0.1);
+          z-index: 1;
+          display: flex;
+          justify-content: flex-end;
+          align-items: center;
+          z-index: 998;
+        }
 
-          .side-menu {
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 400px;
-            height: 100%;
-            background-color: var(--secondary_color);
-            z-index: 999;
-            box-shadow: 0 0 5px rgba(0, 0, 0, 0.1);
-          }
+        .side-menu {
+          position: fixed;
+          top: 0;
+          left: 0;
+          width: 400px;
+          height: 100%;
+          background-color: var(--secondary_color);
+          z-index: 999;
+          box-shadow: 0 0 5px rgba(0, 0, 0, 0.1);
+        }
 
-          .side-menu__container {
-            display: flex;
-            flex-direction: column;
-            justify-content: space-between;
-            height: 100%;
-          }
+        .side-menu__container {
+          display: flex;
+          flex-direction: column;
+          justify-content: space-between;
+          height: 100%;
+        }
 
-          .logo__image {
-            width: 262px;
-            height: 78px;
-          }
+        .logo__image {
+          width: 262px;
+          height: 78px;
+        }
 
-          .logo__container {
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            padding: 0px 10px 10px 10px;
-          }
+        .logo__container {
+          display: flex;
+          justify-content: center;
+          align-items: center;
+          padding: 0px 10px 10px 10px;
+        }
 
-          .close__container {
-            display: flex;
-            justify-content: flex-end;
-            padding: 20px 20px 0 0;
-          }
+        .close__container {
+          display: flex;
+          justify-content: flex-end;
+          padding: 20px 20px 0 0;
+        }
 
-          .close__button {
-            cursor: pointer;
-            margin: 0;
-          }
+        .close__button {
+          cursor: pointer;
+          margin: 0;
+        }
 
-          .section-btn__container {
-            cursor: pointer;
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            padding: 20px 20px 20px 20px;
-            border-bottom: 1px solid #f0f0f0;
-            border-top: 1px solid #f0f0f0;
-          }
+        .section-btn__container {
+          cursor: pointer;
+          display: flex;
+          align-items: center;
+          justify-content: space-between;
+          padding: 20px 20px 20px 20px;
+          border-bottom: 1px solid #f0f0f0;
+          border-top: 1px solid #f0f0f0;
+        }
 
-          .section-btn__text {
-            font-family: var(--font1);
-            font-size: 1rem;
-            font-weight: 900;
-            color: #25314c;
-            text-transform: uppercase;
-          }
+        .section-btn__text {
+          font-family: var(--font1);
+          font-size: 1rem;
+          font-weight: 900;
+          color: #25314c;
+          text-transform: uppercase;
+        }
 
-          .reward-text-icon__container {
-            display: flex;
-            align-items: center;
-          }
+        .reward-text-icon__container {
+          display: flex;
+          align-items: center;
+        }
 
-          .recent-wins__container {
-            height: 300px;
-          }
+        .recent-wins__container {
+          height: 300px;
+        }
 
-          .tabs {
-            height: 100%;
-            display: flex;
-            flex-direction: column;
-          }
+        .tabs {
+          height: 100%;
+          display: flex;
+          flex-direction: column;
+        }
 
-          .rewards__header {
-            display: grid;
-            grid-template-columns: 50% 35% 15%;
-            padding: 10px 20px;
-            border-bottom: 1px solid #f0f0f0;
-          }
+        .rewards__header {
+          display: grid;
+          grid-template-columns: 50% 35% 15%;
+          padding: 10px 20px;
+          border-bottom: 1px solid #f0f0f0;
+        }
 
-          .rewards-data {
-            display: grid;
-            grid-template-columns: 50% 35% 15%;
-            padding: 10px 20px;
-            border-bottom: 1px solid #f0f0f0;
-          }
+        .rewards-data {
+          display: grid;
+          grid-template-columns: 50% 35% 15%;
+          padding: 10px 20px;
+          border-bottom: 1px solid #f0f0f0;
+        }
 
-          .rewards-data__container {
-            height: 500px;
-          }
+        .rewards-data__container {
+          height: 500px;
+        }
 
-          .rewards-data__container::-webkit-scrollbar {
-            display: none;
-          }
+        .rewards-data__container::-webkit-scrollbar {
+          display: none;
+        }
 
-          .rewards-data__container::-webkit-scrollbar-track {
-            background: var(--common);
-          }
+        .rewards-data__container::-webkit-scrollbar-track {
+          background: var(--common);
+        }
 
-          .rewards-data__container::-webkit-scrollbar-thumb {
-            background: var(--uncommon);
-          }
+        .rewards-data__container::-webkit-scrollbar-thumb {
+          background: var(--uncommon);
+        }
 
-          .rewards-data__container::-webkit-scrollbar-thumb:hover {
-            background: var(--uncommon);
-          }
+        .rewards-data__container::-webkit-scrollbar-thumb:hover {
+          background: var(--uncommon);
+        }
 
-          .header {
-            font-family: var(--font2);
-            font-size: 0.9rem;
-            font-weight: 500;
-            color: #c9ced8;
-          }
+        .header {
+          font-family: var(--font2);
+          font-size: 0.9rem;
+          font-weight: 500;
+          color: #c9ced8;
+        }
 
-          .rewards__container {
-            overflow-y: auto;
-            height: 100%;
-            display: flex;
-            flex-direction: column;
-          }
+        .rewards__container {
+          overflow-y: auto;
+          height: 100%;
+          display: flex;
+          flex-direction: column;
+        }
 
-          .reward-name-image {
-            display: flex;
-            align-items: center;
-          }
+        .reward-name-image {
+          display: flex;
+          align-items: center;
+        }
 
-          .reward__icon {
-            width: 40px;
-            height: 40px;
-            margin-right: 10px;
-            border-radius: 50%;
-          }
+        .reward__icon {
+          width: 40px;
+          height: 40px;
+          margin-right: 10px;
+          border-radius: 50%;
+        }
 
-          .reward__name {
-            font-family: var(--font1);
-            font-size: 0.9rem;
-            font-weight: 900;
-            color: #25314c;
-          }
+        .reward__name {
+          font-family: var(--font1);
+          font-size: 0.9rem;
+          font-weight: 900;
+          color: #25314c;
+        }
 
-          .username {
-            font-family: var(--font1);
-            font-size: 0.9rem;
-            font-weight: 900;
-            color: #25314c;
-            display: flex;
-            align-items: center;
-          }
+        .username {
+          font-family: var(--font1);
+          font-size: 0.9rem;
+          font-weight: 900;
+          color: #25314c;
+          display: flex;
+          align-items: center;
+        }
 
-          .won-date {
-            font-family: var(--font2);
-            font-size: 0.9rem;
-            font-weight: 500;
-            color: #c9ced8;
-            display: flex;
-            align-items: center;
-          }
+        .won-date {
+          font-family: var(--font2);
+          font-size: 0.9rem;
+          font-weight: 500;
+          color: #c9ced8;
+          display: flex;
+          align-items: center;
+        }
 
-          .profile__container {
-            position: relative;
-            display: none;
-            flex-direction: column;
-            height: 100%;
-            justify-content: space-between;
-          }
+        .profile__container {
+          position: relative;
+          display: none;
+          flex-direction: column;
+          height: 100%;
+          justify-content: space-between;
+        }
 
-          .profile-image{
-            width: 45px;
-            height: 45px;
-            border-radius: 8px;
-            background-size: cover;
-            margin-right: 10px;
-          }
+        .profile-image {
+          width: 45px;
+          height: 45px;
+          border-radius: 8px;
+          background-size: cover;
+          margin-right: 10px;
+        }
 
-          .profile__info {
-            display: flex;
-            flex-direction: row;
-            justify-content: space-between;
-            align-items: center;
-            padding: 20px;
-            border-top: 1px solid #f0f0f0;
-            border-bottom: 1px solid #f0f0f0;
-          }
+        .profile__info {
+          display: flex;
+          flex-direction: row;
+          justify-content: space-between;
+          align-items: center;
+          padding: 20px;
+          border-top: 1px solid #f0f0f0;
+          border-bottom: 1px solid #f0f0f0;
+        }
 
-          .profile-image__container {
-            display: flex;
-            flex-direction: row;
-            align-items: center;
-          }
+        .profile-image__container {
+          display: flex;
+          flex-direction: row;
+          align-items: center;
+        }
 
-          .profile-sections__header {
-            display: flex;
-            flex-direction: row;
-            justify-content: center;
-            align-items: center;
-            padding: 10px 20px;
-            border-bottom: 1px solid #f0f0f0;
-            text-align: center;
-          }
+        .profile-sections__header {
+          display: flex;
+          flex-direction: row;
+          justify-content: center;
+          align-items: center;
+          padding: 10px 20px;
+          border-bottom: 1px solid #f0f0f0;
+          text-align: center;
+        }
 
-          .inactive-section-title {
-            font-family: var(--font1);
-            font-size: 0.9rem;
-            font-weight: 900;
-            color: #c9ced8;
-            cursor: pointer;
-          }
+        .inactive-section-title {
+          font-family: var(--font1);
+          font-size: 0.9rem;
+          font-weight: 900;
+          color: #c9ced8;
+          cursor: pointer;
+        }
 
-          .users-rewards__data {
-            display: flex;
-            justify-content: space-between;
-            padding: 10px 20px;
-            border-bottom: 1px solid #f0f0f0;
-          }
+        .users-rewards__data {
+          display: flex;
+          justify-content: space-between;
+          padding: 10px 20px;
+          border-bottom: 1px solid #f0f0f0;
+        }
 
-          .logout-btn__container {
-            margin: 20px;
-          }
+        .logout-btn__container {
+          margin: 20px;
+        }
 
-          .users-rewards__container {
+        .users-rewards__container {
+          display: flex;
+          flex-direction: column;
+        }
 
-            display: flex;
-            flex-direction: column;
-          }
+        .users-rewards-list {
+          display: flex;
+          flex-direction: column;
+          overflow-y: scroll;
+          max-height: 500px;
+        }
 
-          .users-rewards-list {
-            display: flex;
-            flex-direction: column;
-            overflow-y: scroll;
-            max-height: 500px;
-          }
-
-          .users-interaction {
-            position: fixed;
-            bottom: 0;
-            display: flex;
-            flex-direction: column;
-            width: 400px;
-            background-color: #fff;
-          }
+        .users-interaction {
+          position: fixed;
+          bottom: 0;
+          display: flex;
+          flex-direction: column;
+          width: 400px;
+          background-color: #fff;
+        }
       </style>
 
       <div class="side-menu__parent">

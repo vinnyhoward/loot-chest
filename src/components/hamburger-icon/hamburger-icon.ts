@@ -91,9 +91,13 @@ export class HamburgerIcon extends HTMLElement {
           position: fixed;
           top: 75px;
           left: 75px;
-          width: 320px;
           height: 50px;
           opacity: 1;
+
+          @media (max-width: 575px) {
+            top: 25px;
+            left: 25px;
+          }
         }
 
         .hamburger__container {

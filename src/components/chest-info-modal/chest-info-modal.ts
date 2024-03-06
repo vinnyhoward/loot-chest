@@ -142,7 +142,7 @@ export class ChestInfoModal extends HTMLElement {
           padding: 0;
           box-sizing: border-box;
 
-          --main_color: #8847ff;
+          --main-color: #8847ff;
           
           --common: #588cbf;
           --uncommon: #4664d6; 

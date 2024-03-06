@@ -251,11 +251,22 @@ export class OpenButton extends HTMLElement {
           right: 50%;
           top: 90%;
           transform: translate(50%, -50%);
+
+          @media (max-width: 575px) {
+            right: 50%;
+            top: 85%;
+            transform: translate(50%, 0%);
+            bottom: 25px;
+          }
         }
 
         .open__button:hover {
           transform: translate(50%, -50%) scale(1.025);
           transition: transform 100ms ease-in-out;
+
+          @media (max-width: 575px) {
+            transform: translate(50%, 0%) scale(1.025);
+          }
         }
 
         .open__container {
