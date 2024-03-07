@@ -1,7 +1,6 @@
 import gsap from 'gsap';
 import { EVENTS } from '../../constants/events';
 import { html } from '../../utils/html';
-import { urlFor } from '../../services/sanity';
 
 export class HamburgerIcon extends HTMLElement {
   constructor() {
@@ -30,6 +29,13 @@ export class HamburgerIcon extends HTMLElement {
     document.addEventListener(EVENTS.SHOW_SIDE_MENU, () => {
       this.show();
     });
+
+    document.addEventListener(EVENTS.HIDE_UI, () => {
+      this.hide();
+    });
+    document.addEventListener(EVENTS.SHOW_UI, () => {
+      this.show();
+    });
   }
 
   disconnectedCallback(): void {
@@ -52,14 +58,24 @@ export class HamburgerIcon extends HTMLElement {
     document.removeEventListener(EVENTS.SHOW_SIDE_MENU, () => {
       this.show();
     });
+
+    document.removeEventListener(EVENTS.HIDE_UI, () => {
+      this.hide();
+    });
+
+    document.removeEventListener(EVENTS.SHOW_UI, () => {
+      this.show();
+    });
   }
 
   public show(): void {
     if (!this.shadowRoot) return;
+    gsap.to(this, { duration: 0.25, opacity: 1, display: 'block' });
   }
 
   public hide(): void {
     if (!this.shadowRoot) return;
+    gsap.to(this, { duration: 0.25, opacity: 0, display: 'none' });
   }
 
   public render() {

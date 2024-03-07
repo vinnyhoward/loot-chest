@@ -94,75 +94,33 @@ export class DropdownMenu extends HTMLElement {
 
     const dropdown = this.shadowRoot.querySelector('.dropdown');
     dropdown?.addEventListener('click', () => {
-      const list = this.shadowRoot?.querySelector(
-        '.dropdown__list',
-      ) as HTMLElement;
-      const arrow = this.shadowRoot?.querySelector(
-        '#dropdownArrow',
-      ) as SVGSVGElement;
-      const dropdownContainerEl = this.shadowRoot?.querySelector(
-        '.dropdown__container',
-      ) as HTMLElement;
-      const selectedDropdownEl = this.shadowRoot?.querySelector(
-        '.dropdown__selected-chest',
-      ) as HTMLElement;
-      const dropdownChestIconEl = this.shadowRoot?.querySelector(
-        '.dropdown__chest-icon',
-      ) as HTMLImageElement;
-      const chestNameEl = this.shadowRoot?.querySelector(
-        '.chest-name',
-      ) as HTMLElement;
+      this.handleDropdownClick();
+    });
+  }
 
-      if (window.innerWidth >= 575) {
-        if (list && arrow) {
-          const isOpening =
-            list.style.display === 'none' || !list.style.display;
+  private handleDropdownClick(): void {
+    const list = this.shadowRoot?.querySelector(
+      '.dropdown__list',
+    ) as HTMLElement;
+    const arrow = this.shadowRoot?.querySelector(
+      '#dropdownArrow',
+    ) as SVGSVGElement;
+    const dropdownContainerEl = this.shadowRoot?.querySelector(
+      '.dropdown__container',
+    ) as HTMLElement;
+    const selectedDropdownEl = this.shadowRoot?.querySelector(
+      '.dropdown__selected-chest',
+    ) as HTMLElement;
+    const dropdownChestIconEl = this.shadowRoot?.querySelector(
+      '.dropdown__chest-icon',
+    ) as HTMLImageElement;
+    const chestNameEl = this.shadowRoot?.querySelector(
+      '.chest-name',
+    ) as HTMLElement;
 
-          list.style.display = 'block';
-          list.style.opacity = '0';
-          list.style.transform = 'translateY(-20px)';
-
-          const targetHeight = isOpening ? `${list.scrollHeight}px` : '0px';
-
-          gsap.to(list, {
-            duration: 0.15,
-            opacity: isOpening ? 1 : 0,
-            translateY: isOpening ? '0px' : '-20px',
-            onComplete: () => {
-              if (!isOpening) {
-                list.style.display = 'none';
-              }
-            },
-          });
-
-          gsap.to(list, {
-            duration: 0.15,
-            height: targetHeight,
-            onComplete: () => {
-              if (isOpening) {
-                list.style.height = 'auto';
-              }
-            },
-          });
-
-          const rotation = isOpening ? 180 : 0;
-          gsap.to(arrow, {
-            duration: 0.15,
-            rotation,
-            transformOrigin: 'center',
-          });
-        }
-      } else {
+    if (window.innerWidth >= 575) {
+      if (list && arrow) {
         const isOpening = list.style.display === 'none' || !list.style.display;
-
-        dropdownContainerEl.style.width = isOpening ? '320px' : '70px';
-        dropdownContainerEl.style.height = isOpening ? 'auto' : '70px';
-        selectedDropdownEl.style.justifyContent = isOpening
-          ? 'space-between'
-          : 'center';
-        dropdownChestIconEl.style.marginRight = isOpening ? '5px' : '0px';
-        chestNameEl.style.display = isOpening ? 'block' : 'none';
-        arrow.style.display = isOpening ? 'block' : 'none';
 
         list.style.display = 'block';
         list.style.opacity = '0';
@@ -198,9 +156,53 @@ export class DropdownMenu extends HTMLElement {
           transformOrigin: 'center',
         });
       }
-    });
-  }
+    } else {
+      const isOpening = list.style.display === 'none' || !list.style.display;
 
+      dropdownContainerEl.style.width = isOpening ? '320px' : '70px';
+      dropdownContainerEl.style.height = isOpening ? 'auto' : '70px';
+      selectedDropdownEl.style.justifyContent = isOpening
+        ? 'space-between'
+        : 'center';
+      dropdownChestIconEl.style.marginRight = isOpening ? '5px' : '0px';
+      chestNameEl.style.display = isOpening ? 'block' : 'none';
+      arrow.style.display = isOpening ? 'block' : 'none';
+
+      list.style.display = 'block';
+      list.style.opacity = '0';
+      list.style.transform = 'translateY(-20px)';
+
+      const targetHeight = isOpening ? `${list.scrollHeight}px` : '0px';
+
+      gsap.to(list, {
+        duration: 0.15,
+        opacity: isOpening ? 1 : 0,
+        translateY: isOpening ? '0px' : '-20px',
+        onComplete: () => {
+          if (!isOpening) {
+            list.style.display = 'none';
+          }
+        },
+      });
+
+      gsap.to(list, {
+        duration: 0.15,
+        height: targetHeight,
+        onComplete: () => {
+          if (isOpening) {
+            list.style.height = 'auto';
+          }
+        },
+      });
+
+      const rotation = isOpening ? 180 : 0;
+      gsap.to(arrow, {
+        duration: 0.15,
+        rotation,
+        transformOrigin: 'center',
+      });
+    }
+  }
   renderSelectedChest(): void {
     if (!this.shadowRoot) return;
 
@@ -386,7 +388,8 @@ export class DropdownMenu extends HTMLElement {
           background-color: white;
           border-radius: 24px;
           box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
-          min-height: 50px;
+          min-height: 70px;
+          min-width: 320px;
           display: flex;
           flex-direction: column;
           justify-content: center;
@@ -447,6 +450,8 @@ export class DropdownMenu extends HTMLElement {
 
         .dropdown__chest-icon {
           margin-right: 5px;
+          width: 50px;
+          height: 50px;
 
           @media (max-width: 575px) {
             margin-right: 0px;
@@ -494,7 +499,6 @@ export class DropdownMenu extends HTMLElement {
       <div class="dropdown__container">
         <div class="dropdown">
           <div class="selected-dropdown__container"></div>
-
           <ul class="dropdown__list"></ul>
         </div>
       </div>

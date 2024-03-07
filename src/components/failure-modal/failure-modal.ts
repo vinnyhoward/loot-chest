@@ -49,24 +49,12 @@ export class FailureModal extends HTMLElement {
 
   private attachListeners(): void {
     if (!this.shadowRoot) return;
-    const closeIcon = this.shadowRoot.querySelector(
-      '.close__icon',
-    ) as HTMLElement;
-    const closeButton = this.shadowRoot.querySelector('.btn') as HTMLElement;
-
-    closeButton.addEventListener('click', () => {
-      this.hide();
-    });
-
-    closeIcon.addEventListener('click', () => {
-      this.hide();
-    });
-
     document.addEventListener(EVENTS.CHEST_SELECTED, (event: any) => {
       this.state.selectedChest = event.detail.selectedChest;
       this.state.loading = false;
 
       this.render();
+      this.closeModalListener();
       this.updateContent();
     });
 
@@ -81,6 +69,23 @@ export class FailureModal extends HTMLElement {
       this.hide();
       this.state.errorTitle = '';
       this.state.errorDescription = '';
+    });
+  }
+
+  private closeModalListener(): void {
+    if (!this.shadowRoot) return;
+
+    const closeIcon = this.shadowRoot.querySelector(
+      '.close__icon',
+    ) as HTMLElement;
+    const closeButton = this.shadowRoot.querySelector('.btn') as HTMLElement;
+
+    closeButton.addEventListener('click', () => {
+      this.hide();
+    });
+
+    closeIcon.addEventListener('click', () => {
+      this.hide();
     });
   }
 

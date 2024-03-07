@@ -68,7 +68,7 @@ export default class App extends HTMLElement {
       const app = this.shadowRoot.querySelector('.menu');
       if (app) {
         gsap.to(app, {
-          delay: 0.15,
+          delay: 3.5,
           duration: 0.5,
           opacity: 1,
           display: 'block',

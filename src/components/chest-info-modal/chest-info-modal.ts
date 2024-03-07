@@ -23,6 +23,7 @@ export class ChestInfoModal extends HTMLElement {
     loading: boolean;
     showMore: boolean;
   };
+
   constructor() {
     super();
     this.attachShadow({ mode: 'open' });
@@ -40,7 +41,6 @@ export class ChestInfoModal extends HTMLElement {
     this.attachListeners();
     this.attachEventListeners();
     this.updateDescription();
-    gsap.to(this, { duration: 0, opacity: 0, display: 'none' });
   }
 
   get selectedChest(): any {
@@ -49,7 +49,6 @@ export class ChestInfoModal extends HTMLElement {
 
   connectedCallback(): void {
     this.render();
-    gsap.to(this, { duration: 0, opacity: 0, display: 'none' });
   }
 
   disconnectedCallback(): void {
@@ -90,14 +89,32 @@ export class ChestInfoModal extends HTMLElement {
     });
   }
 
-  public show() {
+  public show(): void {
     if (!this.shadowRoot) return;
-    gsap.to(this, { duration: 0.5, opacity: 1, display: 'block' });
+    const parent = this.shadowRoot.querySelector('.info-modal') as HTMLElement;
+    parent.style.display = 'block';
+    parent.style.opacity = '0';
+
+    gsap.fromTo(
+      parent,
+      { y: -50, opacity: 0.5 },
+      { y: 0, opacity: 1, duration: 0.3, ease: 'bounce.out', display: 'block' },
+    );
   }
 
-  public hide() {
+  public hide(): void {
     if (!this.shadowRoot) return;
-    gsap.to(this, { duration: 0.5, opacity: 0, display: 'none' });
+    const parent = this.shadowRoot.querySelector('.info-modal') as HTMLElement;
+
+    gsap.to(parent, {
+      y: 20,
+      opacity: 0,
+      duration: 0.2,
+      ease: 'power1.in',
+      onComplete: () => {
+        parent.style.display = 'none';
+      },
+    });
   }
 
   private updateDescription() {
@@ -164,6 +181,8 @@ export class ChestInfoModal extends HTMLElement {
           left: 50%;
           transform: translate(-50%, -50%);
           z-index: 1000;
+          display: none;
+          opacity: 0;
         }
 
         .info-modal__container {

@@ -407,30 +407,33 @@ export class SideMenu extends HTMLElement {
   public show(): void {
     if (!this.shadowRoot) return;
 
-    gsap.to(this.shadowRoot.querySelector('.side-menu'), {
-      duration: 0.15,
-      x: 0,
-      ease: 'power1.out',
-    });
+    gsap.fromTo(
+      this.shadowRoot.querySelector('.side-menu'),
+      { x: -400 },
+      { x: 0, duration: 0.5, ease: 'bounce.out' },
+    );
 
     gsap.to(this.shadowRoot.querySelector('.side-menu__parent'), {
-      duration: 0.15,
+      delay: 0.1,
+      duration: 0.3,
       opacity: 1,
       display: 'block',
-      ease: 'power1.out',
+      ease: 'power1.in',
     });
   }
 
   public hide(): void {
     if (!this.shadowRoot) return;
+
     gsap.to(this.shadowRoot.querySelector('.side-menu'), {
-      duration: 0.15,
+      duration: 0.5,
       x: -400,
-      ease: 'power1.out',
+      ease: 'power2.in',
     });
 
+    // Fade out the overlay simultaneously
     gsap.to(this.shadowRoot.querySelector('.side-menu__parent'), {
-      duration: 0.15,
+      duration: 0.3,
       opacity: 0,
       display: 'none',
       ease: 'power1.out',
