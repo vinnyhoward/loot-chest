@@ -31,7 +31,10 @@ export class DropdownMenu extends HTMLElement {
     );
 
     this.render();
-    this.attachEventListeners();
+    this.attachGlobalListeners();
+    this.renderSelectedChest();
+    this.renderDropdownList();
+    this.attachDropdownListeners();
   }
 
   get chests() {
@@ -40,7 +43,6 @@ export class DropdownMenu extends HTMLElement {
 
   connectedCallback(): void {
     this.render();
-    this.attachEventListeners();
   }
 
   disconnectedCallback(): void {
@@ -70,22 +72,14 @@ export class DropdownMenu extends HTMLElement {
     );
 
     this.render();
-    this.attachEventListeners();
+    this.attachGlobalListeners();
+    this.renderSelectedChest();
+    this.renderDropdownList();
+    this.attachDropdownListeners();
   }
 
-  attachEventListeners(): void {
+  public attachGlobalListeners(): void {
     if (!this.shadowRoot) return;
-
-    const items = this.shadowRoot.querySelectorAll('.chest__item');
-    items.forEach((item) => {
-      item.addEventListener('click', (e) => {
-        const chestId: string | null = item.getAttribute('data-name');
-        this.selectItem(chestId);
-        e.stopPropagation();
-      });
-    });
-
-    this.dropdownToggle();
 
     document.addEventListener(EVENTS.HIDE_UI, () => {
       this.hide();
@@ -95,11 +89,10 @@ export class DropdownMenu extends HTMLElement {
     });
   }
 
-  dropdownToggle(): void {
+  public attachDropdownListeners(): void {
     if (!this.shadowRoot) return;
 
     const dropdown = this.shadowRoot.querySelector('.dropdown');
-
     dropdown?.addEventListener('click', () => {
       const list = this.shadowRoot?.querySelector(
         '.dropdown__list',
@@ -119,7 +112,7 @@ export class DropdownMenu extends HTMLElement {
       const chestNameEl = this.shadowRoot?.querySelector(
         '.chest-name',
       ) as HTMLElement;
-      console.log('dropdown clicked...', window.innerWidth);
+
       if (window.innerWidth >= 575) {
         if (list && arrow) {
           const isOpening =
@@ -208,6 +201,114 @@ export class DropdownMenu extends HTMLElement {
     });
   }
 
+  renderSelectedChest(): void {
+    if (!this.shadowRoot) return;
+
+    const selectedChestContainer = this.shadowRoot.querySelector(
+      '.selected-dropdown__container',
+    ) as HTMLElement;
+
+    if (!selectedChestContainer) return;
+
+    const selectedChest = this.state.selectedChest;
+    if (!selectedChest) return;
+
+    const selectedChestEl = document.createElement('div');
+    selectedChestEl.classList.add('dropdown__selected-chest');
+
+    selectedChestEl.innerHTML = html`
+      <div class="dropdown__chest-info">
+        <img
+          class="dropdown__chest-icon"
+          src="${urlFor(selectedChest.chestIcon.asset._ref)
+            .width(50)
+            .height(50)
+            .url()}"
+          alt="${selectedChest.chestName}"
+        />
+        <span class="chest-name">${selectedChest.chestName}</span>
+      </div>
+      <div class="arrow__container">
+        <svg
+          id="dropdownArrow"
+          width="24"
+          height="24"
+          viewBox="0 0 24 24"
+          fill="none"
+          xmlns="http://www.w3.org/2000/svg"
+        >
+          <path
+            d="M12 17C11.744 17 11.488 16.9021 11.293 16.7071L4.29301 9.70707C3.90201 9.31607 3.90201 8.68401 4.29301 8.29301C4.68401 7.90201 5.31607 7.90201 5.70707 8.29301L12 14.586L18.293 8.29301C18.684 7.90201 19.3161 7.90201 19.7071 8.29301C20.0981 8.68401 20.0981 9.31607 19.7071 9.70707L12.7071 16.7071C12.5121 16.9021 12.256 17 12 17Z"
+            fill="#25314C"
+          />
+        </svg>
+      </div>
+    `;
+    selectedChestContainer.appendChild(selectedChestEl);
+  }
+
+  renderDropdownList(): void {
+    if (!this.shadowRoot) return;
+    if (this._chests.length === 0) return;
+
+    const list = this.shadowRoot.querySelector(
+      '.dropdown__list',
+    ) as HTMLElement;
+
+    if (!list) return;
+    list.innerHTML = '';
+
+    this._chests.forEach((chest) => {
+      const isDraft = chest._id.split('.').length > 1;
+      if (isDraft) return;
+
+      const listItem = document.createElement('li');
+      listItem.classList.add('chest__item');
+
+      const hideChest = this.state.selectedChest._id === chest._id;
+      if (hideChest) {
+        listItem.classList.add('hide');
+      }
+
+      listItem.setAttribute('data-name', chest._id);
+      listItem.innerHTML = html`
+        <div class="dropdown__chest-info">
+          <img
+            class="dropdown__chest-icon"
+            src="${urlFor(chest.chestIcon.asset._ref)
+              .width(50)
+              .height(50)
+              .url()}"
+            alt="${chest.chestName}"
+          />
+          <span>${chest.chestName}</span>
+        </div>
+        <div class="arrow__container">
+          <svg
+            width="24"
+            height="24"
+            viewBox="0 0 24 24"
+            fill="none"
+            xmlns="http://www.w3.org/2000/svg"
+          >
+            <path
+              d="M12 17C11.744 17 11.488 16.9021 11.293 16.7071L4.29301 9.70707C3.90201 9.31607 3.90201 8.68401 4.29301 8.29301C4.68401 7.90201 5.31607 7.90201 5.70707 8.29301L12 14.586L18.293 8.29301C18.684 7.90201 19.3161 7.90201 19.7071 8.29301C20.0981 8.68401 20.0981 9.31607 19.7071 9.70707L12.7071 16.7071C12.5121 16.9021 12.256 17 12 17Z"
+              fill="#25314C"
+            />
+          </svg>
+        </div>
+      `;
+
+      listItem.addEventListener('click', (e) => {
+        const chestId: string | null = listItem.getAttribute('data-name');
+        this.selectItem(chestId);
+        e.stopPropagation();
+      });
+
+      list.appendChild(listItem);
+    });
+  }
+
   public show(): void {
     gsap.to(this, {
       opacity: 1,
@@ -226,11 +327,6 @@ export class DropdownMenu extends HTMLElement {
 
   render() {
     if (!this.shadowRoot) return;
-    const chestList = this._chests.filter((chest) => {
-      const isDraft = chest._id.split('.').length > 1;
-      return chest._id !== this.state.selectedChest._id && !isDraft;
-    });
-
     this.shadowRoot.innerHTML = html`
       <style>
         {
@@ -381,66 +477,25 @@ export class DropdownMenu extends HTMLElement {
             display: none;
           }
         }
+
+        .hide {
+          display: none;
+        }
+
+        .selected-dropdown__container {
+          display: flex;
+          flex-direction: row;
+          justify-content: space-between;
+          align-items: center;
+          width: 100%;
+        }
       </style>
+
       <div class="dropdown__container">
         <div class="dropdown">
-          ${this._chests.length > 0
-            ? html`<div class="dropdown__selected-chest">
-                <div class="dropdown__chest-info">
-                  <img
-                    class="dropdown__chest-icon"
-                    src="${urlFor(this.state.selectedChest.chestIcon.asset._ref)
-                      .width(50)
-                      .height(50)
-                      .url()}"
-                    alt="${this.state.selectedChest.chestName}"
-                  />
-                  <span class="chest-name"
-                    >${this.state.selectedChest.chestName}</span
-                  >
-                </div>
+          <div class="selected-dropdown__container"></div>
 
-                <div class="arrow__container">
-                  <svg
-                    id="dropdownArrow"
-                    width="24"
-                    height="24"
-                    viewBox="0 0 24 24"
-                    fill="none"
-                    xmlns="http://www.w3.org/2000/svg"
-                  >
-                    <path
-                      d="M12 17C11.744 17 11.488 16.9021 11.293 16.7071L4.29301 9.70707C3.90201 9.31607 3.90201 8.68401 4.29301 8.29301C4.68401 7.90201 5.31607 7.90201 5.70707 8.29301L12 14.586L18.293 8.29301C18.684 7.90201 19.3161 7.90201 19.7071 8.29301C20.0981 8.68401 20.0981 9.31607 19.7071 9.70707L12.7071 16.7071C12.5121 16.9021 12.256 17 12 17Z"
-                      fill="#25314C"
-                    />
-                  </svg>
-                </div>
-              </div>`
-            : html`<div>Loading...</div>`}
-
-          <ul class="dropdown__list">
-            ${chestList
-              .map((chest) => {
-                const url = urlFor(chest.chestIcon.asset._ref)
-                  .width(50)
-                  .height(50)
-                  .url();
-                return html`
-                  <li class="chest__item" data-name="${chest._id}">
-                    <div class="dropdown__chest-info">
-                      <img
-                        class="dropdown__chest-icon"
-                        src="${url}"
-                        alt="${chest.chestName}"
-                      />
-                      <span>${chest.chestName}</span>
-                    </div>
-                    <div class="dead"></div>
-                  </li>
-                `;
-              })
-              .join('')}
-          </ul>
+          <ul class="dropdown__list"></ul>
         </div>
       </div>
     `;

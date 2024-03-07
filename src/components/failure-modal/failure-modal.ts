@@ -63,11 +63,10 @@ export class FailureModal extends HTMLElement {
     });
 
     document.addEventListener(EVENTS.CHEST_SELECTED, (event: any) => {
-      this.selectedChest = event.detail.selectedChest;
+      this.state.selectedChest = event.detail.selectedChest;
       this.state.loading = false;
 
       this.render();
-      this.attachListeners();
       this.updateContent();
     });
 

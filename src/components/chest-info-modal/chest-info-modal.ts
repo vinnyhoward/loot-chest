@@ -49,7 +49,6 @@ export class ChestInfoModal extends HTMLElement {
 
   connectedCallback(): void {
     this.render();
-    this.attachEventListeners();
     gsap.to(this, { duration: 0, opacity: 0, display: 'none' });
   }
 
@@ -79,11 +78,9 @@ export class ChestInfoModal extends HTMLElement {
     if (!this.shadowRoot) return;
 
     document.addEventListener(EVENTS.CHEST_SELECTED, (event: any) => {
-      this.selectedChest = event.detail.selectedChest;
+      this.state.selectedChest = event.detail.selectedChest;
       this.state.loading = false;
-
       this.render();
-      this.attachEventListeners();
       this.attachListeners();
       this.updateDescription();
     });
