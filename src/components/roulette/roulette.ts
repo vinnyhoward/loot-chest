@@ -16,6 +16,7 @@ export class Roulette extends HTMLElement {
   connectedCallback() {
     this.render();
     this.attachEventListeners();
+    this.spin();
   }
 
   attachEventListeners() {
@@ -24,22 +25,33 @@ export class Roulette extends HTMLElement {
       this.attachEventListeners();
       this.render();
       this.updateRoulette();
-      this.horizontalScrolling();
+      this.spin();
     });
   }
 
   private updateRoulette(): void {
     if (!this.shadowRoot) return;
-    const container = this.shadowRoot.querySelector('.roulette__container');
+    const container = this.shadowRoot.querySelector(
+      '.roulette__container',
+    ) as HTMLElement;
     if (!container) return;
+    let rewardItems = this.state.selectedChest.rewardList;
 
     container.innerHTML = '';
+    const currentViewportWidth = window.innerWidth;
+    const itemBoxWidth = 180;
+    const itemBoxMargin = 20;
+    const itemsPerRow = Math.ceil(
+      currentViewportWidth / (itemBoxWidth + itemBoxMargin),
+    );
 
-    const rewards = [
-      ...this.state.selectedChest.rewardList,
-      ...this.state.selectedChest.rewardList,
-    ];
-    rewards.forEach((reward: any) => {
+    if (rewardItems.length < itemsPerRow) {
+      while (rewardItems.length < itemsPerRow) {
+        rewardItems = rewardItems.concat(rewardItems);
+      }
+    }
+
+    rewardItems.forEach((reward: any) => {
       const rewardImageEl = document.createElement('div');
       rewardImageEl.classList.add('reward__image');
       rewardImageEl.style.backgroundImage = `url(${urlFor(reward.rewardImage.asset._ref).width(500).height(500).url()})`;
@@ -61,43 +73,21 @@ export class Roulette extends HTMLElement {
 
       container.appendChild(rewardContainer);
     });
+
+    if (rewardItems.length % 2 === 0) {
+      container.style.transform = `translateX(-110px)`;
+    }
   }
 
-  public horizontalScrolling(): void {
+  public spin(): void {
     if (!this.shadowRoot) return;
-    const container = this.shadowRoot.querySelector(
+    const rouletteContainer = this.shadowRoot.querySelector(
       '.roulette__container',
     ) as HTMLElement;
-    if (!container) return;
-
-    // Ensure the container is full of duplicated rewards for a seamless loop
-    // Note: You might already be doing this in updateRoulette, just ensure there's enough content to scroll through
-
-    // Calculate the width to scroll before resetting (width of a single set of rewards)
-    const scrollWidth = container.scrollWidth / 2; // Assuming you've duplicated the rewards exactly once
-
-    // Use GSAP to animate the scroll
-    gsap.to(container, {
-      x: () => `-${scrollWidth}px`, // Move to the end of the first set of rewards
-      ease: 'linear', // Use a linear ease for consistent speed
-      duration: 10, // Duration before the loop resets
-      repeat: -1, // Infinite repeats
-      onRepeat: () => {
-        // Instantly reset the position to the start without the user noticing
-        gsap.set(container, { x: 0 });
-      },
-    });
-  }
-
-  public show(): void {
-    if (!this.shadowRoot) return;
-    const roulette = this.shadowRoot.querySelector('.roulette');
-    if (!roulette) return;
-    gsap.to(roulette, {
-      duration: 0.5,
-      y: 0,
-      ease: 'power1.out',
-    });
+    const spinButton = this.shadowRoot.querySelector('.spin') as HTMLElement;
+    const prizeItems = this.shadowRoot.querySelectorAll(
+      '.reward__container',
+    ) as NodeListOf<HTMLElement>;
   }
 
   public hide(): void {
@@ -139,6 +129,29 @@ export class Roulette extends HTMLElement {
 
           --font1: 'Montserrat', sans-serif;
           --font2: 'Hind', sans-serif;
+        }
+
+        .roulette-parent__container {
+          width: 100%;
+          height: 100%;
+          position: relative;
+        }
+
+        .spin {
+          position: fixed;
+          bottom: 20px;
+          left: 50%;
+          transform: translateX(-50%);
+          padding: 10px 20px;
+          font-size: 24px;
+          font-family: var(--font1);
+          font-weight: 900;
+          color: #fff;
+          background-color: var(--main_color);
+          border: none;
+          border-radius: 16px;
+          cursor: pointer;
+          box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
         }
 
         .roulette {
@@ -189,6 +202,22 @@ export class Roulette extends HTMLElement {
           color: #fff;
         }
 
+        .downwards {
+          position: fixed;
+          bottom: 335px;
+          left: 50%;
+          transform: translateX(-50%);
+          z-index: 1;
+        }
+
+        .upwards {
+          position: fixed;
+          bottom: 145px;
+          left: 50%;
+          transform: translateX(-50%) rotate(180deg);
+          z-index: 1;
+        }
+
         .bg-common {
           background-color: var(--bg-common);
         }
@@ -209,9 +238,14 @@ export class Roulette extends HTMLElement {
           background-color: var(--bg-divine);
         }
       </style>
-      <div class="roulette">
-        <div class="roulette__container">
-          <div class="roulette__image"></div>
+      <div class="roulette-parent__container">
+        <div class="winning__container">
+          <img class="downwards" src="/icons/svg/white_caret.svg" alt="icon" />
+          <img class="upwards" src="/icons/svg/white_caret.svg" alt="icon" />
+        </div>
+        <div class="roulette">
+          <div class="roulette__container"></div>
+          <div type="button" class="spin" id="spin-button">Spin</div>
         </div>
       </div>
     `;
