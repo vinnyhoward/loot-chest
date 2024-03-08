@@ -377,10 +377,10 @@ export class DropdownMenu extends HTMLElement {
           opacity: 1;
 
           @media (max-width: 575px) {
-            width: 70px;
-            height: 70px;
             top: 25px;
             right: 25px;
+            width: 70px;
+            height: 70px;
           }
         }
 
@@ -395,6 +395,11 @@ export class DropdownMenu extends HTMLElement {
           justify-content: center;
           align-items: center;
           padding: 10px 20px;
+
+          @media (max-width: 575px) {
+            min-width: 70px;
+            min-height: 70px;
+          }
         }
 
         .chest__item {

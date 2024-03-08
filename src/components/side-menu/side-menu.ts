@@ -59,7 +59,6 @@ export class SideMenu extends HTMLElement {
     this.attachEventListeners();
     this.getAllPrizes();
     this.renderProfile();
-    this.hide();
   }
 
   disconnectedCallback(): void {
@@ -502,7 +501,7 @@ export class SideMenu extends HTMLElement {
           height: 100%;
           background-color: rgba(0, 0, 0, 0.1);
           z-index: 1;
-          display: flex;
+          display: none;
           justify-content: flex-end;
           align-items: center;
           z-index: 998;
@@ -511,7 +510,7 @@ export class SideMenu extends HTMLElement {
         .side-menu {
           position: fixed;
           top: 0;
-          left: 0;
+          left: -400;
           width: 400px;
           height: 100%;
           background-color: var(--secondary_color);

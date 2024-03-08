@@ -143,7 +143,7 @@ export default class LoadingBar extends HTMLElement {
 
         .logo__container {
           position: absolute;
-          top: 40%;
+          top: 37.5%;
           left: 50%;
           transform: translate(-50%, -50%);
         }
