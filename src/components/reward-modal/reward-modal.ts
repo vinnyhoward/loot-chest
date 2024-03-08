@@ -68,7 +68,6 @@ export class RewardModal extends HTMLElement {
 
   connectedCallback(): void {
     this.render();
-    this.updateContent();
     this.attachEventListeners();
     gsap.to(this, { opacity: 0, display: 'none' });
   }
@@ -84,8 +83,8 @@ export class RewardModal extends HTMLElement {
     const form = this.shadowRoot?.querySelector('.reward__form');
     form?.addEventListener('submit', this.onSubmit);
 
-    const closeButton = this.shadowRoot?.querySelector('.close__icon');
-    closeButton?.addEventListener('click', () => {
+    const closeIconButton = this.shadowRoot?.querySelector('.close__icon');
+    closeIconButton?.addEventListener('click', () => {
       this.hide();
       const form = this.shadowRoot?.querySelector(
         '.reward__form',
@@ -104,7 +103,7 @@ export class RewardModal extends HTMLElement {
 
     errorFields?.forEach((field) => {
       field.textContent = '';
-      field.style.display = 'none';
+      field.style.display = 'block';
     });
 
     inputs?.forEach((input) => {
@@ -327,6 +326,10 @@ export class RewardModal extends HTMLElement {
 
   public show(): void {
     if (!this.shadowRoot) return;
+    const inputContainer = this.shadowRoot?.querySelector(
+      '.input__container',
+    ) as HTMLElement;
+    inputContainer.innerHTML = '';
     gsap.to(this, {
       opacity: 1,
       display: 'block',
@@ -401,14 +404,16 @@ export class RewardModal extends HTMLElement {
       case RewardModalState.SHOW:
         claimButtonText.textContent = 'Claim your reward';
         claimButtonText.style.color = '#FFFFFF';
+        claimButton.style.background = `var(--gradient-${this.state.reward.itemRarity.toLowerCase()})`;
         break;
       case RewardModalState.CLAIM:
         claimButtonText.textContent = 'Claim your reward';
+        claimButton.style.background = `var(--gradient-${this.state.reward.itemRarity.toLowerCase()})`;
         break;
       case RewardModalState.SUCCESSFULLY_CLAIMED:
         claimButtonText.textContent = 'Close';
         claimButtonText.style.color = 'var(--font-color)';
-        claimButton.style.backgroundColor = '#FFFFFF';
+        claimButton.style.background = '#FFFFFF';
         break;
       default:
         break;
@@ -432,9 +437,6 @@ export class RewardModal extends HTMLElement {
     const contentContainer = this.shadowRoot?.querySelector(
       '.content__container',
     ) as HTMLElement;
-    const claimButton = this.shadowRoot?.querySelector(
-      '.claim__button',
-    ) as HTMLButtonElement;
 
     if (this.state.rewardState == RewardModalState.SUCCESSFULLY_CLAIMED) {
       headerImage.style.display = 'none';
@@ -454,11 +456,6 @@ export class RewardModal extends HTMLElement {
           .width(500)
           .height(500)
           .url()})`;
-
-        claimButton.classList.remove(
-          `gradient-${this.state.reward.itemRarity.toLowerCase()}`,
-        );
-        claimButton.style.backgroundColor = '#FFFFFF';
       }
 
       containerBackground.style.height = '100%';
@@ -468,9 +465,7 @@ export class RewardModal extends HTMLElement {
       hexImage.style.display = 'none';
       headerImage.style.display = 'block';
       containerBackground.style.height = '135px';
-      containerBackground.classList.add(
-        `gradient-${this.state.reward.itemRarity.toLowerCase()}`,
-      );
+      containerBackground.style.background = `var(--gradient-${this.state.reward.itemRarity.toLowerCase()})`;
       contentContainer.style.marginBottom = '40px';
     } else {
       hexImage.style.display = 'block';
@@ -493,12 +488,7 @@ export class RewardModal extends HTMLElement {
       containerBackground.style.borderBottomLeftRadius = '0px';
       containerBackground.style.borderBottomRightRadius = '0px';
       if (this.state.reward) {
-        containerBackground.classList.add(
-          `gradient-${this.state.reward.itemRarity.toLowerCase()}`,
-        );
-        claimButton.classList.add(
-          `gradient-${this.state.reward.itemRarity.toLowerCase()}`,
-        );
+        containerBackground.style.background = `var(--gradient-${this.state.reward.itemRarity.toLowerCase()})`;
       }
     }
 

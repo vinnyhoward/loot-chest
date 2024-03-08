@@ -3,7 +3,7 @@ export function validateName(name: string) {
 }
 
 export function validatePhoneNumber(number: string) {
-  return /^\+?[1-9]\d{1,14}$/.test(number);
+  return /^\+?([1-9][0-9]{0,2})(-?[0-9]{1,3}){0,4}$/.test(number);
 }
 
 export function validateEmail(email: string) {

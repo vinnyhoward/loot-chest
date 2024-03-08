@@ -60,12 +60,10 @@ export default class LoadingBar extends HTMLElement {
 
   public hideLoadingScreen(): void {
     if (!this.shadowRoot) return;
-
     this.loadingBarElement = this.shadowRoot.querySelector('.loading-bar');
     this.loadingBarContainerElement = this.shadowRoot.querySelector(
-      '.loading-bar-container',
+      '.loading__container',
     );
-
     window.setTimeout(() => {
       gsap.to(this.loadingBarElement, {
         duration: 2,
@@ -111,7 +109,7 @@ export default class LoadingBar extends HTMLElement {
     if (!this.shadowRoot) return;
     this.shadowRoot.innerHTML = html`
       <style>
-        .loading-bar-container {
+        * {
           --main-color: #8847ff;
           --main-color-gradient: linear-gradient(
             120deg,
@@ -136,7 +134,27 @@ export default class LoadingBar extends HTMLElement {
 
           --text-color: white;
           --bar-wrap-back-color: rgba(166, 166, 166, 0.2);
+        }
 
+        .loading__container {
+          position: relative;
+          height: 100vh;
+        }
+
+        .logo__container {
+          position: absolute;
+          top: 40%;
+          left: 50%;
+          transform: translate(-50%, -50%);
+        }
+
+        .logo__image {
+          background-size: cover;
+          width: 100%;
+          max-width: 750px;
+        }
+
+        .loading-bar-container {
           position: absolute;
           right: 50%;
           top: 50%;
@@ -164,9 +182,14 @@ export default class LoadingBar extends HTMLElement {
           font-size: clamp(1.8rem, 3.5vw, 2.6rem);
         }
       </style>
-      <div class="loading-bar-container">
-        <div class="loading-bar"></div>
-        <span class="percentage"></span>
+      <div class="loading__container">
+        <div class="logo__container">
+          <img class="logo__image" src="/logos/temp_logo.png" alt="logo" />
+        </div>
+        <div class="loading-bar-container">
+          <div class="loading-bar"></div>
+          <span class="percentage"></span>
+        </div>
       </div>
     `;
   }
