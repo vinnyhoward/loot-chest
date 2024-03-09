@@ -49,6 +49,8 @@ export class Roulette extends HTMLElement {
       while (rewardItems.length < itemsPerRow) {
         rewardItems = rewardItems.concat(rewardItems);
       }
+
+      rewardItems = [...rewardItems, ...rewardItems];
     }
 
     rewardItems.forEach((reward: any) => {
@@ -85,9 +87,86 @@ export class Roulette extends HTMLElement {
       '.roulette__container',
     ) as HTMLElement;
     const spinButton = this.shadowRoot.querySelector('.spin') as HTMLElement;
-    const prizeItems = this.shadowRoot.querySelectorAll(
-      '.reward__container',
-    ) as NodeListOf<HTMLElement>;
+    if (!rouletteContainer || !spinButton) return;
+
+    spinButton.addEventListener('click', () => {
+      if (!this.shadowRoot) return;
+
+      let velocity = 500;
+      const deceleration = 0.99;
+      const minVelocity = 0.5;
+
+      const updateVelocity = () => {
+        if (velocity > minVelocity) {
+          velocity *= deceleration;
+        } else {
+          velocity = 0;
+          gsap.killTweensOf(rouletteContainer);
+        }
+      };
+
+      let animation: gsap.core.Tween | null;
+      animation = gsap.to(rouletteContainer, {
+        x: `+=${velocity}`,
+        ease: 'none',
+        repeat: -1,
+        modifiers: {
+          x: (x) => {
+            updateVelocity();
+            return `${parseFloat(x) - velocity}px`;
+          },
+        },
+        onUpdate: () => {
+          const items =
+            rouletteContainer.querySelectorAll('.reward__container');
+          items.forEach((item) => {
+            const rect = item.getBoundingClientRect();
+            const containerRect = rouletteContainer.getBoundingClientRect();
+            // Assuming horizontal scrolling to the left, check if the item has moved off-screen
+            if (rect.right < containerRect.left) {
+              // If so, move it to the end of the container
+              rouletteContainer.appendChild(item);
+            }
+          });
+
+          // If velocity reaches the stopping condition, consider how to cleanly end the animation
+          if (velocity === 0) {
+            if (animation) {
+              animation.kill(); // Ensure this logic is placed appropriately to not prematurely kill the animation
+              gsap.killTweensOf(rouletteContainer);
+              animation = null;
+            }
+          }
+        },
+        onComplete: () => {
+          if (!animation) return;
+          animation.kill();
+          gsap.killTweensOf(rouletteContainer);
+          animation = null;
+        },
+      });
+    });
+  }
+
+  private centerPrize(
+    container: HTMLElement,
+    items: NodeListOf<HTMLElement>,
+  ): void {
+    const predeterminedPrizeIndex = 2;
+    const targetPrize = items[predeterminedPrizeIndex];
+
+    const prizeCenter = targetPrize.offsetLeft + targetPrize.offsetWidth / 2;
+    const containerCenter = container.offsetWidth / 2;
+    const offsetToCenter = prizeCenter - containerCenter;
+
+    gsap.to(container, {
+      duration: 1,
+      x: `-=${offsetToCenter}`,
+      ease: 'power2.out', // Or another easing of your choice
+      onComplete: () => {
+        // Optional: Handle the prize selection here (display, etc.)
+      },
+    });
   }
 
   public hide(): void {
