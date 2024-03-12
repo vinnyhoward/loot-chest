@@ -132,12 +132,11 @@ export default class App extends HTMLElement {
           <hamburger-icon></hamburger-icon>
           <dropdown-menu></dropdown-menu>
           <toast-notification></toast-notification>
-
+          <open-button></open-button>
           <chest-info-button></chest-info-button>
           <reward-modal></reward-modal>
           <failure-modal></failure-modal>
           <chest-info-modal></chest-info-modal>
-          <roulette-component></roulette-component>
         </div>
         <div class="experience">
           <side-menu></side-menu>
