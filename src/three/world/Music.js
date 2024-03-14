@@ -8,14 +8,6 @@ export default class Music {
     this.lootChestOpenFailure = new Audio('/music/lootchest_failure_open.mp3');
   }
 
-  // setOceanAmbience(isLooped) {
-  //   fadeInAudio(this.oceanAmbience, isLooped);
-  // }
-
-  // removeOceanAmbience() {
-  //   fadeOutAudio(this.oceanAmbience);
-  // }
-
   setLootChestTheme(isLooped) {
     fadeInAudio(this.lootChestTheme, isLooped);
   }
@@ -49,7 +41,9 @@ export default class Music {
   }
 
   remove() {
-    // this.removeOceanAmbience();
     this.removeLootChestTheme();
+    this.removeLootChestOpeningTheme();
+    this.removeLootChestOpenSuccess();
+    this.removeLootChestOpenFailure();
   }
 }

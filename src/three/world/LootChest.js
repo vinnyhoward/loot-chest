@@ -165,10 +165,12 @@ export default class LootChest {
 
   startSuccessAnimation() {
     this.setNewAnimation('success');
+    this.music.setLootChestOpenSuccess(false);
   }
 
   startFailureAnimation() {
     this.setNewAnimation('failure');
+    this.music.setLootChestOpenFailure(false);
   }
 
   startOpeningCutScene(callback) {
@@ -298,7 +300,7 @@ export default class LootChest {
     clearTimeout(this.timerThree);
     clearTimeout(this.timerFour);
 
-    this.music.removeLootChestOpeningTheme(false);
+    this.music.remove();
     this.music.setLootChestTheme(true);
     callback();
   }
