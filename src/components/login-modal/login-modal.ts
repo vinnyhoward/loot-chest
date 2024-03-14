@@ -51,11 +51,11 @@ export class LoginModal extends HTMLElement {
         this.resetPasswordToken = resetPassToken;
         this.authState = AuthState.RESET_PASSWORD;
 
-        params.delete('reset-password-token');
-        const newUrl =
-          window.location.pathname +
-          (params.toString() ? '?' + params.toString() : '');
-        window.history.replaceState(null, '', newUrl);
+        // params.delete('reset-password-token');
+        // const newUrl =
+        //   window.location.pathname +
+        //   (params.toString() ? '?' + params.toString() : '');
+        // window.history.replaceState(null, '', newUrl);
         this.show();
       }
       this.render();
