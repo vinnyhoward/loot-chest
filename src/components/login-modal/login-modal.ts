@@ -56,8 +56,8 @@ export class LoginModal extends HTMLElement {
           window.location.pathname +
           (params.toString() ? '?' + params.toString() : '');
         window.history.replaceState(null, '', newUrl);
+        this.show();
       }
-
       this.render();
       this.attachEventListeners();
       if (!this.shadowRoot) return;
@@ -265,7 +265,10 @@ export class LoginModal extends HTMLElement {
             errorText.textContent = 'Something went wrong. Please try again';
           }
         }
-        this.setFormState(false);
+        this.submitting = false;
+        this.render();
+        this.attachEventListeners();
+        return this.setFormState(false);
       }
     }
 
@@ -347,7 +350,6 @@ export class LoginModal extends HTMLElement {
     if (this.authState === AuthState.SIGNUP && email && password && username) {
       this.setFormState(true);
       try {
-        console.log('Signing up:', username, email, password);
         await signUpUser(username, email, password);
         target.reset();
         document.dispatchEvent(new CustomEvent(EVENTS.LOGIN_SUCCESS));
@@ -356,7 +358,7 @@ export class LoginModal extends HTMLElement {
         console.error('Failed to sign up:', error);
         this.showError();
       }
-      this.setFormState(false);
+      return this.setFormState(false);
     }
   }
 
