@@ -52,6 +52,9 @@ export class SideMenu extends HTMLElement {
       skip: 0,
       loading: false,
     };
+
+    this.escapeButtonPressed = this.escapeButtonPressed.bind(this);
+    this.hide = this.hide.bind(this);
   }
 
   connectedCallback(): void {
@@ -96,9 +99,10 @@ export class SideMenu extends HTMLElement {
       this.loginButtonListener();
       this.show();
     });
+    document.addEventListener('keydown', this.escapeButtonPressed);
   }
 
-  loginButtonListener(): void {
+  private loginButtonListener(): void {
     if (!this.shadowRoot) return;
     const loginButton = this.shadowRoot?.querySelector(
       '.login-btn',
@@ -128,7 +132,7 @@ export class SideMenu extends HTMLElement {
     });
   }
 
-  recentWinsSelectedListener(): void {
+  private recentWinsSelectedListener(): void {
     const winsArrow = this.shadowRoot?.querySelector(
       '#wins-dropdown-arrow',
     ) as SVGSVGElement;
@@ -189,7 +193,7 @@ export class SideMenu extends HTMLElement {
     });
   }
 
-  myProfileSelectedListener(): void {
+  private myProfileSelectedListener(): void {
     const winsArrow = this.shadowRoot?.querySelector(
       '#wins-dropdown-arrow',
     ) as SVGSVGElement;
@@ -247,7 +251,7 @@ export class SideMenu extends HTMLElement {
     });
   }
 
-  async getAllPrizes(): Promise<void> {
+  private async getAllPrizes(): Promise<void> {
     this.state.allRewards = [];
     this.state.loading = true;
     const prizes = await fetchAllPrizes(1, 20);
@@ -258,7 +262,7 @@ export class SideMenu extends HTMLElement {
     }
   }
 
-  async fetchUserPrizes(): Promise<void> {
+  private async fetchUserPrizes(): Promise<void> {
     const user = JSON.parse(localStorage.getItem('user_auth') || '{}');
     if (Object.keys(user).length === 0) {
       return this.renderUsersRewards();
@@ -304,7 +308,7 @@ export class SideMenu extends HTMLElement {
     });
   }
 
-  renderUsersRewards(): void {
+  private renderUsersRewards(): void {
     if (!this.shadowRoot) return;
     const usersRewardsContainer = this.shadowRoot.querySelector(
       '.users-rewards__container',
@@ -336,7 +340,7 @@ export class SideMenu extends HTMLElement {
     });
   }
 
-  renderProfile(): void {
+  private renderProfile(): void {
     if (!this.shadowRoot) return;
     const profileContainer = this.shadowRoot.querySelector(
       '.profile__container',
@@ -394,7 +398,13 @@ export class SideMenu extends HTMLElement {
     }
   }
 
-  detachEventListeners(): void {
+  private escapeButtonPressed(event: any): void {
+    if (event.key === 'Escape') {
+      this.hide();
+    }
+  }
+
+  private detachEventListeners(): void {
     if (!this.shadowRoot) return;
 
     this.shadowRoot
@@ -409,6 +419,7 @@ export class SideMenu extends HTMLElement {
     document.removeEventListener(EVENTS.HIDE_SIDE_MENU, () => {
       this.hide();
     });
+    document.removeEventListener('keydown', this.escapeButtonPressed);
   }
 
   public show(): void {

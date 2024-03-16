@@ -35,6 +35,8 @@ export class ChestInfoModal extends HTMLElement {
 
     this.updateChestSelected = this.updateChestSelected.bind(this);
     this.show = this.show.bind(this);
+    this.hide = this.hide.bind(this);
+    this.escapeButtonPressed = this.escapeButtonPressed.bind(this);
   }
 
   set selectedChest(chest: any) {
@@ -80,6 +82,7 @@ export class ChestInfoModal extends HTMLElement {
     });
     document.addEventListener(EVENTS.CHEST_SELECTED, this.updateChestSelected);
     document.addEventListener(EVENTS.CHEST_INFO_BUTTON_CLICKED, this.show);
+    document.addEventListener('keydown', this.escapeButtonPressed);
   }
 
   private updateChestSelected(event: any): void {
@@ -90,6 +93,12 @@ export class ChestInfoModal extends HTMLElement {
     this.updateChestTitle();
     this.updateRewards();
     this.updateDescription();
+  }
+
+  private escapeButtonPressed(event: any): void {
+    if (event.key === 'Escape') {
+      this.hide();
+    }
   }
 
   private updateRewards(): void {

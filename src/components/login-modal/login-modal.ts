@@ -43,6 +43,8 @@ export class LoginModal extends HTMLElement {
 
     const token = localStorage.getItem('token');
     if (token) {
+      this.render();
+      this.attachEventListeners();
       this.hide();
     } else {
       const params = new URLSearchParams(window.location.search);
