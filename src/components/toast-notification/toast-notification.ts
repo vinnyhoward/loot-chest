@@ -20,6 +20,11 @@ export class ToastNotifications extends HTMLElement {
     super();
     this.attachShadow({ mode: 'open' });
     this._updateProgressInterval = null;
+
+    this.hide = this.hide.bind(this);
+    this.show = this.show.bind(this);
+    this.hideWithDelay = this.hideWithDelay.bind(this);
+    this.updateNotification = this.updateNotification.bind(this);
   }
 
   set notification(data: Notification) {
@@ -54,21 +59,36 @@ export class ToastNotifications extends HTMLElement {
     if (closeIcon) {
       closeIcon.addEventListener('click', this.hide.bind(this));
     }
-    document.addEventListener(EVENTS.TOAST_SUCCESS, (event: any) => {
-      this._notification = event.detail;
+    document.addEventListener(EVENTS.TOAST_SUCCESS, this.updateNotification);
+    document.addEventListener(
+      EVENTS.TOAST_AWARDED_KEY,
+      this.updateNotification,
+    );
+  }
 
-      this.show();
-      this.render();
-      this.attachEventListeners();
-    });
+  updateNotification(event: any): void {
+    this._notification = event.detail;
+    this.show();
 
-    document.addEventListener(EVENTS.TOAST_AWARDED_KEY, (event: any) => {
-      this._notification = event.detail;
+    const imgElement = this.shadowRoot?.querySelector(
+      '.icon',
+    ) as HTMLImageElement;
+    const src = this.iconType();
+    imgElement.src = src;
 
-      this.show();
-      this.render();
-      this.attachEventListeners();
-    });
+    const toastTitleEl = this.shadowRoot?.querySelector(
+      '.toast__title',
+    ) as HTMLElement;
+    if (this._notification.type === NotificationType.AWARDED) {
+      toastTitleEl.innerHTML = html`${this._notification.title}
+        <span class="key__text">x3</span>`;
+    } else {
+      toastTitleEl.textContent = this._notification.title;
+    }
+    const captionEl = this.shadowRoot?.querySelector(
+      '.toast__caption',
+    ) as HTMLElement;
+    captionEl.textContent = this._notification.message || '';
   }
 
   hideWithDelay(): void {
@@ -95,6 +115,7 @@ export class ToastNotifications extends HTMLElement {
     });
 
     this._notification = initialState;
+    this._updateProgressInterval = null;
   }
 
   hide(): void {
@@ -115,17 +136,17 @@ export class ToastNotifications extends HTMLElement {
       opacity: 0,
       display: 'none',
     });
+    toast;
     this._notification = initialState;
+    this._updateProgressInterval = null;
   }
 
   show(): void {
     if (!this.shadowRoot) return;
     const toast = this.shadowRoot.querySelector('.toast') as HTMLElement;
 
-    // Ensure toast is initially off-screen to the left
     gsap.set(toast, { x: '-100%', opacity: 0 });
 
-    // Animate toast coming in from the left
     gsap.to(toast, {
       x: '0%',
       opacity: 1,
@@ -133,19 +154,18 @@ export class ToastNotifications extends HTMLElement {
       ease: 'power1.out',
     });
 
+    this.render();
+    this.attachEventListeners();
     this.hideAfterDuration();
   }
 
   hideAfterDuration(): void {
     if (this._notification.duration === Duration.NONE) return;
-
     const totalDuration = this._notification.duration;
     let elapsed = 0;
-
     this._updateProgressInterval = setInterval(() => {
       elapsed += 100;
       const progressRatio = elapsed / totalDuration;
-
       this.updateLoadingBar(progressRatio);
 
       if (elapsed >= totalDuration) {
@@ -321,16 +341,11 @@ export class ToastNotifications extends HTMLElement {
         <div class="toast">
           <div class="toast-content">
             <div class="toast__icon">
-              <img class="icon" src=${this.iconType()} alt="icon" />
+              <img class="icon" src="/icons/svg/success.svg" alt="icon" />
             </div>
             <div class="toast_body">
-              <h3 class="toast__title">
-                ${this._notification.title}
-                ${this._notification.type === NotificationType.AWARDED
-                  ? html`<span class="key__text">x3</span>`
-                  : ''}
-              </h3>
-              <p class="toast__caption">${this._notification.message}</p>
+              <h3 class="toast__title"></h3>
+              <p class="toast__caption"></p>
             </div>
           </div>
           <div class="toast__close-icon">

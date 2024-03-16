@@ -148,7 +148,7 @@ export class OpenButton extends HTMLElement {
       };
 
       document.dispatchEvent(
-        new CustomEvent(EVENTS.TOAST_SUCCESS, {
+        new CustomEvent(EVENTS.TOAST_ERROR, {
           bubbles: true,
           composed: true,
           detail,
@@ -226,21 +226,27 @@ export class OpenButton extends HTMLElement {
       // @ts-ignore
       window.experience.world.lootChest.endOpeningCutScene(callback);
     }
-    // this.render();
-    // this.attachEventListeners();
+
+    this.updateButtonText();
   }
 
   updateButtonText(): void {
     if (!this.shadowRoot) return;
+    const openTextEl = this.shadowRoot?.querySelector(
+      '.open__text',
+    ) as HTMLElement;
+    const imageEl = this.shadowRoot?.querySelector('.key__icon') as HTMLElement;
+    const keyTextEl = this.shadowRoot?.querySelector(
+      '.key__text',
+    ) as HTMLElement;
+
     if (this.state.isOpening) {
-      const openTextEl = this.shadowRoot?.querySelector(
-        '.open__text',
-      ) as HTMLElement;
+      imageEl.style.display = 'none';
+      keyTextEl.style.display = 'none';
       openTextEl.textContent = 'Skip';
     } else {
-      const openTextEl = this.shadowRoot?.querySelector(
-        '.open__text',
-      ) as HTMLElement;
+      imageEl.style.display = 'block';
+      keyTextEl.style.display = 'block';
       openTextEl.textContent = 'Open';
     }
   }
