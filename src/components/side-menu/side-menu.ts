@@ -59,6 +59,10 @@ export class SideMenu extends HTMLElement {
     this.attachEventListeners();
     this.getAllPrizes();
     this.renderProfile();
+
+    this.loginButtonListener();
+    this.recentWinsSelectedListener();
+    this.myProfileSelectedListener();
   }
 
   disconnectedCallback(): void {
@@ -92,10 +96,6 @@ export class SideMenu extends HTMLElement {
       this.loginButtonListener();
       this.show();
     });
-
-    this.recentWinsSelected();
-    this.myProfileSelected();
-    this.loginButtonListener();
   }
 
   loginButtonListener(): void {
@@ -105,6 +105,7 @@ export class SideMenu extends HTMLElement {
     ) as HTMLElement;
     loginButton?.addEventListener('click', () => {
       document.dispatchEvent(new CustomEvent(EVENTS.SHOW_LOGIN_MENU));
+      console.log('login button clicked');
       this.hide();
     });
 
@@ -113,22 +114,21 @@ export class SideMenu extends HTMLElement {
     ) as HTMLElement;
 
     logoutButton?.addEventListener('click', () => {
+      console.log('logout button clicked');
       document.dispatchEvent(new CustomEvent(EVENTS.LOGOUT));
-      localStorage.removeItem('user_auth');
-      localStorage.removeItem('token');
       this.renderProfile();
       this.fetchUserPrizes();
-      this.attachEventListeners();
+      this.loginButtonListener();
     });
 
     document.addEventListener(EVENTS.LOGIN_SUCCESS, () => {
       this.renderProfile();
       this.fetchUserPrizes();
-      this.attachEventListeners();
+      this.loginButtonListener();
     });
   }
 
-  recentWinsSelected(): void {
+  recentWinsSelectedListener(): void {
     const winsArrow = this.shadowRoot?.querySelector(
       '#wins-dropdown-arrow',
     ) as SVGSVGElement;
@@ -189,7 +189,7 @@ export class SideMenu extends HTMLElement {
     });
   }
 
-  myProfileSelected(): void {
+  myProfileSelectedListener(): void {
     const winsArrow = this.shadowRoot?.querySelector(
       '#wins-dropdown-arrow',
     ) as SVGSVGElement;
@@ -210,7 +210,6 @@ export class SideMenu extends HTMLElement {
       if (this.state.selectedSection !== SelectedSection.PROFILE) {
         this.state.selectedSection = SelectedSection.PROFILE;
         this.fetchUserPrizes();
-        this.loginButtonListener();
         profileElement.style.position = 'relative';
         profileContainer.style.display = 'flex';
         rewardsContainer.style.display = 'none';
@@ -261,7 +260,9 @@ export class SideMenu extends HTMLElement {
 
   async fetchUserPrizes(): Promise<void> {
     const user = JSON.parse(localStorage.getItem('user_auth') || '{}');
-    if (Object.keys(user).length === 0) return;
+    if (Object.keys(user).length === 0) {
+      return this.renderUsersRewards();
+    }
 
     this.state.usersRewards = [];
     this.state.loading = true;
@@ -310,6 +311,10 @@ export class SideMenu extends HTMLElement {
     );
 
     if (!usersRewardsContainer) return;
+    if (this.state.usersRewards.length === 0) {
+      usersRewardsContainer.innerHTML = html``;
+      return;
+    }
 
     usersRewardsContainer.innerHTML = '';
 
@@ -401,6 +406,9 @@ export class SideMenu extends HTMLElement {
     document.removeEventListener(EVENTS.SHOW_SIDE_MENU, () => {
       this.show();
     });
+    document.removeEventListener(EVENTS.HIDE_SIDE_MENU, () => {
+      this.hide();
+    });
   }
 
   public show(): void {
@@ -430,7 +438,6 @@ export class SideMenu extends HTMLElement {
       ease: 'power2.in',
     });
 
-    // Fade out the overlay simultaneously
     gsap.to(this.shadowRoot.querySelector('.side-menu__parent'), {
       duration: 0.3,
       opacity: 0,
