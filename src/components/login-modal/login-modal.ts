@@ -123,8 +123,14 @@ export class LoginModal extends HTMLElement {
       this.attachEventListeners();
     });
 
-    document.addEventListener(EVENTS.SHOW_LOGIN_MENU, this.show.bind(this));
-    document.addEventListener(EVENTS.HIDE_LOGIN_MENU, this.hide.bind(this));
+    document.addEventListener(EVENTS.SHOW_LOGIN_MENU, () => {
+      console.log('show login menu from login modal');
+      this.show();
+    });
+    document.addEventListener(EVENTS.HIDE_LOGIN_MENU, () => {
+      console.log('hide login menu from login modal');
+      this.hide();
+    });
   }
 
   public hide(): void {

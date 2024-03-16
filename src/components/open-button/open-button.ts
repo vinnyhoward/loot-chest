@@ -26,17 +26,36 @@ export class OpenButton extends HTMLElement {
       selectedChest: null,
       openedChestData: null,
     };
-
     this.showRewardModal = this.showRewardModal.bind(this);
+    this.handleLogout = this.handleLogout.bind(this);
+    this.handleChestSelected = this.handleChestSelected.bind(this);
+    this.handleLoginSuccess = this.handleLoginSuccess.bind(this);
+    this.handleOpen = this.handleOpen.bind(this);
   }
 
   connectedCallback(): void {
     this.render();
     this.attachEventListeners();
+
     this.state.userToken = localStorage.getItem('token');
     if (this.state.userToken) {
       setTimeout(() => this.awardAndFetchKeys(), 3000);
     }
+    document.addEventListener(EVENTS.LOGOUT, this.handleLogout);
+  }
+
+  disconnectedCallback(): void {
+    this.detachEventListeners();
+  }
+
+  handleChestSelected(event: Event): void {
+    const detail = (event as CustomEvent).detail;
+    this.state.selectedChest = detail.selectedChest;
+  }
+
+  handleLoginSuccess(): void {
+    this.state.userToken = localStorage.getItem('token');
+    this.awardAndFetchKeys();
   }
 
   async awardAndFetchKeys(): Promise<void> {
@@ -50,7 +69,6 @@ export class OpenButton extends HTMLElement {
         type: NotificationType.AWARDED,
         duration: Duration.LONG,
       };
-
       document.dispatchEvent(
         new CustomEvent(EVENTS.TOAST_SUCCESS, {
           bubbles: true,
@@ -59,36 +77,32 @@ export class OpenButton extends HTMLElement {
         }),
       );
     }
-
     const userKeys: Keys[] = await fetchUserKeys();
     if (userKeys) {
       this.state.userKeys = userKeys;
     }
-
-    this.render();
-    this.attachEventListeners();
+    this.updateKeyText();
   }
 
   attachEventListeners(): void {
     if (!this.shadowRoot) return;
-    document.addEventListener(EVENTS.CHEST_SELECTED, (event: any) => {
-      this.state.selectedChest = event.detail.selectedChest;
-    });
-
+    document.addEventListener(EVENTS.CHEST_SELECTED, this.handleChestSelected);
+    document.addEventListener(EVENTS.LOGIN_SUCCESS, () =>
+      this.handleLoginSuccess(),
+    );
     const openButton = this.shadowRoot.querySelector('.open__container');
-    openButton?.addEventListener('click', this.handleOpen.bind(this));
+    openButton?.addEventListener('click', this.handleOpen);
+  }
 
-    document.addEventListener(EVENTS.LOGIN_SUCCESS, () => {
-      this.state.userToken = localStorage.getItem('token');
-      this.awardAndFetchKeys();
-    });
-
-    document.addEventListener(EVENTS.LOGOUT, () => {
-      this.state.userToken = null;
-      this.state.userKeys = [];
-      this.render();
-      this.attachEventListeners();
-    });
+  detachEventListeners(): void {
+    document.removeEventListener(EVENTS.LOGOUT, this.handleLogout);
+    document.removeEventListener(
+      EVENTS.CHEST_SELECTED,
+      this.handleChestSelected,
+    );
+    document.removeEventListener(EVENTS.LOGIN_SUCCESS, this.handleLoginSuccess);
+    const openButton = this.shadowRoot?.querySelector('.open__container');
+    openButton?.removeEventListener('click', this.handleOpen);
   }
 
   async handleOpen(): Promise<void> {
@@ -198,8 +212,8 @@ export class OpenButton extends HTMLElement {
 
       this.state.isOpening = false;
       this.state.openedChestData = null;
-      this.render();
-      this.attachEventListeners();
+
+      this.updateKeyText();
     };
 
     document.dispatchEvent(new CustomEvent(EVENTS.HIDE_UI));
@@ -212,8 +226,38 @@ export class OpenButton extends HTMLElement {
       // @ts-ignore
       window.experience.world.lootChest.endOpeningCutScene(callback);
     }
-    this.render();
-    this.attachEventListeners();
+    // this.render();
+    // this.attachEventListeners();
+  }
+
+  updateButtonText(): void {
+    if (!this.shadowRoot) return;
+    if (this.state.isOpening) {
+      const openTextEl = this.shadowRoot?.querySelector(
+        '.open__text',
+      ) as HTMLElement;
+      openTextEl.textContent = 'Skip';
+    } else {
+      const openTextEl = this.shadowRoot?.querySelector(
+        '.open__text',
+      ) as HTMLElement;
+      openTextEl.textContent = 'Open';
+    }
+  }
+
+  updateKeyText(): void {
+    const keyTextEl = this.shadowRoot?.querySelector(
+      '.key__text',
+    ) as HTMLElement;
+    keyTextEl.textContent = `x${this.state.userKeys.length}`;
+  }
+
+  handleLogout(): void {
+    localStorage.removeItem('user_auth');
+    localStorage.removeItem('token');
+    this.state.userToken = null;
+    this.state.userKeys = [];
+    this.updateKeyText();
   }
 
   showRewardModal(reward: any, prizeLogId: string) {
@@ -319,17 +363,9 @@ export class OpenButton extends HTMLElement {
       </style>
       <div class="open__button">
         <div class="open__container">
-          <span class="open__text"
-            >${this.state.isOpening ? 'Skip' : 'Open'}</span
-          >
-          ${this.state.isOpening
-            ? html``
-            : html`<img
-                  class="key__icon"
-                  src="icons/png/key_icon.png"
-                  alt="key"
-                />
-                <span class="key__text">x${this.state.userKeys.length}</span>`}
+          <span class="open__text">Open</span>
+          <img class="key__icon" src="icons/png/key_icon.png" alt="key" />
+          <span class="key__text">x0</span>
         </div>
       </div>
     `;
