@@ -32,15 +32,22 @@ export class ChestInfoModal extends HTMLElement {
       loading: true,
       showMore: false,
     };
+
+    this.updateChestSelected = this.updateChestSelected.bind(this);
+    this.show = this.show.bind(this);
   }
 
   set selectedChest(chest: any) {
     this.state.selectedChest = chest;
     this.state.loading = false;
+
     this.render();
-    this.attachListeners();
-    this.attachEventListeners();
+    this.updateImage();
+    this.updateChestTitle();
+    this.updateRewards();
     this.updateDescription();
+
+    this.attachEventListeners();
   }
 
   get selectedChest(): any {
@@ -56,7 +63,7 @@ export class ChestInfoModal extends HTMLElement {
     this.removeEventListener(EVENTS.CHEST_INFO_BUTTON_CLICKED, () => {});
   }
 
-  private attachListeners(): void {
+  private attachEventListeners(): void {
     if (!this.shadowRoot) return;
 
     const closeIcon = this.shadowRoot.querySelector(
@@ -71,22 +78,66 @@ export class ChestInfoModal extends HTMLElement {
       this.state.showMore = !this.state.showMore;
       this.updateDescription();
     });
+    document.addEventListener(EVENTS.CHEST_SELECTED, this.updateChestSelected);
+    document.addEventListener(EVENTS.CHEST_INFO_BUTTON_CLICKED, this.show);
   }
 
-  private attachEventListeners(): void {
+  private updateChestSelected(event: any): void {
+    this.state.selectedChest = event.detail.selectedChest;
+    this.state.loading = false;
+
+    this.updateImage();
+    this.updateChestTitle();
+    this.updateRewards();
+    this.updateDescription();
+  }
+
+  private updateRewards(): void {
     if (!this.shadowRoot) return;
+    const rewards = this.shadowRoot.querySelector(
+      '.rewards-item__container--inner',
+    ) as HTMLElement;
+    rewards.innerHTML = sortRewards(this.state.selectedChest.rewardList)
+      .map((reward: any) => {
+        return html`
+          <div
+            class="rewards-item__container bg-${reward.itemRarity.toLowerCase()}"
+          >
+            <div class="icon-name">
+              <img
+                class="reward-icon"
+                src="${urlFor(reward.rewardImage.asset._ref)
+                  .width(40)
+                  .height(40)
+                  .url()}"
+                alt="key icon"
+              />
+              <div class="reward-name">${reward.rewardName}</div>
+            </div>
+            <div class="reward ${reward.itemRarity.toLowerCase()}">
+              ${reward.itemRarity}
+            </div>
+          </div>
+        `;
+      })
+      .join('');
+  }
 
-    document.addEventListener(EVENTS.CHEST_SELECTED, (event: any) => {
-      this.state.selectedChest = event.detail.selectedChest;
-      this.state.loading = false;
-      this.render();
-      this.attachListeners();
-      this.updateDescription();
-    });
+  private updateImage(): void {
+    if (!this.shadowRoot) return;
+    const image = this.shadowRoot.querySelector(
+      '.chest__image',
+    ) as HTMLImageElement;
+    image.src = urlFor(this.state.selectedChest.chestImage.asset._ref)
+      .width(280)
+      .height(280)
+      .url();
+  }
 
-    document.addEventListener(EVENTS.CHEST_INFO_BUTTON_CLICKED, () => {
-      this.show();
-    });
+  private updateChestTitle(): void {
+    if (!this.shadowRoot) return;
+    const title = this.shadowRoot.querySelector('.chest__title') as HTMLElement;
+    title.innerText = this.state.selectedChest.chestName;
   }
 
   public show(): void {
@@ -409,32 +460,23 @@ export class ChestInfoModal extends HTMLElement {
               alt="close icon"
             />
           </div>
-          ${
-            this.state.loading
-              ? html`<div>Loading...</div>`
-              : html`
+
                   <div class="info-modal__header">
                     <img
                       class="chest__image"
-                      src="${urlFor(
-                        this.state.selectedChest.chestImage.asset._ref,
-                      )
-                        .width(280)
-                        .height(280)
-                        .url()}"
+                      src=""
                       alt="Chest"
                     />
                     <div class="chest__placeholder"></div>
                     <div class="chest__header-text">
                       <span class="chest__title"
-                        >${this.state.selectedChest.chestName}</span
+                        ></span
                       >
                       <p class="chest__description"></p>
                       <span class="show-more">Show More</span>
                     </div>
                   </div>
-                `
-          }
+                
           <div class="line"></div>
           <div class="section-title">
             <p>Reward</p>
@@ -444,36 +486,6 @@ export class ChestInfoModal extends HTMLElement {
           <div class="rewards__container">
             <div class="rewards-list__container--outer">
             <div class="rewards-item__container--inner">
-            ${
-              this.state.loading && !this.state.selectedChest
-                ? html`<div>Loading...</div>`
-                : sortRewards(this.state.selectedChest.rewardList)
-                    .map((reward: any) => {
-                      return html`
-                        <div
-                          class="rewards-item__container bg-${reward.itemRarity.toLowerCase()}"
-                        >
-                          <div class="icon-name">
-                            <img
-                              class="reward-icon"
-                              src="${urlFor(reward.rewardImage.asset._ref)
-                                .width(40)
-                                .height(40)
-                                .url()}"
-                              alt="key icon"
-                            />
-                            <div class="reward-name">${reward.rewardName}</div>
-                          </div>
-                          <div
-                            class="reward ${reward.itemRarity.toLowerCase()}"
-                          >
-                            ${reward.itemRarity}
-                          </div>
-                        </div>
-                      `;
-                    })
-                    .join('')
-            }
             </div>
               </div>
             </div>
