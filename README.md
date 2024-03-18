@@ -73,7 +73,6 @@ Focused on the fusion of technology and creativity, this project demonstrates wh
 
 <p align="right">(<a href="#readme-top">back to top</a>)</p>
 
-
 ## Getting Started
 
 To set up this project locally and explore the immersive 3D chest-opening experience, follow these steps.
@@ -97,8 +96,6 @@ curl https://bun.sh/install | bash
 git clone https://github.com/your_username/loot-chest.git
 cd loot-chest
 ```
-
-
 
 2. Install dependencies using either npm (Node.js) or Bun. Choose the command based on your preference:
 
@@ -129,11 +126,11 @@ Set up your environment variables: Rename the .env.example file to .env and upda
 
 - PORT: The port your local server will run on (e.g., 3000).
 
-- VITE_API_URL: Your backend API URL. Replace <your_api_url> with the actual API URL.
+- VITE_API_URL: Your backend API URL. Replace `<your_api_url>` with the actual API URL.
 
-- VITE_SANITY_PROJECT_ID and VITE_SANITY_DATASET: Replace <your_sanity_project_id> and <your_sanity_dataset> with your Sanity project ID and dataset name. These are necessary for connecting to Sanity.io.
+- VITE_SANITY_PROJECT_ID and VITE_SANITY_DATASET: Replace `<your_sanity_project_id>` and `<your_sanity_dataset>` with your Sanity project ID and dataset name. These are necessary for connecting to Sanity.io.
 
-Visit the [backend repository](https://github.com/vinnyhoward/loot-chest-backend) for instructions on setting up your <your_api_url>.
+Visit the [backend repository](https://github.com/vinnyhoward/loot-chest-backend) for instructions on setting up your `<your_api_url>`.
 
 Visit the [cms repository](https://github.com/vinnyhoward/loot-chest-cms) for instructions on setting up your Sanity environment started.
 
@@ -158,10 +155,21 @@ Now, you're ready to dive into the project and start exploring the 3D chest-open
 
 <p align="right">(<a href="#readme-top">back to top</a>)</p>
 
-
 ## Usage
+This platform is designed to deliver a captivating and interactive experience through several core features:
 
-WIP
+### Authentication
+**Sign Up & Log In:** Securely create and access your account to start your adventure.
+Password Reset: Easily recover access in case you forget your password, ensuring you're never locked out of the action.
+
+### Key Opening Experience
+**Daily Keys:** Receive a key daily when you sign up or log in, unlocking the opportunity to open a chest.
+Choose Your Chest: Use your key to open any chest you choose, each containing unique rewards waiting to be discovered.
+
+### Leader boards
+**Compete and Compare** View the leaderboard to see how your rewards stack up against the community, fostering a competitive yet friendly environment.
+Track Your Achievements: Access your history of opened chests and rewards, celebrating your progress and strategizing for future openings.
+Whether you're here to compete, collect, or simply explore, these features are designed to ensure a rich, engaging experience for every user. Dive into the adventure and see what treasures await!
 
 <p align="right">(<a href="#readme-top">back to top</a>)</p>
 
