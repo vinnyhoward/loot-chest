@@ -188,7 +188,6 @@ Distributed under the MIT License. See `LICENSE.txt` for more information.
 
 <p align="right">(<a href="#readme-top">back to top</a>)</p>
 
-
 ## Contact
 
 Vincent Howard - [@NiftyDeveloper](https://twitter.com/NiftyDeveloper) - vincenguyenhoward@gmail.com
@@ -199,10 +198,7 @@ Project Link: [https://github.com/vinnyhoward/loot-chest](https://github.com/vin
 
 ## Acknowledgments
 
-WIP
-
-* [Choose an Open Source License](https://choosealicense.com)
-
+This project wouldn't be as rich and immersive without the incredible assets created by the talented team over at [Spacestation Animation](https://www.spacestationanimation.com/)
 
 <p align="right">(<a href="#readme-top">back to top</a>)</p>
 
