@@ -13,6 +13,20 @@ export enum Duration {
   MEDIUM = 4000,
   LONG = 6000,
 }
+
+export interface ButtonProps {
+  buttonTitle: string;
+  buttonType: string;
+  buttonColor: string;
+  textColor: string;
+  buttonAction: () => void;
+  loading: boolean;
+}
+
+export interface BrandButtonElement extends HTMLElement {
+  buttonValues: ButtonProps;
+}
+
 export interface UserAuthStorage {
   id: string;
   lastCheckedTokenAward: string;

@@ -4,7 +4,8 @@ import { html } from '../../utils/html';
 import { fetchAllPrizes, fetchUserPrizes } from '../../services/prizes';
 import { urlFor } from '../../services/sanity';
 import { timeAgo } from '../../utils/timeAgo';
-import { UserAuthStorage } from '../../types';
+import { UserAuthStorage, BrandButtonElement } from '../../types';
+import '../brand-button/brand-button';
 
 enum SelectedSection {
   WINS = 'WINS',
@@ -106,25 +107,47 @@ export class SideMenu extends HTMLElement {
   private loginButtonListener(): void {
     if (!this.shadowRoot) return;
     const loginButton = this.shadowRoot?.querySelector(
-      '.login-btn',
+      'brand-button#login-btn',
+    ) as BrandButtonElement;
+    const profileInfoEl = this.shadowRoot?.querySelector(
+      '.profile__info',
     ) as HTMLElement;
-    loginButton?.addEventListener('click', () => {
-      document.dispatchEvent(new CustomEvent(EVENTS.SHOW_LOGIN_MENU));
-      console.log('login button clicked');
-      this.hide();
-    });
+    if (loginButton) {
+      profileInfoEl.style.display = 'block';
+      loginButton.buttonValues = {
+        buttonTitle: 'Login',
+        buttonType: 'button',
+        buttonColor: '#974af4',
+        textColor: 'white',
+        loading: false,
+        buttonAction: () => {
+          console.log('login button clicked');
+          document.dispatchEvent(new CustomEvent(EVENTS.SHOW_LOGIN_MENU));
+          this.hide();
+        },
+      };
+    }
 
     const logoutButton = this.shadowRoot?.querySelector(
-      '.logout-btn',
-    ) as HTMLElement;
-
-    logoutButton?.addEventListener('click', () => {
-      console.log('logout button clicked');
-      document.dispatchEvent(new CustomEvent(EVENTS.LOGOUT));
-      this.renderProfile();
-      this.fetchUserPrizes();
-      this.loginButtonListener();
-    });
+      'brand-button#logout-btn',
+    ) as BrandButtonElement;
+    if (logoutButton) {
+      profileInfoEl.style.display = 'flex';
+      logoutButton.buttonValues = {
+        buttonTitle: 'Logout',
+        buttonType: 'button',
+        buttonColor: '#974af4',
+        textColor: 'white',
+        loading: false,
+        buttonAction: () => {
+          console.log('logout button clicked');
+          document.dispatchEvent(new CustomEvent(EVENTS.LOGOUT));
+          this.renderProfile();
+          this.fetchUserPrizes();
+          this.loginButtonListener();
+        },
+      };
+    }
 
     document.addEventListener(EVENTS.LOGIN_SUCCESS, () => {
       this.renderProfile();
@@ -359,7 +382,7 @@ export class SideMenu extends HTMLElement {
           <h3 class="header">My Past Rewards</h3>
         </div>
         <div class="profile__info">
-          <button class="login-btn">Login</button>
+          <brand-button id="login-btn">Login</brand-button>
         </div>
       `;
     } else {
@@ -373,7 +396,7 @@ export class SideMenu extends HTMLElement {
 
         <div class="users-interaction">
           <div class="logout-btn__container">
-            <button class="logout-btn">Logout</button>
+            <brand-button id="logout-btn">Logout</brand-button>
           </div>
           <div class="profile__info">
             <div class="profile-image__container">

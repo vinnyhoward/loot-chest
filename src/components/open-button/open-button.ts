@@ -138,7 +138,6 @@ export class OpenButton extends HTMLElement {
       }
     } else {
       if (userObject && !userObject.lastCheckedTokenAward) {
-        console.log('checking else');
         userObject.lastCheckedTokenAward = currentDate.toISOString();
         localStorage.setItem('user_auth', JSON.stringify(userObject));
         this.awardAndFetchKeys();
