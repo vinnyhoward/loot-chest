@@ -19,8 +19,9 @@ export interface ButtonProps {
   buttonType: string;
   buttonColor: string;
   textColor: string;
-  buttonAction: () => void;
+  buttonAction: ((arg?: any) => void) | ((arg?: any) => Promise<void>);
   loading: boolean;
+  disabled?: boolean;
 }
 
 export interface BrandButtonElement extends HTMLElement {

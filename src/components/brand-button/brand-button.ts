@@ -1,6 +1,7 @@
 import gsap from 'gsap';
 import { html } from '../../utils/html';
 import { ButtonProps } from '../../types';
+import '../loader/loader';
 
 export class BrandButton extends HTMLElement {
   private state: ButtonProps;
@@ -15,6 +16,7 @@ export class BrandButton extends HTMLElement {
       textColor: '#ffffff',
       buttonAction: () => {},
       loading: false,
+      disabled: false,
     };
   }
 
@@ -32,23 +34,42 @@ export class BrandButton extends HTMLElement {
     this.updateButton();
   }
 
+  set disabled(isDisabled: boolean) {
+    this.state.disabled = isDisabled;
+    this.updateButton();
+  }
+
   updateButton() {
     if (!this.shadowRoot) return;
-    const buttonElement = this.shadowRoot.querySelector('button');
-    if (buttonElement) {
-      buttonElement.innerText = this.state.loading
-        ? 'Loading...'
-        : this.state.buttonTitle;
-      buttonElement.setAttribute('type', this.state.buttonType);
-      buttonElement.style.backgroundColor = this.state.buttonColor;
-      buttonElement.style.color = this.state.textColor;
 
-      if (this.currentButtonAction) {
-        buttonElement.removeEventListener('click', this.currentButtonAction);
-      }
-      if (!this.state.loading) {
-        this.currentButtonAction = this.state.buttonAction;
-        buttonElement.addEventListener('click', this.currentButtonAction);
+    const loaderElement = this.shadowRoot.querySelector(
+      'loader-component',
+    ) as HTMLElement;
+    const buttonElement = this.shadowRoot.querySelector(
+      'button',
+    ) as HTMLButtonElement;
+
+    if (this.state.loading) {
+      if (loaderElement) loaderElement.style.display = 'block';
+      if (buttonElement) buttonElement.style.display = 'none';
+    } else {
+      if (loaderElement) loaderElement.style.display = 'none';
+      if (buttonElement) {
+        buttonElement.style.display = 'block';
+        buttonElement.innerText = this.state.buttonTitle;
+        buttonElement.setAttribute('type', this.state.buttonType);
+        buttonElement.style.backgroundColor = this.state.buttonColor;
+        buttonElement.style.color = this.state.textColor;
+        buttonElement.disabled = this.state.disabled || false;
+
+        if (this.currentButtonAction) {
+          buttonElement.removeEventListener('click', this.currentButtonAction);
+        }
+
+        if (!this.state.disabled) {
+          this.currentButtonAction = this.state.buttonAction;
+          buttonElement.addEventListener('click', this.currentButtonAction);
+        }
       }
     }
   }
@@ -83,10 +104,10 @@ export class BrandButton extends HTMLElement {
     if (!buttonElement) {
       this.shadowRoot.innerHTML = html`
         <style>
-          {
-            @import url('https://fonts.googleapis.com/css2?family=Montserrat:ital,wght@0,100..900;1,100..900&display=swap');
-            @import url('https://fonts.googleapis.com/css2?family=Hind:wght@300;400;500;600;700&family=Montserrat:ital,wght@0,100..900;1,100..900&display=swap');
-          }
+            {
+                @import url('https://fonts.googleapis.com/css2?family=Montserrat:ital,wght@0,100..900;1,100..900&display=swap');
+                @import url('https://fonts.googleapis.com/css2?family=Hind:wght@300;400;500;600;700&family=Montserrat:ital,wght@0,100..900;1,100..900&display=swap');
+            }
 
           * {
             margin: 0;
@@ -100,7 +121,6 @@ export class BrandButton extends HTMLElement {
             --rare: #7a5bf0;
             --legendary: #be47d0;
             --divine: #db9f45;
-
 
             --bg-common: #5e98d9;
             --bg-uncommon: #4b69ff;
@@ -126,6 +146,11 @@ export class BrandButton extends HTMLElement {
             font-size: 14px;
             cursor: pointer;
             text-transform: uppercase;
+          }
+
+          button:disabled {
+            background-color: #ccc;
+            cursor: not-allowed;
           }
         </style>
         <button></button>

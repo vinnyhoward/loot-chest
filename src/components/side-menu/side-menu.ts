@@ -121,7 +121,6 @@ export class SideMenu extends HTMLElement {
         textColor: 'white',
         loading: false,
         buttonAction: () => {
-          console.log('login button clicked');
           document.dispatchEvent(new CustomEvent(EVENTS.SHOW_LOGIN_MENU));
           this.hide();
         },
@@ -140,7 +139,6 @@ export class SideMenu extends HTMLElement {
         textColor: 'white',
         loading: false,
         buttonAction: () => {
-          console.log('logout button clicked');
           document.dispatchEvent(new CustomEvent(EVENTS.LOGOUT));
           this.renderProfile();
           this.fetchUserPrizes();
