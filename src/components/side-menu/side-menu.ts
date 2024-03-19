@@ -4,6 +4,7 @@ import { html } from '../../utils/html';
 import { fetchAllPrizes, fetchUserPrizes } from '../../services/prizes';
 import { urlFor } from '../../services/sanity';
 import { timeAgo } from '../../utils/timeAgo';
+import { UserAuthStorage } from '../../types';
 
 enum SelectedSection {
   WINS = 'WINS',
@@ -263,7 +264,8 @@ export class SideMenu extends HTMLElement {
   }
 
   private async fetchUserPrizes(): Promise<void> {
-    const user = JSON.parse(localStorage.getItem('user_auth') || '{}');
+    const user: string = JSON.parse(localStorage.getItem('user_auth') || '{}');
+
     if (Object.keys(user).length === 0) {
       return this.renderUsersRewards();
     }
@@ -347,7 +349,9 @@ export class SideMenu extends HTMLElement {
     );
 
     if (!profileContainer) return;
-    const user = JSON.parse(localStorage.getItem('user_auth') || '{}');
+    const user: UserAuthStorage = JSON.parse(
+      localStorage.getItem('user_auth') || '{}',
+    );
 
     if (Object.keys(user).length === 0) {
       profileContainer.innerHTML = html`

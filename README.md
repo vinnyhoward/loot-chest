@@ -177,7 +177,7 @@ Whether you're here to compete, collect, or simply explore, these features are d
 
 - [ ] Add onboarding modal
 - [ ] Roulette chest opening experience
-- [ ] Forgot Password/Reset Password  needs a expired token flow
+- [ ] Forgot Password/Reset Password needs a expired token flow
 - [ ] Welcome to Loot Chest email
 
 <p align="right">(<a href="#readme-top">back to top</a>)</p>

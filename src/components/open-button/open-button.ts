@@ -1,6 +1,12 @@
 import gsap from 'gsap';
 import { v4 as uuidv4 } from 'uuid';
-import { Notification, NotificationType, Duration, Keys } from '../../types';
+import {
+  Notification,
+  NotificationType,
+  Duration,
+  Keys,
+  UserAuthStorage,
+} from '../../types';
 import { EVENTS } from '../../constants/events';
 import { html } from '../../utils/html';
 import { awardKey, fetchUserKeys } from '../../services/keys';
@@ -31,6 +37,7 @@ export class OpenButton extends HTMLElement {
     this.handleChestSelected = this.handleChestSelected.bind(this);
     this.handleLoginSuccess = this.handleLoginSuccess.bind(this);
     this.handleOpen = this.handleOpen.bind(this);
+    this.handleActiveTab = this.handleActiveTab.bind(this);
   }
 
   connectedCallback(): void {
@@ -60,6 +67,7 @@ export class OpenButton extends HTMLElement {
 
   async awardAndFetchKeys(): Promise<void> {
     const userIsAwarded = await awardKey();
+    const userKeys: Keys[] = await fetchUserKeys();
     if (userIsAwarded) {
       const detail: Notification = {
         // TODO: Make dynamic based on key amount and just 3
@@ -68,6 +76,7 @@ export class OpenButton extends HTMLElement {
         id: uuidv4(),
         type: NotificationType.AWARDED,
         duration: Duration.LONG,
+        keyAmount: userKeys.length,
       };
       document.dispatchEvent(
         new CustomEvent(EVENTS.TOAST_SUCCESS, {
@@ -77,7 +86,6 @@ export class OpenButton extends HTMLElement {
         }),
       );
     }
-    const userKeys: Keys[] = await fetchUserKeys();
     if (userKeys) {
       this.state.userKeys = userKeys;
     }
@@ -90,6 +98,8 @@ export class OpenButton extends HTMLElement {
     document.addEventListener(EVENTS.LOGIN_SUCCESS, () =>
       this.handleLoginSuccess(),
     );
+    document.addEventListener('visibilitychange', this.handleActiveTab);
+
     const openButton = this.shadowRoot.querySelector('.open__container');
     openButton?.addEventListener('click', this.handleOpen);
   }
@@ -103,6 +113,37 @@ export class OpenButton extends HTMLElement {
     document.removeEventListener(EVENTS.LOGIN_SUCCESS, this.handleLoginSuccess);
     const openButton = this.shadowRoot?.querySelector('.open__container');
     openButton?.removeEventListener('click', this.handleOpen);
+  }
+
+  private handleActiveTab(): void {
+    const userString: string | null = localStorage.getItem('user_auth');
+    const userObject: UserAuthStorage | null = userString
+      ? JSON.parse(userString)
+      : null;
+    const currentDate: Date = new Date();
+    const HOURS_THRESHOLD: number = 4;
+    if (
+      userObject &&
+      userObject.lastCheckedTokenAward &&
+      document.visibilityState === 'visible'
+    ) {
+      const lastCheckedDate: Date = new Date(userObject.lastCheckedTokenAward);
+      const hoursDiff: number =
+        (currentDate.getTime() - lastCheckedDate.getTime()) / (1000 * 60 * 60);
+
+      if (hoursDiff > HOURS_THRESHOLD) {
+        userObject.lastCheckedTokenAward = currentDate.toISOString();
+        localStorage.setItem('user_auth', JSON.stringify(userObject));
+        this.awardAndFetchKeys();
+      }
+    } else {
+      if (userObject && !userObject.lastCheckedTokenAward) {
+        console.log('checking else');
+        userObject.lastCheckedTokenAward = currentDate.toISOString();
+        localStorage.setItem('user_auth', JSON.stringify(userObject));
+        this.awardAndFetchKeys();
+      }
+    }
   }
 
   async handleOpen(): Promise<void> {

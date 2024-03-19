@@ -3,7 +3,7 @@ import {
   getAllPrizesUrl,
   getUserPrizesUrl,
 } from '../api/index';
-import { UserLocalStorage, PrizeFields } from '../types/index';
+import { UserAuthStorage, PrizeFields } from '../types/index';
 
 export const savePrize = async (body: PrizeFields) => {
   try {
@@ -14,7 +14,7 @@ export const savePrize = async (body: PrizeFields) => {
       throw new Error('User not found');
     }
 
-    const user: UserLocalStorage = JSON.parse(stringifiedUser);
+    const user: UserAuthStorage = JSON.parse(stringifiedUser);
     const userId = user.id;
     const response = await fetch(savePrizeFulfillmentUrl(), {
       method: 'POST',

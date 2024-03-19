@@ -1,5 +1,5 @@
 import { getAllChestsUrl, openChestUrl } from '../api/index';
-import { UserLocalStorage } from '../types/index';
+import { UserAuthStorage } from '../types/index';
 
 export const fetchAssets = async () => {
   try {
@@ -24,7 +24,7 @@ export const openChest = async (chestId: string, keyId: string) => {
     if (!stringifiedUser || !token) {
       throw new Error('User not found');
     }
-    const user: UserLocalStorage = JSON.parse(stringifiedUser);
+    const user: UserAuthStorage = JSON.parse(stringifiedUser);
     const userId = user.id;
     const response = await fetch(openChestUrl(chestId), {
       method: 'POST',

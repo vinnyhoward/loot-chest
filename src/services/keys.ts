@@ -1,5 +1,5 @@
 import { awardKeyUrl, fetchUserKeysUrl } from '../api/index';
-import { UserLocalStorage } from '../types/index';
+import { UserAuthStorage } from '../types/index';
 
 export const awardKey = async () => {
   try {
@@ -10,7 +10,7 @@ export const awardKey = async () => {
       throw new Error('User not found');
     }
 
-    const user: UserLocalStorage = JSON.parse(stringifiedUser);
+    const user: UserAuthStorage = JSON.parse(stringifiedUser);
     const userId = user.id;
     const response = await fetch(awardKeyUrl(), {
       method: 'GET',
@@ -41,7 +41,7 @@ export const fetchUserKeys = async () => {
       throw new Error('User not found');
     }
 
-    const user: UserLocalStorage = JSON.parse(stringifiedUser);
+    const user: UserAuthStorage = JSON.parse(stringifiedUser);
     const userId = user.id;
     const response = await fetch(fetchUserKeysUrl(userId), {
       method: 'GET',

@@ -13,6 +13,12 @@ export enum Duration {
   MEDIUM = 4000,
   LONG = 6000,
 }
+export interface UserAuthStorage {
+  id: string;
+  lastCheckedTokenAward: string;
+  email: string;
+  username: string;
+}
 
 export interface Notification {
   title: string;
@@ -22,12 +28,7 @@ export interface Notification {
   type: NotificationType;
   duration: Duration;
   currentDuration?: number;
-}
-
-export interface UserLocalStorage {
-  id: string;
-  username: string;
-  email: string;
+  keyAmount?: number;
 }
 
 export interface Keys {
