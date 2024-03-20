@@ -167,7 +167,7 @@ Password Reset: Easily recover access in case you forget your password, ensuring
 Choose Your Chest: Use your key to open any chest you choose, each containing unique rewards waiting to be discovered.
 
 ### Leader boards
-**Compete and Compare** View the leaderboard to see how your rewards stack up against the community, fostering a competitive yet friendly environment.
+**Compete and Compare:** View the leaderboard to see how your rewards stack up against the community, fostering a competitive yet friendly environment.
 Track Your Achievements: Access your history of opened chests and rewards, celebrating your progress and strategizing for future openings.
 Whether you're here to compete, collect, or simply explore, these features are designed to ensure a rich, engaging experience for every user. Dive into the adventure and see what treasures await!
 
@@ -214,7 +214,7 @@ This project wouldn't be as rich and immersive without the incredible assets cre
 [license-shield]: https://img.shields.io/github/license/othneildrew/Best-README-Template.svg?style=for-the-badge
 [license-url]: https://github.com/othneildrew/Best-README-Template/blob/master/LICENSE.txt
 [linkedin-shield]: https://img.shields.io/badge/-LinkedIn-black.svg?style=for-the-badge&logo=linkedin&colorB=555
-[linkedin-url]: https://linkedin.com/in/othneildrew
+[linkedin-url]: https://www.linkedin.com/in/vinnyhoward/
 [product-screenshot]: public/images/product_image.png
 [Next.js]: https://img.shields.io/badge/next.js-000000?style=for-the-badge&logo=nextdotjs&logoColor=white
 [Next-url]: https://nextjs.org/
