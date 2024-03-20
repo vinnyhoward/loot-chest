@@ -4,7 +4,7 @@
 
 <br />
 <div align="center">
-  <a href="https://github.com/othneildrew/Best-README-Template">
+  <a href="hhttps://lootchest.lol/">
     <img src="public/logos/temp_logo.png" alt="Logo" width="80%">
   </a>
 
@@ -93,7 +93,7 @@ curl https://bun.sh/install | bash
 1. Clone the repository to get a local copy of the project:
 
 ```sh
-git clone https://github.com/your_username/loot-chest.git
+git clone https://github.com/vinnyhoward/loot-chest.git
 cd loot-chest
 ```
 
