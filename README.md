@@ -114,7 +114,6 @@ bun install
 3. Configure environment variables by creating a .env file in the root directory of the project. Fill it with your specific values based on the provided .env template:
 
 ```makefile
-Copy code
 PORT=3000
 VITE_API_URL=<your_api_url>
 
