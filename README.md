@@ -46,7 +46,11 @@
 
 ## About The Project
 
-[![Product Name Screen Shot][product-screenshot]](/public/images/product_image.png)
+<!-- ![View of Product Design](/public/images/product_image.png) -->
+[![Product Name Screen Shot][figma-screenshot]](/public/images/product_image.png)
+
+For a detailed view of the design, visit the [Figma project](https://www.figma.com/file/yo4yZHmceBc5z21Vr7i3L2/Loot-Chest?type=design&node-id=182%3A359&mode=design&t=C6DMpQkKM9eEPxM9-1).
+
 
 This project introduces a unique web-based 3D chest-opening experience, designed to captivate users with interactive visualizations and dynamic content. It stands out by providing a seamless and engaging exploration of virtual treasures, continuously evolving through updates in content management.
 
@@ -215,6 +219,7 @@ This project wouldn't be as rich and immersive without the incredible assets cre
 [linkedin-shield]: https://img.shields.io/badge/-LinkedIn-black.svg?style=for-the-badge&logo=linkedin&colorB=555
 [linkedin-url]: https://www.linkedin.com/in/vinnyhoward/
 [product-screenshot]: public/images/product_image.png
+[figma-screenshot]: public/images/figma_preview.png
 [Next.js]: https://img.shields.io/badge/next.js-000000?style=for-the-badge&logo=nextdotjs&logoColor=white
 [Next-url]: https://nextjs.org/
 [React.js]: https://img.shields.io/badge/React-20232A?style=for-the-badge&logo=react&logoColor=61DAFB
