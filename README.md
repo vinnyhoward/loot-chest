@@ -12,7 +12,7 @@
     A unique chest opening platform
     <br />
     <br />
-    <a href="https://lootchest.lol/">View Site</a>
+    <a href="https://main--lootchest.netlify.app/">View Site</a>
     ·
     <a href="https://github.com/vinnyhoward/loot-chest/issues">Report Bug</a>
     ·
@@ -223,7 +223,7 @@ This project wouldn't be as rich and immersive without the incredible assets cre
 [Next.js]: https://img.shields.io/badge/next.js-000000?style=for-the-badge&logo=nextdotjs&logoColor=white
 [Next-url]: https://nextjs.org/
 [React.js]: https://img.shields.io/badge/React-20232A?style=for-the-badge&logo=react&logoColor=61DAFB
-[React-url]: https://reactjs.org/
+[React-url]: https://reactjs.org/🏃🏻‍➡️
 [Vue.js]: https://img.shields.io/badge/Vue.js-35495E?style=for-the-badge&logo=vuedotjs&logoColor=4FC08D
 [Vue-url]: https://vuejs.org/
 [Angular.io]: https://img.shields.io/badge/Angular-DD0031?style=for-the-badge&logo=angular&logoColor=white
